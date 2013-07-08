@@ -49,7 +49,7 @@ const vector<APNGFrame>& APNGAsm::loadAnimationSpec(const string &filePath)
 //Assembles and outputs an APNG file
 //Returns the assembled file object
 //If no output path is specified only the file object is returned
-FILE* APNGAsm::assemble(const string &outputPath)
+FILE* APNGAsm::assemble(const string &outputPath) const
 {
 	return NULL;
 }

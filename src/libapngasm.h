@@ -39,7 +39,7 @@ public:
 	//Assembles and outputs an APNG file
 	//Returns the assembled file object
 	//If no output path is specified only the file object is returned
-	FILE* assemble(const string &outputPath);
+	FILE* assemble(const string &outputPath) const;
 
 private:
 	//Loads an animation spec from JSON
