@@ -2,6 +2,7 @@
 #define _LIBAPNGASM_H_
 
 
+#include <cstdio>
 #include <string>
 #include <vector>
 #include "apngframe.h"
