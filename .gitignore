@@ -1,2 +1,8 @@
 *.swp
 *.swo
+/CMakeFiles
+/CMakeCache.txt
+/Makefile
+/apngasm
+/cmake_install.cmake
+
