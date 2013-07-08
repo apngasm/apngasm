@@ -1,6 +1,6 @@
-#inlucde "libapngasm.h"
+#include "libapngasm.h"
 #include <string>
-namespace std;
+using namespace std;
 
 //Construct APNGAsm object
 APNGAsm::APNGAsm(void){}
@@ -38,10 +38,10 @@ APNGAsm& APNGAsm::operator << (const APNGFrame &frame)
 //Loads an animation spec from JSON or XML
 //Returns a frame vector with the loaded frames
 //Loaded frames are added to the end of the frame vector
-const vector<APNGFrame>& loadAnimationSpec(const string &filePath)
+const vector<APNGFrame>& APNGAsm::loadAnimationSpec(const string &filePath)
 {
 	const bool isJSON = true;
-	const vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath));
+	const vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
 	frames.insert(frames.end(), newFrames.begin(), newFrames.end());
 	return frames;
 }
@@ -55,20 +55,21 @@ FILE* APNGAsm::assemble(const string &outputPath)
 }
 
 // private static object
+namespace
 {
 	vector<APNGFrame> tmpFrames;
 }
 
 //Loads an animation spec from JSON
 //Returns a frame vector with the loaded frames
-const vector<APNGFrame>& loadJSONSpec(const string &filePath)
+const vector<APNGFrame>& APNGAsm::loadJSONSpec(const string &filePath)
 {
 	return tmpFrames;
 }
 
 //Loads an animation spec from XML
 //Returns a frame vector with the loaded frames
-const vector<APNGFrame>& loadXMLSpec(const string &filePath)
+const vector<APNGFrame>& APNGAsm::loadXMLSpec(const string &filePath)
 {
 	return tmpFrames;
 }

@@ -34,7 +34,7 @@ public:
 	//Loads an animation spec from JSON or XML
 	//Returns a frame vector with the loaded frames
 	//Loaded frames are added to the end of the frame vector
-	cosnt vector<APNGFrame>& loadAnimationSpec(const string &filePath);
+	const vector<APNGFrame>& loadAnimationSpec(const string &filePath);
 
 	//Assembles and outputs an APNG file
 	//Returns the assembled file object
