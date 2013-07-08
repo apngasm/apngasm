@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(apngasm)
-include_directories("${PROJECT_SOURCE_DIR}/src")
-add_executable(apngasm src/apngasm.cpp src/libapngasm.cpp)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+add_executable(apngasm src/apngasm.cpp)
+add_library(apngasm-dev SHARED src/libapngasm.cpp src/apngframe.cpp)
+target_link_libraries(apngasm apngasm-dev)
