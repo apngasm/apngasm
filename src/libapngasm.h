@@ -3,15 +3,17 @@
 
 
 #include <stdio.h>
-
+#include <string>
 #include <vector>
 using namespace std;
+
+class APNGFrame;
 
 class APNGAsm
 {
 public:
-	Vector<APNGFrame> frames;
-	void APNGAsm(Vector<APNGFrame> frames = NULL);
+	vector<APNGFrame> frames;
+	APNGAsm(vector<APNGFrame> frames = NULL);
 
 	//Adds a frame from a file
 	//Returns the frame number in the frame vector
@@ -25,7 +27,7 @@ public:
 	//Loads an animation spec from JSON or XML
 	//Returns a frame vector with the loaded frames
 	//Loaded frames are added to the end of the frame vector
-	Vector<APNGFrame> loadAnimationSpec(string filePath);
+	vector<APNGFrame> loadAnimationSpec(string filePath);
 
 	//Assembles and outputs an APNG file
 	//Returns the assembled file object
@@ -33,8 +35,8 @@ public:
 	FILE* assemble(string outputPath);
 
 private:
-	Vector<APNGFrame> loadJSONSpec(string filePath);
-	Vector<APNGFrame> loadXMLSpec(string filePath);
+	vector<APNGFrame> loadJSONSpec(string filePath);
+	vector<APNGFrame> loadXMLSpec(string filePath);
 };
 
 //Individual APNG frame
@@ -45,6 +47,6 @@ public:
 	int delay;
 
 private:
-}
+};
 
 #endif /* _LIBAPNGASM_H_ */
