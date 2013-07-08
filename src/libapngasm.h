@@ -2,9 +2,9 @@
 #define _LIBAPNGASM_H_
 
 
-#include <stdio.h>
-
+#include <string>
 #include <vector>
+#include "apngframe.h"
 using namespace std;
 
 class APNGAsm
@@ -34,7 +34,7 @@ public:
 	//Loads an animation spec from JSON or XML
 	//Returns a frame vector with the loaded frames
 	//Loaded frames are added to the end of the frame vector
-	vector<APNGFrame> loadAnimationSpec(const string &filePath);
+	cosnt vector<APNGFrame>& loadAnimationSpec(const string &filePath);
 
 	//Assembles and outputs an APNG file
 	//Returns the assembled file object
