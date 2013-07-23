@@ -7,17 +7,16 @@ project(apngasm)
 # path to include files
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
+# register lib/ as a subdirectory
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib")
+
+# path to libraries
+link_directories("${PROJECT_SOURCE_DIR}/lib")
+
 # executable file and sources
 add_executable(bin/apngasm
     src/apngasm.cpp
 )
 
-# path to libraries
-link_directories("${PROJECT_BINARY_DIR}/lib")
-
 # libraries to use
-target_link_libraries(bin/apngasm lib/libapngasm)
-
-# register lib/ as a subdirectory
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib")
-
+target_link_libraries(bin/apngasm ${PROJECT_SOURCE_DIR}/lib/libapngasm.so)
