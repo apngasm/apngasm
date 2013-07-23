@@ -16,7 +16,7 @@ add_executable(bin/apngasm
 link_directories("${PROJECT_BINARY_DIR}/lib")
 
 # libraries to use
-target_link_libraries(bin/apngasm apngasm-dev)
+target_link_libraries(bin/apngasm lib/libapngasm)
 
 # register lib/ as a subdirectory
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib")

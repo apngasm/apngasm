@@ -1,10 +1,8 @@
 *.swp
 *.swo
-/CMakeFiles
-/CMakeCache.txt
-/Makefile
-/apngasm
-/cmake_install.cmake
-/libapngasm-dev.so
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
 /bin/*
 /lib/*
