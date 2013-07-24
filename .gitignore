@@ -4,5 +4,5 @@ CMakeFiles/
 CMakeCache.txt
 Makefile
 cmake_install.cmake
-/bin/*
-/lib/*
+/bin/apngasm
+/lib/libapngasm.so
