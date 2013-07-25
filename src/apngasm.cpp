@@ -2,9 +2,10 @@
 #include <iostream>
 using namespace std;
 
-int main(void)
+int main(int argc, char* argv[])
 {
-	APNGAsm hoge;
-	cout << "Initializing apngasm v2" << endl;
+	APNGAsm apngasm;
+	cout << "Initializing apngasm " << apngasm.version() << endl;
+
 	return 0;
 }

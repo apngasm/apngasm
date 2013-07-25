@@ -8,6 +8,8 @@
 #include "apngframe.h"
 using namespace std;
 
+#define APNGASM_VERSION "2.0.0"
+
 class APNGAsm
 {
 public:
@@ -29,7 +31,6 @@ public:
 	int addFrame(const APNGFrame &frame);
 	
 	//Adds an APNGFrame object to the frame vector
-	//Returns a frame vector with the added frames
 	APNGAsm& operator << (const APNGFrame &frame);
 
 	//Loads an animation spec from JSON or XML
@@ -41,6 +42,12 @@ public:
 	//Returns the assembled file object
 	//If no output path is specified only the file object is returned
 	FILE* assemble(const string &outputPath) const;
+
+	//Disassembles an APNG file
+	//Returns the frame vector
+	const vector<APNGFrame>& disassemble(const string &filePath);
+
+	string version(void);
 
 private:
 	//Loads an animation spec from JSON

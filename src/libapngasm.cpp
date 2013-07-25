@@ -11,6 +11,11 @@ APNGAsm::APNGAsm(const vector<APNGFrame> &frames)
 	this->frames.insert(this->frames.end(), frames.begin(), frames.end());
 }
 
+string APNGAsm::version(void)
+{
+	return APNGASM_VERSION;
+}
+
 //Adds a frame from a file
 //Returns the frame number in the frame vector
 //Uses default delay of 10ms if not specified
@@ -55,9 +60,15 @@ FILE* APNGAsm::assemble(const string &outputPath) const
 }
 
 // private static object
+// TODO to be removed during implementation of actual code
 namespace
 {
 	vector<APNGFrame> tmpFrames;
+}
+
+const vector<APNGFrame>& APNGAsm::disassemble(const string &filePath)
+{
+	return tmpFrames;
 }
 
 //Loads an animation spec from JSON
