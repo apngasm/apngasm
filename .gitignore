@@ -1,2 +1,9 @@
 *.swp
 *.swo
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+/bin/apngasm
+/lib/libapngasm.so
+/lib/libapngasm-static.a
