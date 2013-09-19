@@ -6,4 +6,4 @@ add_executable(apngasm-bin
 set_target_properties(apngasm-bin
 	PROPERTIES OUTPUT_NAME apngasm)
 
-target_link_libraries(apngasm-bin apngasm-static)
+target_link_libraries(apngasm-bin apngasm)

@@ -1,5 +1,6 @@
 #include "libapngasm.h"
-#include "png.h"
+#include <png.h>
+#include <cstdlib>
 #include <string>
 using namespace std;
 
