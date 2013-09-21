@@ -10,7 +10,7 @@ public:
   //Pointer to raw pixel data
   unsigned char * p;
   //Width and Height
-  unsigned int w, h; 
+  unsigned int w, h;
   //PNG color type
   unsigned char t;
   //Palette into

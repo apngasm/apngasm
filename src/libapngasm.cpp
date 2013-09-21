@@ -118,7 +118,7 @@ size_t APNGAsm::addFrame(const string &filePath, unsigned int delay_num, unsigne
             png_set_expand(png_ptr);
         }
         else
-        if (depth > 8) 
+        if (depth > 8)
         {
           png_set_expand(png_ptr);
           png_set_strip_16(png_ptr);
@@ -499,7 +499,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
           r = *sp++;
           g = *sp++;
           b = *sp++;
-          if (*sp++ == 0) 
+          if (*sp++ == 0)
             *dp++ = m_trns[1];
           else
             *dp++ = g;
@@ -513,7 +513,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
 
       if (has_tcolor==0 && colors<256)
         col[colors++].a = 0;
-        
+
       qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
 
       m_palsize = colors;
@@ -718,7 +718,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
 
       if (has_tcolor==0 && colors<256)
         col[colors++].a = 0;
-        
+
       qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
 
       m_palsize = colors;
@@ -782,7 +782,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
         g = *sp++;
         a = *sp++;
 
-        if (a != 0) 
+        if (a != 0)
         {
           if (a != 255)
             simple_trans = 0;
@@ -836,7 +836,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
         for (j=0; j<m_size; j++)
         {
           g = *sp++;
-          if (*sp++ == 0) 
+          if (*sp++ == 0)
             *dp++ = m_trns[1];
           else
             *dp++ = g;
@@ -850,7 +850,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
 
       if (has_tcolor==0 && colors<256)
         col[colors++].a = 0;
-        
+
       qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
 
       m_palsize = colors;
@@ -916,7 +916,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
       else
         has_tcolor = 1;
     }
-    
+
     if (grayscale && simple_trans && !keep_coltype) /* 3 -> 0 */
     {
       for (i=0; i<256; i++)
@@ -978,7 +978,7 @@ unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep
         m_trns[i]      = col[i].a;
         if (col[i].num != 0)
           m_palsize = i+1;
-        if (m_trns[i] != 255) 
+        if (m_trns[i] != 255)
           m_trnssize = i+1;
       }
 
@@ -1052,8 +1052,8 @@ bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int
   unsigned char * zbuf;
   FILE*           f;
   unsigned char   png_sign[8] = {137,  80,  78,  71,  13,  10,  26,  10};
-  unsigned char   png_Software[27] = { 83, 111, 102, 116, 119, 97, 114, 101, '\0', 
-                                       65,  80,  78,  71,  32, 65, 115, 115, 101, 
+  unsigned char   png_Software[27] = { 83, 111, 102, 116, 119, 97, 114, 101, '\0',
+                                       65,  80,  78,  71,  32, 65, 115, 115, 101,
                                       109,  98, 108, 101, 114, 32,  50,  46,  56};
 
   unsigned int bpp = 1;
@@ -1114,7 +1114,7 @@ bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int
 
   if ((f = fopen(outputPath.c_str(), "wb")) != 0)
   {
-    struct IHDR 
+    struct IHDR
     {
       unsigned int    mWidth;
       unsigned int    mHeight;
@@ -1125,13 +1125,13 @@ bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int
       unsigned char   mInterlaceMethod;
     } ihdr = { swap32(m_width), swap32(m_height), 8, coltype, 0, 0, 0 };
 
-    struct acTL 
+    struct acTL
     {
       unsigned int    mFrameCount;
       unsigned int    mLoopCount;
     } actl = { swap32(frames.size()-first), swap32(loops) };
 
-    struct fcTL 
+    struct fcTL
     {
       unsigned int    mSeq;
       unsigned int    mWidth;
@@ -1323,7 +1323,7 @@ bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int
 
     write_IDATs(f, frames.size()-1, zbuf, zsize, idat_size);
 
-    write_chunk(f, "tEXt", png_Software, 27); 
+    write_chunk(f, "tEXt", png_Software, 27);
     write_chunk(f, "IEND", 0, 0);
     fclose(f);
 
@@ -1443,7 +1443,7 @@ void APNGAsm::process_rect(unsigned char * row, int rowbytes, int bpp, int strid
         if (sum > mins) break;
       }
       if (sum < mins)
-      { 
+      {
         mins = sum;
         best_row = avg_row;
       }
@@ -1694,7 +1694,7 @@ void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, u
   if (diffnum == 0)
   {
     x0 = y0 = 0;
-    w0 = h0 = 1; 
+    w0 = h0 = 1;
   }
   else
   {
