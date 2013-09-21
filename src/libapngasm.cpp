@@ -215,9 +215,9 @@ const vector<APNGFrame>& APNGAsm::loadAnimationSpec(const string &filePath)
   return frames;
 }
 
-unsigned int APNGAsm::FindCommonType(void)
+unsigned char APNGAsm::FindCommonType(void)
 {
-  unsigned int coltype = frames[0].t;
+  unsigned char coltype = frames[0].t;
 
   for (size_t n = 1; n < frames.size(); ++n)
   {
@@ -241,7 +241,7 @@ unsigned int APNGAsm::FindCommonType(void)
   return coltype;
 }
 
-int APNGAsm::UpconvertToCommonType(unsigned int coltype)
+int APNGAsm::UpconvertToCommonType(unsigned char coltype)
 {
   unsigned char  * sp;
   unsigned char  * dp;
@@ -371,10 +371,8 @@ int APNGAsm::UpconvertToCommonType(unsigned int coltype)
   return 0;
 }
 
-void APNGAsm::DirtyTransparencyOptimization(unsigned int coltype)
+void APNGAsm::DirtyTransparencyOptimization(unsigned char coltype)
 {
-  unsigned int size = frames[0].w*frames[0].h;
-
   if (coltype == 6)
   {
     for (size_t n = 0; n < frames.size(); ++n)
@@ -398,7 +396,7 @@ void APNGAsm::DirtyTransparencyOptimization(unsigned int coltype)
   }
 }
 
-unsigned int APNGAsm::DownconvertOptimizations(unsigned int coltype, bool keep_palette, bool keep_coltype)
+unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype)
 {
   unsigned int     has_tcolor = 0;
   unsigned int     colors = 0;
@@ -1044,12 +1042,11 @@ unsigned int APNGAsm::DownconvertOptimizations(unsigned int coltype, bool keep_p
   return coltype;
 }
 
-bool APNGAsm::Save(const string &outputPath, unsigned int coltype, unsigned int first, unsigned int loops)
+bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
 {
   unsigned int    j, k;
   unsigned int    has_tcolor = 0;
   unsigned int    tcolor = 0;
-  unsigned int    colors = 0;
   unsigned int    i, rowbytes, imagesize;
   unsigned int    idat_size, zbuf_size, zsize;
   unsigned char * zbuf;
@@ -1363,7 +1360,7 @@ bool APNGAsm::assemble(const string &outputPath)
   m_height = frames[0].h;
   m_size   = m_width * m_height;
 
-  unsigned int coltype = FindCommonType();
+  unsigned char coltype = FindCommonType();
 
   if (UpconvertToCommonType(coltype))
     return false;

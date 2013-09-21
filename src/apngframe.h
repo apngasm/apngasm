@@ -12,7 +12,7 @@ public:
   //Width and Height
   unsigned int w, h; 
   //PNG color type
-  int t;
+  unsigned char t;
   //Palette into
   rgb pl[256];
   //Transparency info
