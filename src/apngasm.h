@@ -1,5 +1,5 @@
-#ifndef _LIBAPNGASM_H_
-#define _LIBAPNGASM_H_
+#ifndef _APNGASM_H_
+#define _APNGASM_H_
 
 
 #include <cstdio>
@@ -9,7 +9,7 @@
 #include "apngframe.h"
 using namespace std;
 
-#define APNGASM_VERSION "2.0.0"
+#define APNGASM_VERSION "2.0.3"
 
 typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
@@ -105,4 +105,4 @@ private:
     unsigned char * paeth_row;
 };
 
-#endif /* _LIBAPNGASM_H_ */
+#endif /* _APNGASM_H_ */
