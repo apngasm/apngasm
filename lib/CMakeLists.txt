@@ -13,6 +13,6 @@ find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
 target_link_libraries(apngasm ${PNG_LIBRARY})
 
-find_package(ZLIB_REQUIRED)
+#find_package(ZLIB_REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 target_link_libraries(apngasm ${ZLIB_LIBRARIES})
