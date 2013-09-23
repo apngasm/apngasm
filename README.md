@@ -26,7 +26,7 @@ make
 Building on OS-X (with homebrew):
 1. Install cmake and libpng
 ```bash
-brew install cake libpng
+brew install cmake libpng lzlib
 ```
 2. Generate makefiles with cmake
 ```bash
