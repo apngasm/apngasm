@@ -60,12 +60,12 @@ public:
 	string version(void);
 
 private:
-	unsigned int FindCommonType(void);
-	int UpconvertToCommonType(unsigned int coltype);
-	void DirtyTransparencyOptimization(unsigned int coltype);
-	unsigned int DownconvertOptimizations(unsigned int coltype, bool keep_palette, bool keep_coltype);
+	unsigned char FindCommonType(void);
+	int UpconvertToCommonType(unsigned char coltype);
+	void DirtyTransparencyOptimization(unsigned char coltype);
+	unsigned char DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
-	bool Save(const string &outputPath, unsigned int coltype, unsigned int first, unsigned int loops);
+	bool Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops);
 
 	void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 	void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
