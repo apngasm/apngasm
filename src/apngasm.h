@@ -9,7 +9,7 @@
 #include "apngframe.h"
 using namespace std;
 
-#define APNGASM_VERSION "2.0.3"
+#define APNGASM_VERSION "3.0.0"
 
 typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;

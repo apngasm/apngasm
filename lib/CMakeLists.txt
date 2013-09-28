@@ -8,6 +8,9 @@ ADD_LIBRARY(apngasm SHARED
 #	${APNGASM_SOURCE_DIR}/src/libapngasm.cpp
 #	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
 #)
+FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options) 
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}) 
+TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})                                                                                                                                                                                                                            
 
 FIND_PACKAGE(PNG REQUIRED)
 INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR})

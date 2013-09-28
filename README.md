@@ -10,9 +10,9 @@ apngasm uses CMake to provide cross platform build chains.
 For all systems first clone the repository then enter the repository directory in 
 
 Building on (Ubuntu/Debian) Linux:
-1. Install cmake and libpng
+1. Install dependencies/build chain
 ```bash
-sudo apt-get install cmake libpng-dev
+sudo apt-get install cmake libpng-dev libboost-program-options-dev
 ```
 2. Generate makefiles with cmake
 ```bash
