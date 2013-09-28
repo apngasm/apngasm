@@ -7,3 +7,8 @@ cmake_install.cmake
 /bin/apngasm
 /lib/libapngasm.so
 /lib/libapngasm-static.a
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages
+*.deb
+install_manifest.txt
