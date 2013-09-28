@@ -1,9 +1,13 @@
-link_directories(${APNGASM_BINARY_DIR}/lib)
+LINK_DIRECTORIES(${APNGASM_BINARY_DIR}/lib)
 
-add_executable(apngasm-bin
-    ${APNGASM_SOURCE_DIR}/src/apngasm.cpp
+ADD_EXECUTABLE(apngasm-cli
+    ${APNGASM_SOURCE_DIR}/src/apngasm-cli.cpp
 )
-set_target_properties(apngasm-bin
+SET_TARGET_PROPERTIES(apngasm-cli
 	PROPERTIES OUTPUT_NAME apngasm)
 
-target_link_libraries(apngasm-bin apngasm-static)
+TARGET_LINK_LIBRARIES(apngasm-cli apngasm)
+
+INSTALL(TARGETS apngasm-cli
+	RUNTIME	DESTINATION bin
+	COMPONENT applications)

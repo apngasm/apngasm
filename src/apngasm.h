@@ -1,5 +1,5 @@
-#ifndef _LIBAPNGASM_H_
-#define _LIBAPNGASM_H_
+#ifndef _APNGASM_H_
+#define _APNGASM_H_
 
 
 #include <cstdio>
@@ -9,7 +9,7 @@
 #include "apngframe.h"
 using namespace std;
 
-#define APNGASM_VERSION "2.0.0"
+#define APNGASM_VERSION "2.0.3"
 
 typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
@@ -60,12 +60,12 @@ public:
 	string version(void);
 
 private:
-	unsigned int FindCommonType(void);
-	int UpconvertToCommonType(unsigned int coltype);
-	void DirtyTransparencyOptimization(unsigned int coltype);
-	unsigned int DownconvertOptimizations(unsigned int coltype, bool keep_palette, bool keep_coltype);
+	unsigned char FindCommonType(void);
+	int UpconvertToCommonType(unsigned char coltype);
+	void DirtyTransparencyOptimization(unsigned char coltype);
+	unsigned char DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
-	bool Save(const string &outputPath, unsigned int coltype, unsigned int first, unsigned int loops);
+	bool Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops);
 
 	void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 	void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
@@ -105,4 +105,4 @@ private:
     unsigned char * paeth_row;
 };
 
-#endif /* _LIBAPNGASM_H_ */
+#endif /* _APNGASM_H_ */

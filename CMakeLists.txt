@@ -1,8 +1,21 @@
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-project(APNGASM)
+PROJECT(APNGASM)
+SET(VERSION 0.0.3)
 
-include_directories(${APNGASM_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(${APNGASM_SOURCE_DIR}/src)
 
-add_subdirectory(${APNGASM_SOURCE_DIR}/lib)
-add_subdirectory(${APNGASM_SOURCE_DIR}/bin)
+ADD_SUBDIRECTORY(${APNGASM_SOURCE_DIR}/lib)
+ADD_SUBDIRECTORY(${APNGASM_SOURCE_DIR}/bin)
+
+##CPack definitions for package creation
+INCLUDE(InstallRequiredSystemLibraries)
+
+SET(CPACK_PACKAGE_CONTACT "zero@genshin.org")
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_PACKAGE_DESCRIPTION "apngasm APNG assembler libraries and command line tool")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "apngasm APNG assembler libraries and command line tool")
+SET(CPACK_PACKAGE_FILE_NAME "apngasm-${VERSION}")
+SET(CPACK_COMPONENTS_ALL Libraries ApplicationData)
+
+INCLUDE(CPack)
