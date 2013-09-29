@@ -14,11 +14,15 @@ int main(int argc, char* argv[])
 	description << "APNG Assembler v" << apngasm.version() << endl \
 		<< "Assemble an APNG:\n" \
 		<< "\tapngasm outfile.png frame1.png frame2.png frame3.png [options]\n" \
-		<< "\tapngasm outfile frame*.png\n" \
+		<< "\tapngasm outfile.png frame*.png [options]\n" \
+		<< "Assemble an APNG with specific frame delays:\n" \
+		<< "\tapngasm outfile.png frame1.png 200 frame2.png 100 [options]\n"
 		<< "Disassemble an APNG file into frames and JSON/XML directive files:\n" \
-		<< "\tapngasm apng_file.png" \
+		<< "\tapngasm apng_file.png\n" \
 		<< "Optimize or re-assemble PNG/APNG file with new options:\n" \
 		<< "\tapngasm outfile.png infile.png [options]\n" \
+		<< "Add a frame to an existing APNG or concatinate APNG animations:\n"
+		<< "\tapngasm outfile.png apng1.png newframe.png apng2.png [options]\n"
 		<< "options";
 	bpo::options_description opts(description.str());
 	opts.add_options()
