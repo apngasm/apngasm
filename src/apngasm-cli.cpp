@@ -15,6 +15,8 @@ int main(int argc, char* argv[])
 		<< "Assemble an APNG:\n" \
 		<< "\tapngasm outfile.png frame1.png frame2.png frame3.png [options]\n" \
 		<< "\tapngasm outfile.png frame*.png [options]\n" \
+		<< "Assemble an APNG file using a directive file:\n" \
+		<< "\tapngasm outfile.png -f animation.json\n" \
 		<< "Assemble an APNG with specific frame delays:\n" \
 		<< "\tapngasm outfile.png frame1.png 200 frame2.png 100 [options]\n"
 		<< "Disassemble an APNG file into frames and JSON/XML directive files:\n" \
