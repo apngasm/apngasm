@@ -5,10 +5,37 @@
 using namespace std;
 #include <boost/program_options.hpp>
 
+
+bool isNumber(const string s)
+{
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
+}
+
+bool parseDelay(const string delay, int *numerator, int *denominator)
+{
+	if (isNumber(delay)) { // The delay is in miliseconds
+		*numerator = atoi(delay.c_str());
+		return true;
+	} else { // Delay is in fractions of a second or invalid
+		vector<string> portions;
+		//delay.split(delay, ':', portions);
+		cout << "elem lenght: " << portions.length << endl;
+	}
+	
+	return false;
+}
+
 int main(int argc, char* argv[])
 {
 	APNGAsm apngasm;
 	namespace bpo = boost::program_options;
+
+	// Defaults
+	int delayNumerator = 100;
+	int delayDenominator = 1000;
+
 
 	stringstream description;
 	description << "APNG Assembler v" << apngasm.version() << endl \
@@ -17,31 +44,43 @@ int main(int argc, char* argv[])
 		<< "\tapngasm outfile.png frame*.png [options]\n" \
 		<< "Assemble an APNG file using a directive file:\n" \
 		<< "\tapngasm outfile.png -f animation.json\n" \
-		<< "Assemble an APNG with specific frame delays:\n" \
+		<< "Assemble an APNG with specific frame delays in miliseconds:\n" \
 		<< "\tapngasm outfile.png frame1.png 200 frame2.png 100 [options]\n"
+		<< "Assemble an APNG with specific frame delays in fractions of a second:\n" \
+		<< "\tapngasm outfile.png frame1.png 1:2 frame2.png 3:5 [options]\n"
 		<< "Disassemble an APNG file into frames and JSON/XML directive files:\n" \
 		<< "\tapngasm apng_file.png\n" \
 		<< "Optimize or re-assemble PNG/APNG file with new options:\n" \
 		<< "\tapngasm outfile.png infile.png [options]\n" \
-		<< "Add a frame to an existing APNG or concatinate APNG animations:\n"
-		<< "\tapngasm outfile.png apng1.png newframe.png apng2.png [options]\n"
+		//<< "Add a frame to an existing APNG or concatinate APNG animations:\n"
+		//<< "\tapngasm outfile.png apng1.png newframe.png apng2.png [options]\n"
 		<< "options";
 	bpo::options_description opts(description.str());
 	opts.add_options()
 		("help,h",	"View detailed help.")
-		("delay,d",	bpo::value<int>()->default_value(10), "Default frame delay [in miliseconds], default is 100.")
+		("delay,d",	bpo::value<string>()->default_value("100"), "Default frame delay [in miliseconds or fractions of a second], default is 100.")
 		("loops,l",	bpo::value<int>()->default_value(0), "Number of loops. Use 0 [the default] for infinite loops.")
 		("file,f",	bpo::value<string>(), "Loads an XML or JSON animation directive file.")
-		("skip,s",	"Skip the first frame. When animation is not supported the first frame is shown.");
+		("skip,s",	"Skip the first frame. When animation is not supported the first frame is shown.")
+		("version,v", "Display the version.");
 
 	bpo::variables_map vm;
 	store(parse_command_line(argc, argv, opts), vm);
 
-	if (vm.count("help"))
+	if (vm.count("help")) {
 		cout << opts << endl;
-	else
-	{
+	} else if (vm.count("version")) {
+		cout << apngasm.version() << endl;
+	} else {
+		if (vm.count("delay")) {
+			const string delayOverride = vm["delay"].as<string>();
+			if (parseDelay(delayOverride, &delayNumerator, &delayDenominator)) {
+				cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
+			}
+
+		}
 		cout << "opts were passed" << endl;
+		//cout << "count: " << vm.count() << endl;
 	}
 
 
