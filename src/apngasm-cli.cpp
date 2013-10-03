@@ -4,6 +4,7 @@
 #include <sstream>
 using namespace std;
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string/regex.hpp>
 
 
 bool isNumber(const string s)
@@ -21,7 +22,7 @@ bool parseDelay(const string delay, int *numerator, int *denominator)
 	} else { // Delay is in fractions of a second or invalid
 		vector<string> portions;
 		//delay.split(delay, ':', portions);
-		cout << "elem lenght: " << portions.length << endl;
+		//cout << "elem lenght: " << portions.length << endl;
 	}
 	
 	return false;

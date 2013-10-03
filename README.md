@@ -13,7 +13,7 @@ Building on (Ubuntu/Debian) Linux:
 
 1. Install dependencies/build chain
 ```
-sudo apt-get install cmake libpng-dev libboost-program-options-dev
+sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev
 ```
 
 2. Generate makefiles with cmake  
