@@ -100,6 +100,14 @@ int main(int argc, char* argv[])
 	apngasm.assemble("clock_anim.png");
 	cout << "frames=" << apngasm.frameCount() << endl;
 
+	apngasm.disassemble("penguins.png");
+	char szOut[256];
+	for (unsigned int i=0; i<apngasm.frames.size(); ++i)
+	{
+		sprintf(szOut, "penguins_frame%02d.png", i);
+		apngasm.SavePNG(szOut, &apngasm.frames[i]);
+	}
+
 	cout << "OK" << endl;*/
 	return 0;
 }

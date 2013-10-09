@@ -14,6 +14,9 @@ using namespace std;
 typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
 
+struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
+struct FramePNG { vector<CHUNK> chunkSet; unsigned int w, h, x, y, delay_num, delay_den; unsigned char dop, bop; };
+
 class APNGAsm
 {
 public:
@@ -51,6 +54,8 @@ public:
 	//Returns the frame vector
 	const vector<APNGFrame>& disassemble(const string &filePath);
 
+	void SavePNG(char * szOut, APNGFrame * frame);
+
 	//Returns the number of frames
 	size_t frameCount();
 
@@ -74,6 +79,11 @@ private:
 
 	void write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length);
 	void write_IDATs(FILE * f, int frame, unsigned char * data, unsigned int length, unsigned int idat_size);
+
+	void decode_frame(APNGFrame * frameOut, FramePNG * frameIn);
+	void compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
+	unsigned int read_chunk(FILE * f, CHUNK * pChunk);
+	void recalc_crc(CHUNK * pChunk);
 
 	//Loads an animation spec from JSON
 	//Returns a frame vector with the loaded frames
@@ -103,6 +113,8 @@ private:
     unsigned char * up_row;
     unsigned char * avg_row;
     unsigned char * paeth_row;
+
+    vector<CHUNK>   all_chunks;
 };
 
 #endif /* _APNGASM_H_ */

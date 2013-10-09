@@ -22,6 +22,7 @@ public:
   //Delay is numerator/denominator ratio, in seconds
   unsigned int delay_num, delay_den;
 
+  unsigned char ** rows;
 private:
 };
 

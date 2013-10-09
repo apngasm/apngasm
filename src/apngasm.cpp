@@ -24,6 +24,15 @@ unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data 
 unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
 #endif
 
+#define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
+
+#define id_IHDR 0x52444849
+#define id_acTL 0x4C546361
+#define id_fcTL 0x4C546366
+#define id_IDAT 0x54414449
+#define id_fdAT 0x54416466
+#define id_IEND 0x444E4549
+
 int cmp_colors( const void *arg1, const void *arg2 )
 {
   if ( ((COLORS*)arg1)->a != ((COLORS*)arg2)->a )
@@ -1785,9 +1794,321 @@ namespace
   vector<APNGFrame> tmpFrames;
 }
 
+void info_fn(png_structp png_ptr, png_infop info_ptr)
+{
+  APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
+  png_set_expand(png_ptr);
+  png_set_strip_16(png_ptr);
+  png_set_gray_to_rgb(png_ptr);
+  png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
+  (void)png_set_interlace_handling(png_ptr);
+  png_read_update_info(png_ptr, info_ptr);
+  frame->w = png_get_image_width(png_ptr, info_ptr);
+  frame->h = png_get_image_height(png_ptr, info_ptr);
+  unsigned int rowbytes = frame->w * 4;
+
+  frame->p = new unsigned char[frame->h * rowbytes];
+  frame->rows = new png_bytep[frame->h * sizeof(png_bytep)];
+  if (frame->p && frame->rows)
+    for (unsigned int j=0; j<frame->h; ++j)
+      frame->rows[j] = frame->p + j * rowbytes;
+}
+
+void row_fn(png_structp png_ptr, png_bytep new_row, png_uint_32 row_num, int pass)
+{
+  APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
+  png_progressive_combine_row(png_ptr, frame->rows[row_num], new_row);
+}
+
+void APNGAsm::decode_frame(APNGFrame * frameOut, FramePNG * frameIn)
+{
+  png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  png_infop   info_ptr = png_create_info_struct(png_ptr);
+  if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
+  {
+    png_set_progressive_read_fn(png_ptr, (void *)frameOut, info_fn, row_fn, NULL);
+
+    for (unsigned int i=0; i<frameIn->chunkSet.size(); ++i)
+      png_process_data(png_ptr, info_ptr, frameIn->chunkSet[i].p, frameIn->chunkSet[i].size);
+
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+  }
+}
+
+void APNGAsm::compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+{
+  unsigned int  i, j;
+  int u, v, al;
+
+  for (j=0; j<h; j++)
+  {
+    unsigned char * sp = rows_src[j];
+    unsigned char * dp = rows_dst[j+y] + x*4;
+
+    if (bop == 0)
+      memcpy(dp, sp, w*4);
+    else
+    for (i=0; i<w; i++, sp+=4, dp+=4)
+    {
+      if (sp[3] == 255)
+        memcpy(dp, sp, 4);
+      else
+      if (sp[3] != 0)
+      {
+        if (dp[3] != 0)
+        {
+          u = sp[3]*255;
+          v = (255-sp[3])*dp[3];
+          al = 255*255-(255-sp[3])*(255-dp[3]);
+          dp[0] = (sp[0]*u + dp[0]*v)/al;
+          dp[1] = (sp[1]*u + dp[1]*v)/al;
+          dp[2] = (sp[2]*u + dp[2]*v)/al;
+          dp[3] = al/255;
+        }
+        else
+          memcpy(dp, sp, 4);
+      }
+    }  
+  }
+}
+
+unsigned int APNGAsm::read_chunk(FILE * f, CHUNK * pChunk)
+{
+  unsigned int len;
+  fread(&len, 4, 1, f);
+  pChunk->size = swap32(len) + 12;
+  pChunk->p = new unsigned char[pChunk->size];
+  unsigned int * pi = (unsigned int *)pChunk->p;
+  pi[0] = len;
+  fread(pChunk->p + 4, 1, pChunk->size - 4, f);
+  return pi[1];
+}
+
+void APNGAsm::recalc_crc(CHUNK * pChunk)
+{
+  unsigned int crc = crc32(0, Z_NULL, 0);
+  crc = crc32(crc, pChunk->p + 4, pChunk->size - 8);
+  crc = swap32(crc);
+  memcpy(pChunk->p + pChunk->size - 4, &crc, 4);
+}
+
+void APNGAsm::SavePNG(char * szOut, APNGFrame * frame)
+{
+  FILE * f;
+  if ((f = fopen(szOut, "wb")) != 0)
+  {
+    png_structp  png_ptr  = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_infop    info_ptr = png_create_info_struct(png_ptr);
+    if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
+    {
+      png_init_io(png_ptr, f);
+      png_set_compression_level(png_ptr, 9);
+      if (frame->p && frame->rows)
+      {
+        png_set_IHDR(png_ptr, info_ptr, frame->w, frame->h, 8, 6, 0, 0, 0);
+        png_write_info(png_ptr, info_ptr);
+        png_write_image(png_ptr, frame->rows);
+        png_write_end(png_ptr, info_ptr);
+      }
+    }
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+    fclose(f);
+  }
+}
+
 const vector<APNGFrame>& APNGAsm::disassemble(const string &filePath)
 {
-  return tmpFrames;
+  unsigned int   i, j, id;
+  unsigned int   w, h;
+  unsigned int * pi;
+  unsigned char  header[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+  unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
+  CHUNK chunk_ihdr;
+  CHUNK chunk;
+  CHUNK chunk_sign = {8, &header[0]};
+  CHUNK chunk_iend = {12, &footer[0]};
+
+  reset();
+
+  FILE * f;
+  if ((f = fopen(filePath.c_str(), "rb")) != 0)
+  {
+    unsigned char sig[8];
+    unsigned int  flag_fctl = 0;
+    unsigned int  flag_idat = 0;
+    unsigned int  len = 1;
+    unsigned int  num_frames = 1;
+
+    if (fread(sig, 1, 8, f) == 8 && memcmp(sig, header, 8) == 0)
+    {
+      id = read_chunk(f, &chunk_ihdr);
+
+      if (id == id_IHDR && chunk_ihdr.size == 25)
+      {
+        pi = (unsigned int *)chunk_ihdr.p;
+        FramePNG frame;
+        frame.chunkSet.push_back(chunk_sign);
+        frame.chunkSet.push_back(chunk_ihdr);
+        frame.w = w = swap32(pi[2]);
+        frame.h = h = swap32(pi[3]);
+        frame.x = 0;
+        frame.y = 0;
+        frame.delay_num = 1;
+        frame.delay_den = 10;
+        frame.dop = 0;
+        frame.bop = 0;
+        unsigned int rowbytes = w * 4;
+        unsigned int imagesize = h * rowbytes;
+
+        APNGFrame frameRaw;
+        APNGFrame frameCur;
+        APNGFrame frameNext;
+
+        frameCur.w = w;
+        frameCur.h = h;
+        frameCur.p = new unsigned char[imagesize];
+        frameCur.rows = new png_bytep[h * sizeof(png_bytep)];
+        if (frameCur.p && frameCur.rows)
+          for (j=0; j<h; ++j)
+            frameCur.rows[j] = frameCur.p + j * rowbytes;
+
+        while ( !feof(f) )
+        {
+          id = read_chunk(f, &chunk);
+
+          if (id == id_acTL)
+          {
+            chunk.flag = 1;
+            all_chunks.push_back(chunk);
+            pi = (unsigned int *)chunk.p;
+            num_frames = swap32(pi[2]);
+          }
+          else
+          if (id == id_fcTL)
+          {
+            chunk.flag = 1;
+            all_chunks.push_back(chunk);
+            frame.chunkSet.push_back(chunk_iend);
+
+            if (flag_fctl)
+            {
+              frameNext.p = new unsigned char[imagesize];
+              frameNext.rows = new png_bytep[h * sizeof(png_bytep)];
+              if (frameNext.p && frameNext.rows)
+                for (j=0; j<h; ++j)
+                  frameNext.rows[j] = frameNext.p + j * rowbytes;
+
+              if (frame.dop == 2)
+                memcpy(frameNext.p, frameCur.p, imagesize);
+
+              decode_frame(&frameRaw, &frame);
+              compose_frame(frameCur.rows, frameRaw.rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
+              frameCur.delay_num = frame.delay_num;
+              frameCur.delay_den = frame.delay_den;
+              frames.push_back(frameCur);
+
+              if (frame.dop != 2)
+              {
+                memcpy(frameNext.p, frameCur.p, imagesize);
+                if (frame.dop == 1)
+                  for (j=0; j<frame.h; j++)
+                    memset(frameNext.rows[frame.y + j], 0, frame.w * 4);
+              }
+              frameCur.p = frameNext.p;
+              frameCur.rows = frameNext.rows;
+            }
+
+            memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
+            recalc_crc(&chunk_ihdr);
+            pi = (unsigned int *)chunk.p;
+            frame.chunkSet.clear();
+            frame.chunkSet.push_back(chunk_sign);
+            frame.chunkSet.push_back(chunk_ihdr);
+            frame.w = swap32(pi[3]);
+            frame.h = swap32(pi[4]);
+            frame.x = swap32(pi[5]);
+            frame.y = swap32(pi[6]);
+            frame.delay_num = chunk.p[28]*256 + chunk.p[29];
+            frame.delay_den = chunk.p[30]*256 + chunk.p[31];
+            frame.dop = chunk.p[32];
+            frame.bop = chunk.p[33];
+            if (!flag_fctl)
+            {
+              frame.bop = 0;
+              if (frame.dop == 2)
+                frame.dop = 1;
+            }
+            flag_fctl = 1;
+          }
+          else
+          if (id == id_IDAT)
+          {
+            chunk.flag = flag_idat = 1;
+            all_chunks.push_back(chunk);
+
+            if (frame.chunkSet.size() == 2)
+              for (i=0; i<all_chunks.size(); ++i)
+                if (!all_chunks[i].flag)
+                  frame.chunkSet.push_back(all_chunks[i]);
+
+            frame.chunkSet.push_back(chunk);
+          }
+          else
+          if (id == id_fdAT)
+          {
+            chunk.flag = 1;
+            all_chunks.push_back(chunk);
+
+            if (frame.chunkSet.size() == 2)
+              for (i=0; i<all_chunks.size(); ++i)
+                if (!all_chunks[i].flag)
+                  frame.chunkSet.push_back(all_chunks[i]);
+
+            chunk.size -= 4;
+            chunk.p += 4;
+            unsigned int new_size = swap32(chunk.size - 12);
+            unsigned int new_id   = id_IDAT;
+            memcpy(chunk.p, &new_size, 4);
+            memcpy(chunk.p + 4, &new_id, 4);
+            recalc_crc(&chunk);
+
+            frame.chunkSet.push_back(chunk);
+          }
+          else
+          if (id == id_IEND)
+          {
+            chunk.flag = 1;
+            all_chunks.push_back(chunk);
+            frame.chunkSet.push_back(chunk_iend);
+
+            decode_frame(&frameRaw, &frame);
+            compose_frame(frameCur.rows, frameRaw.rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
+            frameCur.delay_num = frame.delay_num;
+            frameCur.delay_den = frame.delay_den;
+            frames.push_back(frameCur);
+            break;
+          }
+          else
+          {
+            chunk.flag = flag_idat;
+            all_chunks.push_back(chunk);
+
+            if (notabc(chunk.p[4]) || notabc(chunk.p[5]) || notabc(chunk.p[6]) || notabc(chunk.p[7]))
+              break;
+          }
+        }
+      }
+    }
+    fclose(f);
+
+    for (i=0; i<all_chunks.size(); ++i)
+      delete[] all_chunks[i].p;
+
+    all_chunks.clear();
+
+    delete[] chunk_ihdr.p;
+  }
+  return frames;
 }
 
 //Loads an animation spec from JSON
