@@ -65,11 +65,24 @@ int main(int argc, char* argv[])
 		("skip,s",	"Skip the first frame. When animation is not supported the first frame is shown.")
 		("version,v", "Display the version.");
 
+	bpo::options_description hidden("Hidden options");
+	hidden.add_options()
+		("input-file", bpo::value< vector<string> >(), "input file");
+
+	bpo::options_description cmdline_options;
+	cmdline_options.add(opts).add(hidden);
+
+	bpo::options_description visible("Allowed options");
+	visible.add(opts);
+
+	bpo::positional_options_description p;
+	p.add("input-file", -1);
+
 	bpo::variables_map vm;
-	store(parse_command_line(argc, argv, opts), vm);
+	store(bpo::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
 
 	if (vm.count("help")) {
-		cout << opts << endl;
+		cout << visible << endl;
 	} else if (vm.count("version")) {
 		cout << apngasm.version() << endl;
 	} else {
@@ -78,7 +91,13 @@ int main(int argc, char* argv[])
 			if (parseDelay(delayOverride, &delayNumerator, &delayDenominator)) {
 				cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
 			}
-
+		}
+		if (vm.count("input-file")) {
+			vector<string> filename;
+			vector<string> str( vm["input-file"].as< vector<string> >() );
+			for (vector<string>::iterator it = str.begin(); it != str.end(); ++it) {
+				filename.push_back(*it);
+			}
 		}
 		cout << "opts were passed" << endl;
 		//cout << "count: " << vm.count() << endl;
