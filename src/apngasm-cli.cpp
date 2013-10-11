@@ -25,7 +25,11 @@ bool parseDelay(const string delay, int *numerator, int *denominator)
 		//TODO parse numerator and denominator
 		vector<string> portions;
 		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
-		*numerator = ((float)atoi(portions[0].c_str()) / (float)atoi(portions[1].c_str())) * 1000;
+		*numerator = atoi((portions.front()).c_str()) * 1000;
+
+		for (vector<string>::iterator it = portions.erase(portions.begin()); it != portions.end(); ++it) {
+			*numerator /= (float)atoi(it->c_str());
+		}
 		*denominator = MILISECOND;
 		return true;
 	}
