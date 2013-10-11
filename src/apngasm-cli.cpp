@@ -6,6 +6,7 @@ using namespace std;
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/regex.hpp>
 
+#define MILISECOND 1000
 
 bool isNumber(const string s)
 {
@@ -18,8 +19,10 @@ bool parseDelay(const string delay, int *numerator, int *denominator)
 {
 	if (isNumber(delay)) { // The delay is in miliseconds
 		*numerator = atoi(delay.c_str());
+		*denominator = MILISECOND;
 		return true;
 	} else { // Delay is in fractions of a second or invalid
+		//TODO parse numerator and denominator
 		vector<string> portions;
 		//delay.split(delay, ':', portions);
 		//cout << "elem lenght: " << portions.length << endl;
@@ -35,7 +38,7 @@ int main(int argc, char* argv[])
 
 	// Defaults
 	int delayNumerator = 100;
-	int delayDenominator = 1000;
+	int delayDenominator = MILISECOND;
 
 
 	stringstream description;
@@ -67,7 +70,7 @@ int main(int argc, char* argv[])
 
 	bpo::options_description hidden("Hidden options");
 	hidden.add_options()
-		("input-file", bpo::value< vector<string> >(), "input file");
+		("files", bpo::value< vector<string> >(), "a list files to be turned into frames");
 
 	bpo::options_description cmdline_options;
 	cmdline_options.add(opts).add(hidden);
@@ -76,7 +79,7 @@ int main(int argc, char* argv[])
 	visible.add(opts);
 
 	bpo::positional_options_description p;
-	p.add("input-file", -1);
+	p.add("files", -1);
 
 	bpo::variables_map vm;
 	store(bpo::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
@@ -92,12 +95,18 @@ int main(int argc, char* argv[])
 				cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
 			}
 		}
-		if (vm.count("input-file")) {
-			vector<string> filename;
-			vector<string> str( vm["input-file"].as< vector<string> >() );
-			for (vector<string>::iterator it = str.begin(); it != str.end(); ++it) {
-				filename.push_back(*it);
+		if (vm.count("files")) {
+			vector<string> files;
+			vector<string> fileParamsRaw( vm["files"].as< vector<string> >() );
+			//extract individual file names
+			for (vector<string>::iterator it = fileParamsRaw.begin(); it != fileParamsRaw.end(); ++it) {
+				files.push_back(*it);
 			}
+			//TODO first file arg is the output file
+			//TODO 最初のファイル名引数が出力ファイル
+			string outputFile = files.pop_front();
+
+			cout << "frame count" << files.size() << endl;
 		}
 		cout << "opts were passed" << endl;
 		//cout << "count: " << vm.count() << endl;
