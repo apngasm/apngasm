@@ -4,7 +4,7 @@
 #include <sstream>
 using namespace std;
 #include <boost/program_options.hpp>
-#include <boost/algorithm/string/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #define MILISECOND 1000
 
@@ -24,10 +24,11 @@ bool parseDelay(const string delay, int *numerator, int *denominator)
 	} else { // Delay is in fractions of a second or invalid
 		//TODO parse numerator and denominator
 		vector<string> portions;
-		//delay.split(delay, ':', portions);
-		//cout << "elem lenght: " << portions.length << endl;
+		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
+		*numerator = ((float)atoi(portions[0].c_str()) / (float)atoi(portions[1].c_str())) * 1000;
+		*denominator = MILISECOND;
+		return true;
 	}
-	
 	return false;
 }
 
