@@ -4,9 +4,12 @@
 #include <sstream>
 using namespace std;
 #include <boost/program_options.hpp>
-#include <boost/algorithm/string/regex.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
+//#include <boost/algorithm/string/regex.hpp>
 
 #define MILISECOND 1000
+#define DERAYNUMERATOR 100
 
 bool isNumber(const string s)
 {
@@ -15,20 +18,43 @@ bool isNumber(const string s)
 	return !s.empty() && it == s.end();
 }
 
-bool parseDelay(const string delay, int *numerator, int *denominator)
+// bool parseDelay(const string delay, int *numerator, int *denominator)
+// {
+// 	if (isNumber(delay)) { // The delay is in miliseconds
+// 		*numerator = atoi(delay.c_str());
+// 		*denominator = MILISECOND;
+// 		return true;
+// 	} else { // Delay is in fractions of a second or invalid
+// 		//TODO parse numerator and denominator
+// 		vector<string> portions;
+// 		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
+// 		*numerator = atoi((portions.front()).c_str()) * 1000;
+
+// 		for (vector<string>::iterator it = portions.erase(portions.begin()); it != portions.end(); ++it) {
+// 			*numerator /= (float)atoi(it->c_str());
+// 		}
+// 		*denominator = MILISECOND;
+// 	}
+// 	return false;
+// }
+
+int parseDelay(const string delay, int *denominator)
 {
+	int delays = -1;
 	if (isNumber(delay)) { // The delay is in miliseconds
-		*numerator = atoi(delay.c_str());
+		delays = atoi(delay.c_str());
 		*denominator = MILISECOND;
-		return true;
 	} else { // Delay is in fractions of a second or invalid
-		//TODO parse numerator and denominator
 		vector<string> portions;
-		//delay.split(delay, ':', portions);
-		//cout << "elem lenght: " << portions.length << endl;
+		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
+		delays = atoi((portions.front()).c_str()) * 1000;
+
+		for (vector<string>::iterator it = portions.erase(portions.begin()); it != portions.end(); ++it) {
+			delays /= (float)atoi(it->c_str());
+		}
+		*denominator = MILISECOND;
 	}
-	
-	return false;
+	return delays;
 }
 
 int main(int argc, char* argv[])
@@ -37,9 +63,7 @@ int main(int argc, char* argv[])
 	namespace bpo = boost::program_options;
 
 	// Defaults
-	int delayNumerator = 100;
 	int delayDenominator = MILISECOND;
-
 
 	stringstream description;
 	description << "APNG Assembler v" << apngasm.version() << endl \
@@ -90,22 +114,44 @@ int main(int argc, char* argv[])
 		cout << apngasm.version() << endl;
 	} else {
 		if (vm.count("delay")) {
-			const string delayOverride = vm["delay"].as<string>();
-			if (parseDelay(delayOverride, &delayNumerator, &delayDenominator)) {
-				cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
-			}
+			// const string delayOverride = vm["delay"].as<string>();
+			// if (parseDelay(delayOverride, &delayNumerator, &delayDenominator)) {
+			// 	cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
+			// }
 		}
 		if (vm.count("files")) {
 			vector<string> files;
-			vector<string> fileParamsRaw( vm["files"].as< vector<string> >() );
-			//extract individual file names
-			for (vector<string>::iterator it = fileParamsRaw.begin(); it != fileParamsRaw.end(); ++it) {
-				files.push_back(*it);
-			}
-			//TODO first file arg is the output file
-			//TODO 最初のファイル名引数が出力ファイル
-			string outputFile = files.pop_front();
+			vector<int> delay;
+			const boost::regex period(".*\\..*");
+			const boost::regex png(".*\\.png\\z");
+			const boost::regex delayNum("[0-9]+[:[0-9]+]*");
 
+			vector<string> fileParamsRaw( vm["files"].as< vector<string> >() );
+			string outputFile = fileParamsRaw.front();
+			vector<string>::iterator fileit = fileParamsRaw.erase(fileParamsRaw.begin());
+
+			if (!regex_match(*fileit, period)) {
+				cout << "there is not firstframe file" << endl;
+				return 0;
+			}
+
+			//extract individual file names
+			for (; fileit != fileParamsRaw.end(); ++fileit) {
+				if (regex_match(*fileit, period)) {
+					if (!regex_match(*fileit, png)) {
+						cout << "ERROR:  \"" << *fileit << "\" is invalid extension" << endl;
+						return 0;
+					}
+					files.push_back(*fileit);
+					delay.push_back(DERAYNUMERATOR);
+				} else {
+					if (!regex_match(*fileit, delayNum)) {
+						cout << "ERROR:  \"" << *fileit << "\" is invalid" << endl;
+						return 0;
+					}
+					*((delay.end()) - 1) = parseDelay(*fileit, &delayDenominator);
+				}
+			}
 			cout << "frame count" << files.size() << endl;
 		}
 		cout << "opts were passed" << endl;
