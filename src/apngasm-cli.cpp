@@ -98,14 +98,12 @@ int main(int argc, char* argv[])
 		if (vm.count("files")) {
 			vector<string> files;
 			vector<string> fileParamsRaw( vm["files"].as< vector<string> >() );
+			string outputFile = fileParamsRaw.front();
+
 			//extract individual file names
-			for (vector<string>::iterator it = fileParamsRaw.begin(); it != fileParamsRaw.end(); ++it) {
+			for (vector<string>::iterator it = fileParamsRaw.erase(fileParamsRaw.begin()); it != fileParamsRaw.end(); ++it) {
 				files.push_back(*it);
 			}
-			//TODO first file arg is the output file
-			//TODO 最初のファイル名引数が出力ファイル
-			string outputFile = files.pop_front();
-
 			cout << "frame count" << files.size() << endl;
 		}
 		cout << "opts were passed" << endl;
