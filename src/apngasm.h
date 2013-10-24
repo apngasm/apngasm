@@ -1,13 +1,11 @@
 #ifndef _APNGASM_H_
 #define _APNGASM_H_
 
-
 #include <cstdio>
 #include <string>
 #include <vector>
 #include "zlib.h"
 #include "apngframe.h"
-using namespace std;
 
 #define APNGASM_VERSION "3.0.0"
 
@@ -15,23 +13,26 @@ typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, fil
 typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
 
 struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
-struct FramePNG { vector<CHUNK> chunkSet; unsigned int w, h, x, y, delay_num, delay_den; unsigned char dop, bop; };
+struct FramePNG {
+	std::vector<CHUNK> chunkSet;
+	unsigned w, h, x, y, delay_num, delay_den;
+	unsigned char dop, bop;
+};
 
-class APNGAsm
-{
+class APNGAsm {
 public:
-	vector<APNGFrame> frames;
+	std::vector<APNGFrame> frames;
 	
 	//Construct APNGAsm object
 	APNGAsm(void);
 	
 	//Construct APNGAsm object
-	APNGAsm(const vector<APNGFrame> &frames);
+	APNGAsm(const std::vector<APNGFrame> &frames);
 
 	//Adds a frame from a file
 	//Returns the frame number in the frame vector
 	//Uses default delay of 10ms if not specified
-	size_t addFrame(const string &filePath, unsigned int delay_num = 10, unsigned int delay_den = 100);
+	size_t addFrame(const std::string &filePath, unsigned delay_num = 10, unsigned delay_den = 100);
 
 	//Adds an APNGFrame object to the frame vector
 	//Returns the frame number in the frame vector
@@ -43,16 +44,16 @@ public:
 	//Loads an animation spec from JSON or XML
 	//Returns a frame vector with the loaded frames
 	//Loaded frames are added to the end of the frame vector
-	const vector<APNGFrame>& loadAnimationSpec(const string &filePath);
+	const std::vector<APNGFrame>& loadAnimationSpec(const std::string &filePath);
 
 	//Assembles and outputs an APNG file
 	//Returns the assembled file object
 	//If no output path is specified only the file object is returned
-	bool assemble(const string &outputPath);
+	bool assemble(const std::string &outputPath);
 
 	//Disassembles an APNG file
 	//Returns the frame vector
-	const vector<APNGFrame>& disassemble(const string &filePath);
+	const std::vector<APNGFrame>& disassemble(const std::string &filePath);
 
 	void SavePNG(char * szOut, APNGFrame * frame);
 
@@ -62,7 +63,7 @@ public:
 	//Throw away all frames, start over
 	size_t reset();
 
-	string version(void);
+	std::string version(void);
 
 private:
 	unsigned char FindCommonType(void);
@@ -70,7 +71,7 @@ private:
 	void DirtyTransparencyOptimization(unsigned char coltype);
 	unsigned char DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
-	bool Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops);
+	bool Save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
 
 	void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 	void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
@@ -87,11 +88,11 @@ private:
 
 	//Loads an animation spec from JSON
 	//Returns a frame vector with the loaded frames
-	const vector<APNGFrame>& loadJSONSpec(const string &filePath);
+	const std::vector<APNGFrame>& loadJSONSpec(const std::string &filePath);
 	
 	//Loads an animation spec from XML
 	//Returns a frame vector with the loaded frames
-	const vector<APNGFrame>& loadXMLSpec(const string &filePath);
+	const std::vector<APNGFrame>& loadXMLSpec(const std::string &filePath);
 
     OP              op[6];
     unsigned int    m_width;
@@ -114,7 +115,7 @@ private:
     unsigned char * avg_row;
     unsigned char * paeth_row;
 
-    vector<CHUNK>   all_chunks;
+	std::vector<CHUNK>   all_chunks;
 };
 
-#endif /* _APNGASM_H_ */
+#endif  // _APNGASM_H_

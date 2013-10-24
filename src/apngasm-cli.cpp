@@ -1,69 +1,77 @@
 #include "apngasm.h"
-
-#include <iostream>
-#include <sstream>
-using namespace std;
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
-//#include <boost/algorithm/string/regex.hpp>
+#include <iostream>
+#include <sstream>
 
-#define MILISECOND 1000
-#define DERAYNUMERATOR 100
+namespace apngasm_cli {
+	class Fraction {
+	private:
+		int n, d;
 
-bool isNumber(const string s)
+	public:
+		Fraction(int numerator, int denominator);
+		operator double(void) const;
+	};
+}
+
+namespace apngasm_cli {
+	Fraction::Fraction(int numerator, int denominator)
+		: n(numerator), d(denominator)
+	{
+		// nop
+	}
+
+	Fraction::operator double(void) const
+	{
+		return n * 1.0 / d;
+	}
+}
+
+static const int MILLI_SECONDS = 1000;
+static const int DEFAULT_FRAME_LENGTH = 100;  // default frame length
+
+// string is number?
+static bool isNumber(const std::string s)
 {
 	std::string::const_iterator it = s.begin();
 	while (it != s.end() && std::isdigit(*it)) ++it;
 	return !s.empty() && it == s.end();
 }
 
-// bool parseDelay(const string delay, int *numerator, int *denominator)
-// {
-// 	if (isNumber(delay)) { // The delay is in miliseconds
-// 		*numerator = atoi(delay.c_str());
-// 		*denominator = MILISECOND;
-// 		return true;
-// 	} else { // Delay is in fractions of a second or invalid
-// 		//TODO parse numerator and denominator
-// 		vector<string> portions;
-// 		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
-// 		*numerator = atoi((portions.front()).c_str()) * 1000;
-
-// 		for (vector<string>::iterator it = portions.erase(portions.begin()); it != portions.end(); ++it) {
-// 			*numerator /= (float)atoi(it->c_str());
-// 		}
-// 		*denominator = MILISECOND;
-// 	}
-// 	return false;
-// }
-
-int parseDelay(const string delay, int *denominator)
+static apngasm_cli::Fraction parseFrameLength(
+	const std::string &src_str)
 {
-	int delays = -1;
-	if (isNumber(delay)) { // The delay is in miliseconds
-		delays = atoi(delay.c_str());
-		*denominator = MILISECOND;
+	using namespace std;
+	if(isNumber(src_str)) {
+		return apngasm_cli::Fraction(
+				atoi(src_str.c_str()),
+				1000);
 	} else { // Delay is in fractions of a second or invalid
-		vector<string> portions;
-		boost::algorithm::split(portions, delay, boost::is_any_of(":"));
-		delays = atoi((portions.front()).c_str()) * 1000;
+		using boost::algorithm::split;
 
-		for (vector<string>::iterator it = portions.erase(portions.begin()); it != portions.end(); ++it) {
-			delays /= (float)atoi(it->c_str());
+		vector<string> portions;
+		split(portions, src_str, boost::is_any_of(":"));
+		if(portions.size() != 2
+		|| !isNumber(portions[0]) || !isNumber(portions[1])) {
+			throw std::runtime_error("parse delay error");
 		}
-		*denominator = MILISECOND;
+		return apngasm_cli::Fraction(
+			atoi(portions[0].c_str()),
+			atoi(portions[1].c_str()));
 	}
-	return delays;
 }
 
 int main(int argc, char* argv[])
 {
+	using namespace std;
+
 	APNGAsm apngasm;
 	namespace bpo = boost::program_options;
 
 	// Defaults
-	int delayDenominator = MILISECOND;
+	int delayDenominator = MILLI_SECONDS;
 
 	stringstream description;
 	description << "APNG Assembler v" << apngasm.version() << endl \
@@ -80,8 +88,6 @@ int main(int argc, char* argv[])
 		<< "\tapngasm apng_file.png\n" \
 		<< "Optimize or re-assemble PNG/APNG file with new options:\n" \
 		<< "\tapngasm outfile.png infile.png [options]\n" \
-		//<< "Add a frame to an existing APNG or concatinate APNG animations:\n"
-		//<< "\tapngasm outfile.png apng1.png newframe.png apng2.png [options]\n"
 		<< "options";
 	bpo::options_description opts(description.str());
 	opts.add_options()
@@ -114,10 +120,7 @@ int main(int argc, char* argv[])
 		cout << apngasm.version() << endl;
 	} else {
 		if (vm.count("delay")) {
-			// const string delayOverride = vm["delay"].as<string>();
-			// if (parseDelay(delayOverride, &delayNumerator, &delayDenominator)) {
-			// 	cout << "Default delay overridden to: " << delayNumerator << "/" << delayDenominator << " seconds" << endl;
-			// }
+			// TODO
 		}
 		if (vm.count("files")) {
 			vector<string> files;
@@ -143,45 +146,19 @@ int main(int argc, char* argv[])
 						return 0;
 					}
 					files.push_back(*fileit);
-					delay.push_back(DERAYNUMERATOR);
+					delay.push_back(DEFAULT_FRAME_LENGTH);
 				} else {
 					if (!regex_match(*fileit, delayNum)) {
 						cout << "ERROR:  \"" << *fileit << "\" is invalid" << endl;
 						return 0;
 					}
-					*((delay.end()) - 1) = parseDelay(*fileit, &delayDenominator);
+					double sec = parseFrameLength(*fileit);
+					delay.push_back(static_cast<int>(sec * 1000));
 				}
 			}
 			cout << "frame count" << files.size() << endl;
 		}
 		cout << "opts were passed" << endl;
-		//cout << "count: " << vm.count() << endl;
 	}
-
-
-	/*apngasm.addFrame("gold01.png", 15, 100);
-	apngasm.addFrame("gold02.png", 15, 100);
-	apngasm.addFrame("gold03.png", 15, 100);
-	apngasm.assemble("gold_anim.png");
-	cout << "frames=" << apngasm.frameCount() << endl;
-
-	apngasm.reset();
-
-	apngasm.addFrame("clock1.png", 1, 1);
-	apngasm.addFrame("clock2.png", 1, 1);
-	apngasm.addFrame("clock3.png", 1, 1);
-	apngasm.addFrame("clock4.png", 1, 1);
-	apngasm.assemble("clock_anim.png");
-	cout << "frames=" << apngasm.frameCount() << endl;
-
-	apngasm.disassemble("penguins.png");
-	char szOut[256];
-	for (unsigned int i=0; i<apngasm.frames.size(); ++i)
-	{
-		sprintf(szOut, "penguins_frame%02d.png", i);
-		apngasm.SavePNG(szOut, &apngasm.frames[i]);
-	}
-
-	cout << "OK" << endl;*/
 	return 0;
 }
