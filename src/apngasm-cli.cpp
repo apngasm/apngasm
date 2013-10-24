@@ -63,6 +63,8 @@ static apngasm_cli::Fraction parseFrameLength(
 	}
 }
 
+inline std::string getDescription(const std::string &);
+
 int main(int argc, char* argv[])
 {
 	using namespace std;
@@ -70,26 +72,7 @@ int main(int argc, char* argv[])
 	APNGAsm apngasm;
 	namespace bpo = boost::program_options;
 
-	// Defaults
-	int delayDenominator = MILLI_SECONDS;
-
-	stringstream description;
-	description << "APNG Assembler v" << apngasm.version() << endl \
-		<< "Assemble an APNG:\n" \
-		<< "\tapngasm outfile.png frame1.png frame2.png frame3.png [options]\n" \
-		<< "\tapngasm outfile.png frame*.png [options]\n" \
-		<< "Assemble an APNG file using a directive file:\n" \
-		<< "\tapngasm outfile.png -f animation.json\n" \
-		<< "Assemble an APNG with specific frame delays in miliseconds:\n" \
-		<< "\tapngasm outfile.png frame1.png 200 frame2.png 100 [options]\n"
-		<< "Assemble an APNG with specific frame delays in fractions of a second:\n" \
-		<< "\tapngasm outfile.png frame1.png 1:2 frame2.png 3:5 [options]\n"
-		<< "Disassemble an APNG file into frames and JSON/XML directive files:\n" \
-		<< "\tapngasm apng_file.png\n" \
-		<< "Optimize or re-assemble PNG/APNG file with new options:\n" \
-		<< "\tapngasm outfile.png infile.png [options]\n" \
-		<< "options";
-	bpo::options_description opts(description.str());
+	bpo::options_description opts(getDescription(apngasm.version()));
 	opts.add_options()
 		("help,h",	"View detailed help.")
 		("delay,d",	bpo::value<string>()->default_value("100"), "Default frame delay [in miliseconds or fractions of a second], default is 100.")
@@ -105,9 +88,6 @@ int main(int argc, char* argv[])
 	bpo::options_description cmdline_options;
 	cmdline_options.add(opts).add(hidden);
 
-	bpo::options_description visible("Allowed options");
-	visible.add(opts);
-
 	bpo::positional_options_description p;
 	p.add("files", -1);
 
@@ -115,6 +95,8 @@ int main(int argc, char* argv[])
 	store(bpo::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
 
 	if (vm.count("help")) {
+		bpo::options_description visible("Allowed options");
+		visible.add(opts);
 		cout << visible << endl;
 	} else if (vm.count("version")) {
 		cout << apngasm.version() << endl;
@@ -161,4 +143,25 @@ int main(int argc, char* argv[])
 		cout << "opts were passed" << endl;
 	}
 	return 0;
+}
+
+inline std::string getDescription(const std::string &version)
+{
+	std::stringstream description;
+	description << "APNG Assembler v" << version << std::endl \
+		<< "Assemble an APNG:\n" \
+		<< "\tapngasm outfile.png frame1.png frame2.png frame3.png [options]\n" \
+		<< "\tapngasm outfile.png frame*.png [options]\n" \
+		<< "Assemble an APNG file using a directive file:\n" \
+		<< "\tapngasm outfile.png -f animation.json\n" \
+		<< "Assemble an APNG with specific frame delays in miliseconds:\n" \
+		<< "\tapngasm outfile.png frame1.png 200 frame2.png 100 [options]\n"
+		<< "Assemble an APNG with specific frame delays in fractions of a second:\n" \
+		<< "\tapngasm outfile.png frame1.png 1:2 frame2.png 3:5 [options]\n"
+		<< "Disassemble an APNG file into frames and JSON/XML directive files:\n" \
+		<< "\tapngasm apng_file.png\n" \
+		<< "Optimize or re-assemble PNG/APNG file with new options:\n" \
+		<< "\tapngasm outfile.png infile.png [options]\n" \
+		<< "options";
+	return description.str();
 }
