@@ -2,6 +2,7 @@ LINK_DIRECTORIES(${APNGASM_BINARY_DIR}/lib)
 
 ADD_EXECUTABLE(apngasm-cli
     ${APNGASM_SOURCE_DIR}/src/apngasm-cli.cpp
+    ${APNGASM_SOURCE_DIR}/src/options.cpp
 )
 SET_TARGET_PROPERTIES(apngasm-cli
 	PROPERTIES OUTPUT_NAME apngasm)
