@@ -1,6 +1,5 @@
 apngasm
 =======
-*THIS IS CURRENTLY ONLY A MOCKUP  
 The next generation of apngasm, the APNG Assembler.
 
 Building
@@ -13,7 +12,7 @@ Building on (Ubuntu/Debian) Linux:
 
 1. Install dependencies/build chain
 ```
-sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev
+sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev
 ```
 
 2. Generate makefiles with cmake  
