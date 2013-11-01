@@ -1,27 +1,17 @@
-#include "apngasm.h"
-#include <iostream>
-using namespace std;
+#include "cli.h"
+
+static void warn(const boost::program_options::error &e)
+{
+	std::cerr << "!!! " << e.what() << " !!!" << std::endl;
+}
 
 int main(int argc, char* argv[])
-{
+try {
 	APNGAsm apngasm;
-	cout << "Initializing apngasm " << apngasm.version() << endl;
-
-	apngasm.addFrame("gold01.png", 15, 100);
-	apngasm.addFrame("gold02.png", 15, 100);
-	apngasm.addFrame("gold03.png", 15, 100);
-	apngasm.assemble("gold_anim.png");
-	cout << "frames=" << apngasm.frameCount() << endl;
-
-	apngasm.reset();
-
-	apngasm.addFrame("clock1.png", 1, 1);
-	apngasm.addFrame("clock2.png", 1, 1);
-	apngasm.addFrame("clock3.png", 1, 1);
-	apngasm.addFrame("clock4.png", 1, 1);
-	apngasm.assemble("clock_anim.png");
-	cout << "frames=" << apngasm.frameCount() << endl;
-
-	cout << "OK" << endl;
-	return 0;
+	apngasm_cli::CLI cli(argc, argv);
+	return cli.start();
+} catch(const boost::program_options::invalid_command_line_syntax &e) {
+	warn(e);
+} catch(const boost::program_options::unknown_option              &e) {
+	warn(e);
 }
