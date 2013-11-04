@@ -5,6 +5,14 @@ SET(VERSION 3.0.0)
 
 INCLUDE_DIRECTORIES(${APNGASM_SOURCE_DIR}/src)
 
+# Generate version header
+FILE(WRITE ${APNGASM_SOURCE_DIR}/src/version.h 
+	"#ifndef _VERSION_H_\n"
+	"#define _VERSION_H_\n\n"
+	"#define APNGASM_VERSION \"${VERSION}\"\n\n"
+	"#endif"
+)
+
 ADD_SUBDIRECTORY(${APNGASM_SOURCE_DIR}/lib)
 ADD_SUBDIRECTORY(${APNGASM_SOURCE_DIR}/bin)
 
@@ -19,3 +27,4 @@ SET(CPACK_PACKAGE_FILE_NAME "apngasm-${VERSION}")
 SET(CPACK_COMPONENTS_ALL Libraries ApplicationData)
 
 INCLUDE(CPack)
+

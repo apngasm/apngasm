@@ -1,23 +1,8 @@
 #ifndef _APNGASM_H_
 #define _APNGASM_H_
 
-#include <cstdio>
-#include <string>
-#include <vector>
-#include "zlib.h"
 #include "apngframe.h"
-
-#define APNGASM_VERSION "3.0.0"
-
-typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
-typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
-
-struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
-struct FramePNG {
-	std::vector<CHUNK> chunkSet;
-	unsigned w, h, x, y, delay_num, delay_den;
-	unsigned char dop, bop;
-};
+#include "version.h"
 
 class APNGAsm {
 public:
@@ -67,9 +52,9 @@ public:
 
 private:
 	unsigned char FindCommonType(void);
-	int UpconvertToCommonType(unsigned char coltype);
-	void DirtyTransparencyOptimization(unsigned char coltype);
-	unsigned char DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
+	int upconvertToCommonType(unsigned char coltype);
+	void dirtyTransparencyOptimization(unsigned char coltype);
+    unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
 	bool Save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
 

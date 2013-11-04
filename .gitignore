@@ -12,3 +12,4 @@ CPackSourceConfig.cmake
 _CPack_Packages
 *.deb
 install_manifest.txt
+src/version.h

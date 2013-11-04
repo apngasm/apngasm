@@ -1,41 +1,41 @@
 #include "apngframe.h"
-#include <png.h>
-#include <cstdlib>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1300
-#define swap16(data) _byteswap_ushort(data)
-#define swap32(data) _byteswap_ulong(data)
-#elif defined(__linux__)
-#include <byteswap.h>
-#define swap16(data) bswap_16(data)
-#define swap32(data) bswap_32(data)
-#elif defined(__FreeBSD__)
-#include <sys/endian.h>
-#define swap16(data) bswap16(data)
-#define swap32(data) bswap32(data)
-#elif defined(__APPLE__)
-#include <libkern/OSByteOrder.h>
-#define swap16(data) OSSwapInt16(data)
-#define swap32(data) OSSwapInt32(data)
-#else
-unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data >> 8) & 0xFF);}
-unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
-#endif
-
-#define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-
-#define id_IHDR 0x52444849
-#define id_acTL 0x4C546361
-#define id_fcTL 0x4C546366
-#define id_IDAT 0x54414449
-#define id_fdAT 0x54416466
-#define id_IEND 0x444E4549
-
-
-APNGFrame::APNGFrame() {
+unsigned char* APNGFrame::pixels(unsigned char* setPixels)
+{
+	if (setPixels != NULL)
+		p = setPixels;
+	return p;
 }
 
-APNGFrame::APNGFrame() {
+unsigned int APNGFrame::width(unsigned int setWidth)
+{
+	if (setWidth != 0)
+		w = setWidth;
+	return w;
+}
+
+unsigned int APNGFrame::height(unsigned int setHeight)
+{
+	if (setHeight != 0)
+		h = setHeight;
+	return h;
+}
+
+unsigned char APNGFrame::colorType(unsigned char setColorType)
+{
+	if (setColorType != 255)
+		t = setColorType;
+	return t;
+}
+
+APNGFrame::APNGFrame()
+{
+	w = h = 0;
+}
+
+APNGFrame::APNGFrame(const std::string &filePath, unsigned delay_num, unsigned delay_den)
+{
+	//TODO save extracted info to self
   FILE * f;
   if ((f = fopen(filePath.c_str(), "rb")) != 0)
   {
@@ -135,7 +135,6 @@ APNGFrame::APNGFrame() {
           free(row_ptr);
           png_read_end(png_ptr, NULL);
           png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-          frames.push_back(frame);
         }
       }
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -144,19 +143,12 @@ APNGFrame::APNGFrame() {
   }
 }
 
-int APNGFrame::cmp_colors( const void *arg1, const void *arg2 )
+APNGFrame::APNGFrame(rgb *pixels, unsigned char tr[], unsigned delay_num, unsigned delay_den)
 {
-  if ( ((COLORS*)arg1)->a != ((COLORS*)arg2)->a )
-    return (int)(((COLORS*)arg1)->a) - (int)(((COLORS*)arg2)->a);
+	//TODO
+}
 
-  if ( ((COLORS*)arg1)->num != ((COLORS*)arg2)->num )
-    return (int)(((COLORS*)arg2)->num) - (int)(((COLORS*)arg1)->num);
-
-  if ( ((COLORS*)arg1)->r != ((COLORS*)arg2)->r )
-    return (int)(((COLORS*)arg1)->r) - (int)(((COLORS*)arg2)->r);
-
-  if ( ((COLORS*)arg1)->g != ((COLORS*)arg2)->g )
-    return (int)(((COLORS*)arg1)->g) - (int)(((COLORS*)arg2)->g);
-
-  return (int)(((COLORS*)arg1)->b) - (int)(((COLORS*)arg2)->b);
+APNGFrame::APNGFrame(rgba *pixels, unsigned delay_num, unsigned delay_den)
+{
+	//TODO
 }

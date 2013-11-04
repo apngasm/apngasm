@@ -1,7 +1,21 @@
 #include "apngasm.h"
-#include <string>
-using namespace std;
 
+static int compareColors(const void *arg1, const void *arg2)
+{
+  if ( ((COLORS*)arg1)->a != ((COLORS*)arg2)->a )
+    return (int)(((COLORS*)arg1)->a) - (int)(((COLORS*)arg2)->a);
+
+  if ( ((COLORS*)arg1)->num != ((COLORS*)arg2)->num )
+    return (int)(((COLORS*)arg2)->num) - (int)(((COLORS*)arg1)->num);
+
+  if ( ((COLORS*)arg1)->r != ((COLORS*)arg2)->r )
+    return (int)(((COLORS*)arg1)->r) - (int)(((COLORS*)arg2)->r);
+
+  if ( ((COLORS*)arg1)->g != ((COLORS*)arg2)->g )
+    return (int)(((COLORS*)arg1)->g) - (int)(((COLORS*)arg2)->g);
+
+  return (int)(((COLORS*)arg1)->b) - (int)(((COLORS*)arg2)->b);
+}
 
 //Construct APNGAsm object
 APNGAsm::APNGAsm(void){}
@@ -42,7 +56,7 @@ size_t APNGAsm::reset()
 //Uses default delay of 10ms if not specified
 size_t APNGAsm::addFrame(const string &filePath, unsigned int delay_num, unsigned int delay_den)
 {
-	APNGFrame frame = new APNGFrame(filePath, delay_num, delay_den);
+	APNGFrame frame = APNGFrame(filePath, delay_num, delay_den);
 	frames.push_back(frame);
   return frames.size();
 }
@@ -100,806 +114,6 @@ unsigned char APNGAsm::FindCommonType(void)
   return coltype;
 }
 
-int APNGAsm::UpconvertToCommonType(unsigned char coltype)
-{
-  unsigned char  * sp;
-  unsigned char  * dp;
-  unsigned char    r, g, b;
-  unsigned int     j;
-
-  for (size_t n = 0; n < frames.size(); ++n)
-  {
-    if (coltype == 6 && frames[n].t != 6)
-    {
-      unsigned char * dst = (unsigned char *)malloc(m_size*4);
-      if (dst == NULL)
-        return 1;
-
-      if (frames[n].t == 0)
-      {
-        sp = frames[n].p;
-        dp = dst;
-        if (frames[n].ts == 0)
-        for (j=0; j<m_size; j++)
-        {
-          *dp++ = *sp;
-          *dp++ = *sp;
-          *dp++ = *sp++;
-          *dp++ = 255;
-        }
-        else
-        for (j=0; j<m_size; j++)
-        {
-          g = *sp++;
-          *dp++ = g;
-          *dp++ = g;
-          *dp++ = g;
-          *dp++ = (frames[n].tr[1] == g) ? 0 : 255;
-        }
-      }
-      else
-      if (frames[n].t == 2)
-      {
-        sp = frames[n].p;
-        dp = dst;
-        if (frames[n].ts == 0)
-        for (j=0; j<m_size; j++)
-        {
-          *dp++ = *sp++;
-          *dp++ = *sp++;
-          *dp++ = *sp++;
-          *dp++ = 255;
-        }
-        else
-        for (j=0; j<m_size; j++)
-        {
-          r = *sp++;
-          g = *sp++;
-          b = *sp++;
-          *dp++ = r;
-          *dp++ = g;
-          *dp++ = b;
-          *dp++ = (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b) ? 0 : 255;
-        }
-      }
-      else
-      if (frames[n].t == 3)
-      {
-        sp = frames[n].p;
-        dp = dst;
-        for (j=0; j<m_size; j++, sp++)
-        {
-          *dp++ = frames[n].pl[*sp].r;
-          *dp++ = frames[n].pl[*sp].g;
-          *dp++ = frames[n].pl[*sp].b;
-          *dp++ = frames[n].tr[*sp];
-        }
-      }
-      else
-      if (frames[n].t == 4)
-      {
-        sp = frames[n].p;
-        dp = dst;
-        for (j=0; j<m_size; j++)
-        {
-          *dp++ = *sp;
-          *dp++ = *sp;
-          *dp++ = *sp++;
-          *dp++ = *sp++;
-        }
-      }
-      free(frames[n].p);
-      frames[n].p = dst;
-    }
-    else
-    if (coltype == 4 && frames[n].t == 0)
-    {
-      unsigned char * dst = (unsigned char *)malloc(m_size*2);
-      if (dst == NULL)
-        return 1;
-
-      sp = frames[n].p;
-      dp = dst;
-      for (j=0; j<m_size; j++)
-      {
-        *dp++ = *sp++;
-        *dp++ = 255;
-      }
-      free(frames[n].p);
-      frames[n].p = dst;
-    }
-    else
-    if (coltype == 2 && frames[n].t == 0)
-    {
-      unsigned char * dst = (unsigned char *)malloc(m_size*3);
-      if (dst == NULL)
-        return 1;
-
-      sp = frames[n].p;
-      dp = dst;
-      for (j=0; j<m_size; j++)
-      {
-        *dp++ = *sp;
-        *dp++ = *sp;
-        *dp++ = *sp++;
-      }
-      free(frames[n].p);
-      frames[n].p = dst;
-    }
-  }
-  return 0;
-}
-
-void APNGAsm::DirtyTransparencyOptimization(unsigned char coltype)
-{
-  if (coltype == 6)
-  {
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      unsigned char * sp = frames[n].p;
-      for (unsigned int j=0; j<m_size; j++, sp+=4)
-        if (sp[3] == 0)
-           sp[0] = sp[1] = sp[2] = 0;
-    }
-  }
-  else
-  if (coltype == 4)
-  {
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      unsigned char * sp = frames[n].p;
-      for (unsigned int j=0; j<m_size; j++, sp+=2)
-        if (sp[1] == 0)
-          sp[0] = 0;
-    }
-  }
-}
-
-unsigned char APNGAsm::DownconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype)
-{
-  unsigned int     has_tcolor = 0;
-  unsigned int     colors = 0;
-  unsigned char  * sp;
-  unsigned char  * dp;
-  unsigned char    r, g, b, a;
-  unsigned int     i, j, k;
-  unsigned char    cube[4096];
-  unsigned char    gray[256];
-  COLORS           col[256];
-
-  memset(&cube, 0, sizeof(cube));
-  memset(&gray, 0, sizeof(gray));
-
-  for (i=0; i<256; i++)
-  {
-    col[i].num = 0;
-    col[i].r = col[i].g = col[i].b = i;
-    col[i].a = m_trns[i] = 255;
-  }
-  m_palsize = 0;
-  m_trnssize = 0;
-
-  if (coltype == 6 && !keep_coltype)
-  {
-    int transparent = 255;
-    int simple_trans = 1;
-    int grayscale = 1;
-
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      sp = frames[n].p;
-      for (j=0; j<m_size; j++)
-      {
-        r = *sp++;
-        g = *sp++;
-        b = *sp++;
-        a = *sp++;
-        transparent &= a;
-
-        if (a != 0)
-        {
-          if (a != 255)
-            simple_trans = 0;
-          else
-            if (((r | g | b) & 15) == 0)
-              cube[(r<<4) + g + (b>>4)] = 1;
-
-          if (r != g || g != b)
-            grayscale = 0;
-          else
-            gray[r] = 1;
-        }
-
-        if (colors <= 256)
-        {
-          int found = 0;
-          for (k=0; k<colors; k++)
-          if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
-          {
-            found = 1;
-            col[k].num++;
-            break;
-          }
-          if (found == 0)
-          {
-            if (colors < 256)
-            {
-              col[colors].num++;
-              col[colors].r = r;
-              col[colors].g = g;
-              col[colors].b = b;
-              col[colors].a = a;
-              if (a == 0) has_tcolor = 1;
-            }
-            colors++;
-          }
-        }
-      }
-    }
-
-    if (grayscale && simple_trans && colors<=256) /* 6 -> 0 */
-    {
-      coltype = 0;
-
-      for (i=0; i<256; i++)
-      if (gray[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = i;
-        m_trnssize = 2;
-        break;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          r = *sp++;
-          g = *sp++;
-          b = *sp++;
-          if (*sp++ == 0)
-            *dp++ = m_trns[1];
-          else
-            *dp++ = g;
-        }
-      }
-    }
-    else
-    if (colors<=256)   /* 6 -> 3 */
-    {
-      coltype = 3;
-
-      if (has_tcolor==0 && colors<256)
-        col[colors++].a = 0;
-
-      qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
-
-      m_palsize = colors;
-      for (i=0; i<colors; i++)
-      {
-        m_palette[i].r = col[i].r;
-        m_palette[i].g = col[i].g;
-        m_palette[i].b = col[i].b;
-        m_trns[i]      = col[i].a;
-        if (m_trns[i] != 255) m_trnssize = i+1;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          r = *sp++;
-          g = *sp++;
-          b = *sp++;
-          a = *sp++;
-          for (k=0; k<colors; k++)
-            if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
-              break;
-          *dp++ = k;
-        }
-      }
-    }
-    else
-    if (grayscale)     /* 6 -> 4 */
-    {
-      coltype = 4;
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          r = *sp++;
-          g = *sp++;
-          *dp++ = *sp++;
-          *dp++ = *sp++;
-        }
-      }
-    }
-    else
-    if (simple_trans)  /* 6 -> 2 */
-    {
-      for (i=0; i<4096; i++)
-      if (cube[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = (i>>4)&0xF0;
-        m_trns[2] = 0;
-        m_trns[3] = i&0xF0;
-        m_trns[4] = 0;
-        m_trns[5] = (i<<4)&0xF0;
-        m_trnssize = 6;
-        break;
-      }
-      if (transparent == 255)
-      {
-        coltype = 2;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = dp = frames[n].p;
-          for (j=0; j<m_size; j++)
-          {
-            *dp++ = *sp++;
-            *dp++ = *sp++;
-            *dp++ = *sp++;
-            sp++;
-          }
-        }
-      }
-      else
-      if (m_trnssize != 0)
-      {
-        coltype = 2;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = dp = frames[n].p;
-          for (j=0; j<m_size; j++)
-          {
-            r = *sp++;
-            g = *sp++;
-            b = *sp++;
-            a = *sp++;
-            if (a == 0)
-            {
-              *dp++ = m_trns[1];
-              *dp++ = m_trns[3];
-              *dp++ = m_trns[5];
-            }
-            else
-            {
-              *dp++ = r;
-              *dp++ = g;
-              *dp++ = b;
-            }
-          }
-        }
-      }
-    }
-  }
-  else
-  if (coltype == 2)
-  {
-    int grayscale = 1;
-
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      sp = frames[n].p;
-      for (j=0; j<m_size; j++)
-      {
-        r = *sp++;
-        g = *sp++;
-        b = *sp++;
-
-        if (frames[n].ts == 0)
-          if (((r | g | b) & 15) == 0)
-            cube[(r<<4) + g + (b>>4)] = 1;
-
-        if (r != g || g != b)
-          grayscale = 0;
-        else
-          gray[r] = 1;
-
-        if (colors <= 256)
-        {
-          int found = 0;
-          for (k=0; k<colors; k++)
-          if (col[k].r == r && col[k].g == g && col[k].b == b)
-          {
-            found = 1;
-            col[k].num++;
-            break;
-          }
-          if (found == 0)
-          {
-            if (colors < 256)
-            {
-              col[colors].num++;
-              col[colors].r = r;
-              col[colors].g = g;
-              col[colors].b = b;
-              if (frames[n].ts == 6 && frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
-              {
-                col[colors].a = 0;
-                has_tcolor = 1;
-              }
-            }
-            colors++;
-          }
-        }
-      }
-    }
-
-    if (grayscale && colors<=256 && !keep_coltype) /* 2 -> 0 */
-    {
-      for (i=0; i<256; i++)
-      if (gray[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = i;
-        m_trnssize = 2;
-        break;
-      }
-      if (frames[0].ts == 0)
-      {
-        coltype = 0;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = dp = frames[n].p;
-          for (j=0; j<m_size; j++, sp+=3)
-            *dp++ = *sp;
-        }
-      }
-      else
-      if (m_trnssize != 0)
-      {
-        coltype = 0;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = dp = frames[n].p;
-          for (j=0; j<m_size; j++)
-          {
-            r = *sp++;
-            g = *sp++;
-            b = *sp++;
-            if (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
-              *dp++ = m_trns[1];
-            else
-              *dp++ = g;
-          }
-        }
-      }
-    }
-    else
-    if (colors<=256 && !keep_coltype)   /* 2 -> 3 */
-    {
-      coltype = 3;
-
-      if (has_tcolor==0 && colors<256)
-        col[colors++].a = 0;
-
-      qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
-
-      m_palsize = colors;
-      for (i=0; i<colors; i++)
-      {
-        m_palette[i].r = col[i].r;
-        m_palette[i].g = col[i].g;
-        m_palette[i].b = col[i].b;
-        m_trns[i]      = col[i].a;
-        if (m_trns[i] != 255) m_trnssize = i+1;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          r = *sp++;
-          g = *sp++;
-          b = *sp++;
-
-          for (k=0; k<colors; k++)
-            if (col[k].r == r && col[k].g == g && col[k].b == b)
-              break;
-          *dp++ = k;
-        }
-      }
-    }
-    else /* 2 -> 2 */
-    {
-      if (frames[0].ts != 0)
-      {
-        memcpy(m_trns, frames[0].tr, frames[0].ts);
-        m_trnssize = frames[0].ts;
-      }
-      else
-      for (i=0; i<4096; i++)
-      if (cube[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = (i>>4)&0xF0;
-        m_trns[2] = 0;
-        m_trns[3] = i&0xF0;
-        m_trns[4] = 0;
-        m_trns[5] = (i<<4)&0xF0;
-        m_trnssize = 6;
-        break;
-      }
-    }
-  }
-  else
-  if (coltype == 4 && !keep_coltype)
-  {
-    int simple_trans = 1;
-
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      sp = frames[n].p;
-      for (j=0; j<m_size; j++)
-      {
-        g = *sp++;
-        a = *sp++;
-
-        if (a != 0)
-        {
-          if (a != 255)
-            simple_trans = 0;
-          else
-            gray[g] = 1;
-        }
-
-        if (colors <= 256)
-        {
-          int found = 0;
-          for (k=0; k<colors; k++)
-          if (col[k].g == g && col[k].a == a)
-          {
-            found = 1;
-            col[k].num++;
-            break;
-          }
-          if (found == 0)
-          {
-            if (colors < 256)
-            {
-              col[colors].num++;
-              col[colors].r = g;
-              col[colors].g = g;
-              col[colors].b = g;
-              col[colors].a = a;
-              if (a == 0) has_tcolor = 1;
-            }
-            colors++;
-          }
-        }
-      }
-    }
-
-    if (simple_trans && colors<=256)   /* 4 -> 0 */
-    {
-      coltype = 0;
-
-      for (i=0; i<256; i++)
-      if (gray[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = i;
-        m_trnssize = 2;
-        break;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          g = *sp++;
-          if (*sp++ == 0)
-            *dp++ = m_trns[1];
-          else
-            *dp++ = g;
-        }
-      }
-    }
-    else
-    if (colors<=256)   /* 4 -> 3 */
-    {
-      coltype = 3;
-
-      if (has_tcolor==0 && colors<256)
-        col[colors++].a = 0;
-
-      qsort(&col[0], colors, sizeof(COLORS), cmp_colors);
-
-      m_palsize = colors;
-      for (i=0; i<colors; i++)
-      {
-        m_palette[i].r = col[i].r;
-        m_palette[i].g = col[i].g;
-        m_palette[i].b = col[i].b;
-        m_trns[i]      = col[i].a;
-        if (m_trns[i] != 255) m_trnssize = i+1;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = dp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          g = *sp++;
-          a = *sp++;
-          for (k=0; k<colors; k++)
-            if (col[k].g == g && col[k].a == a)
-              break;
-          *dp++ = k;
-        }
-      }
-    }
-  }
-  else
-  if (coltype == 3)
-  {
-    int simple_trans = 1;
-    int grayscale = 1;
-
-    for (int c=0; c<frames[0].ps; c++)
-    {
-      col[c].r = frames[0].pl[c].r;
-      col[c].g = frames[0].pl[c].g;
-      col[c].b = frames[0].pl[c].b;
-      col[c].a = frames[0].tr[c];
-    }
-
-    for (size_t n = 0; n < frames.size(); ++n)
-    {
-      sp = frames[n].p;
-      for (j=0; j<m_size; j++)
-        col[*sp++].num++;
-    }
-
-    for (i=0; i<256; i++)
-    if (col[i].num != 0)
-    {
-      colors = i+1;
-      if (col[i].a != 0)
-      {
-        if (col[i].a != 255)
-          simple_trans = 0;
-        else
-        if (col[i].r != col[i].g || col[i].g != col[i].b)
-          grayscale = 0;
-        else
-          gray[col[i].g] = 1;
-      }
-      else
-        has_tcolor = 1;
-    }
-
-    if (grayscale && simple_trans && !keep_coltype) /* 3 -> 0 */
-    {
-      for (i=0; i<256; i++)
-      if (gray[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = i;
-        m_trnssize = 2;
-        break;
-      }
-      if (!has_tcolor)
-      {
-        coltype = 0;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = frames[n].p;
-          for (j=0; j<m_size; j++, sp++)
-            *sp = frames[n].pl[*sp].g;
-        }
-      }
-      else
-      if (m_trnssize != 0)
-      {
-        coltype = 0;
-        for (size_t n = 0; n < frames.size(); ++n)
-        {
-          sp = frames[n].p;
-          for (j=0; j<m_size; j++, sp++)
-          {
-            if (col[*sp].a == 0)
-              *sp = m_trns[1];
-            else
-              *sp = frames[n].pl[*sp].g;
-          }
-        }
-      }
-    }
-    else
-    if (!keep_palette)                 /* 3 -> 3 */
-    {
-      for (i=0; i<256; i++)
-      if (col[i].num == 0)
-      {
-        col[i].a = 255;
-        if (!has_tcolor)
-        {
-          col[i].a = 0;
-          has_tcolor = 1;
-        }
-      }
-
-      qsort(&col[0], 256, sizeof(COLORS), cmp_colors);
-
-      for (i=0; i<256; i++)
-      {
-        m_palette[i].r = col[i].r;
-        m_palette[i].g = col[i].g;
-        m_palette[i].b = col[i].b;
-        m_trns[i]      = col[i].a;
-        if (col[i].num != 0)
-          m_palsize = i+1;
-        if (m_trns[i] != 255)
-          m_trnssize = i+1;
-      }
-
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = frames[n].p;
-        for (j=0; j<m_size; j++)
-        {
-          r = frames[n].pl[*sp].r;
-          g = frames[n].pl[*sp].g;
-          b = frames[n].pl[*sp].b;
-          a = frames[n].tr[*sp];
-
-          for (k=0; k<m_palsize; k++)
-            if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
-              break;
-          *sp++ = k;
-        }
-      }
-    }
-    else
-    {
-      m_palsize = frames[0].ps;
-      m_trnssize = frames[0].ts;
-      for (i=0; i<m_palsize; i++)
-      {
-        m_palette[i].r = col[i].r;
-        m_palette[i].g = col[i].g;
-        m_palette[i].b = col[i].b;
-      }
-      for (i=0; i<m_trnssize; i++)
-        m_trns[i] = col[i].a;
-    }
-  }
-  else
-  if (coltype == 0)  /* 0 -> 0 */
-  {
-    if (frames[0].ts != 0)
-    {
-      memcpy(m_trns, frames[0].tr, frames[0].ts);
-      m_trnssize = frames[0].ts;
-    }
-    else
-    {
-      for (size_t n = 0; n < frames.size(); ++n)
-      {
-        sp = frames[n].p;
-        for (j=0; j<m_size; j++)
-          gray[*sp++] = 1;
-      }
-      for (i=0; i<256; i++)
-      if (gray[i] == 0)
-      {
-        m_trns[0] = 0;
-        m_trns[1] = i;
-        m_trnssize = 2;
-        break;
-      }
-    }
-  }
-  return coltype;
-}
 
 bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
 {
@@ -1221,12 +435,12 @@ bool APNGAsm::assemble(const string &outputPath)
 
   unsigned char coltype = FindCommonType();
 
-  if (UpconvertToCommonType(coltype))
+  if (upconvertToCommonType(coltype))
     return false;
 
-  DirtyTransparencyOptimization(coltype);
+  dirtyTransparencyOptimization(coltype);
 
-  coltype = DownconvertOptimizations(coltype, false, false);
+  coltype = downconvertOptimizations(coltype, false, false);
 
   return Save(outputPath, coltype, 0, 0);
 }
@@ -1636,8 +850,6 @@ void APNGAsm::write_IDATs(FILE * f, int n, unsigned char * data, unsigned int le
   }
 }
 
-// private static object
-// TODO to be removed during implementation of actual code
 namespace
 {
   vector<APNGFrame> tmpFrames;
@@ -1972,4 +1184,805 @@ const vector<APNGFrame>& APNGAsm::loadJSONSpec(const string &filePath)
 const vector<APNGFrame>& APNGAsm::loadXMLSpec(const string &filePath)
 {
   return tmpFrames;
+}
+
+int APNGAsm::upconvertToCommonType(unsigned char coltype)
+{
+  unsigned char  * sp;
+  unsigned char  * dp;
+  unsigned char    r, g, b;
+  unsigned int     j;
+
+  for (size_t n = 0; n < frames.size(); ++n)
+  {
+    if (coltype == 6 && frames[n].t != 6)
+    {
+      unsigned char * dst = (unsigned char *)malloc(m_size*4);
+      if (dst == NULL)
+        return 1;
+
+      if (frames[n].t == 0)
+      {
+        sp = frames[n].p;
+        dp = dst;
+        if (frames[n].ts == 0)
+        for (j=0; j<m_size; j++)
+        {
+          *dp++ = *sp;
+          *dp++ = *sp;
+          *dp++ = *sp++;
+          *dp++ = 255;
+        }
+        else
+        for (j=0; j<m_size; j++)
+        {
+          g = *sp++;
+          *dp++ = g;
+          *dp++ = g;
+          *dp++ = g;
+          *dp++ = (frames[n].tr[1] == g) ? 0 : 255;
+        }
+      }
+      else
+      if (frames[n].t == 2)
+      {
+        sp = frames[n].p;
+        dp = dst;
+        if (frames[n].ts == 0)
+        for (j=0; j<m_size; j++)
+        {
+          *dp++ = *sp++;
+          *dp++ = *sp++;
+          *dp++ = *sp++;
+          *dp++ = 255;
+        }
+        else
+        for (j=0; j<m_size; j++)
+        {
+          r = *sp++;
+          g = *sp++;
+          b = *sp++;
+          *dp++ = r;
+          *dp++ = g;
+          *dp++ = b;
+          *dp++ = (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b) ? 0 : 255;
+        }
+      }
+      else
+      if (frames[n].t == 3)
+      {
+        sp = frames[n].p;
+        dp = dst;
+        for (j=0; j<m_size; j++, sp++)
+        {
+          *dp++ = frames[n].pl[*sp].r;
+          *dp++ = frames[n].pl[*sp].g;
+          *dp++ = frames[n].pl[*sp].b;
+          *dp++ = frames[n].tr[*sp];
+        }
+      }
+      else
+      if (frames[n].t == 4)
+      {
+        sp = frames[n].p;
+        dp = dst;
+        for (j=0; j<m_size; j++)
+        {
+          *dp++ = *sp;
+          *dp++ = *sp;
+          *dp++ = *sp++;
+          *dp++ = *sp++;
+        }
+      }
+      free(frames[n].p);
+      frames[n].p = dst;
+    }
+    else
+    if (coltype == 4 && frames[n].t == 0)
+    {
+      unsigned char * dst = (unsigned char *)malloc(m_size*2);
+      if (dst == NULL)
+        return 1;
+
+      sp = frames[n].p;
+      dp = dst;
+      for (j=0; j<m_size; j++)
+      {
+        *dp++ = *sp++;
+        *dp++ = 255;
+      }
+      free(frames[n].p);
+      frames[n].p = dst;
+    }
+    else
+    if (coltype == 2 && frames[n].t == 0)
+    {
+      unsigned char * dst = (unsigned char *)malloc(m_size*3);
+      if (dst == NULL)
+        return 1;
+
+      sp = frames[n].p;
+      dp = dst;
+      for (j=0; j<m_size; j++)
+      {
+        *dp++ = *sp;
+        *dp++ = *sp;
+        *dp++ = *sp++;
+      }
+      free(frames[n].p);
+      frames[n].p = dst;
+    }
+  }
+  return 0;
+}
+
+void APNGAsm::dirtyTransparencyOptimization(unsigned char coltype)
+{
+  if (coltype == 6)
+  {
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      unsigned char * sp = frames[n].p;
+      for (unsigned int j=0; j<m_size; j++, sp+=4)
+        if (sp[3] == 0)
+           sp[0] = sp[1] = sp[2] = 0;
+    }
+  }
+  else
+  if (coltype == 4)
+  {
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      unsigned char * sp = frames[n].p;
+      for (unsigned int j=0; j<m_size; j++, sp+=2)
+        if (sp[1] == 0)
+          sp[0] = 0;
+    }
+  }
+}
+
+unsigned char APNGAsm::downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype)
+{
+  unsigned int     has_tcolor = 0;
+  unsigned int     colors = 0;
+  unsigned char  * sp;
+  unsigned char  * dp;
+  unsigned char    r, g, b, a;
+  unsigned int     i, j, k;
+  unsigned char    cube[4096];
+  unsigned char    gray[256];
+  COLORS           col[256];
+
+  memset(&cube, 0, sizeof(cube));
+  memset(&gray, 0, sizeof(gray));
+
+  for (i=0; i<256; i++)
+  {
+    col[i].num = 0;
+    col[i].r = col[i].g = col[i].b = i;
+    col[i].a = m_trns[i] = 255;
+  }
+  m_palsize = 0;
+  m_trnssize = 0;
+
+  if (coltype == 6 && !keep_coltype)
+  {
+    int transparent = 255;
+    int simple_trans = 1;
+    int grayscale = 1;
+
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      sp = frames[n].p;
+      for (j=0; j<m_size; j++)
+      {
+        r = *sp++;
+        g = *sp++;
+        b = *sp++;
+        a = *sp++;
+        transparent &= a;
+
+        if (a != 0)
+        {
+          if (a != 255)
+            simple_trans = 0;
+          else
+            if (((r | g | b) & 15) == 0)
+              cube[(r<<4) + g + (b>>4)] = 1;
+
+          if (r != g || g != b)
+            grayscale = 0;
+          else
+            gray[r] = 1;
+        }
+
+        if (colors <= 256)
+        {
+          int found = 0;
+          for (k=0; k<colors; k++)
+          if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
+          {
+            found = 1;
+            col[k].num++;
+            break;
+          }
+          if (found == 0)
+          {
+            if (colors < 256)
+            {
+              col[colors].num++;
+              col[colors].r = r;
+              col[colors].g = g;
+              col[colors].b = b;
+              col[colors].a = a;
+              if (a == 0) has_tcolor = 1;
+            }
+            colors++;
+          }
+        }
+      }
+    }
+
+    if (grayscale && simple_trans && colors<=256) /* 6 -> 0 */
+    {
+      coltype = 0;
+
+      for (i=0; i<256; i++)
+      if (gray[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = i;
+        m_trnssize = 2;
+        break;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          r = *sp++;
+          g = *sp++;
+          b = *sp++;
+          if (*sp++ == 0)
+            *dp++ = m_trns[1];
+          else
+            *dp++ = g;
+        }
+      }
+    }
+    else
+    if (colors<=256)   /* 6 -> 3 */
+    {
+      coltype = 3;
+
+      if (has_tcolor==0 && colors<256)
+        col[colors++].a = 0;
+
+      qsort(&col[0], colors, sizeof(COLORS), compareColors);
+
+      m_palsize = colors;
+      for (i=0; i<colors; i++)
+      {
+        m_palette[i].r = col[i].r;
+        m_palette[i].g = col[i].g;
+        m_palette[i].b = col[i].b;
+        m_trns[i]      = col[i].a;
+        if (m_trns[i] != 255) m_trnssize = i+1;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          r = *sp++;
+          g = *sp++;
+          b = *sp++;
+          a = *sp++;
+          for (k=0; k<colors; k++)
+            if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
+              break;
+          *dp++ = k;
+        }
+      }
+    }
+    else
+    if (grayscale)     /* 6 -> 4 */
+    {
+      coltype = 4;
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          r = *sp++;
+          g = *sp++;
+          *dp++ = *sp++;
+          *dp++ = *sp++;
+        }
+      }
+    }
+    else
+    if (simple_trans)  /* 6 -> 2 */
+    {
+      for (i=0; i<4096; i++)
+      if (cube[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = (i>>4)&0xF0;
+        m_trns[2] = 0;
+        m_trns[3] = i&0xF0;
+        m_trns[4] = 0;
+        m_trns[5] = (i<<4)&0xF0;
+        m_trnssize = 6;
+        break;
+      }
+      if (transparent == 255)
+      {
+        coltype = 2;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = dp = frames[n].p;
+          for (j=0; j<m_size; j++)
+          {
+            *dp++ = *sp++;
+            *dp++ = *sp++;
+            *dp++ = *sp++;
+            sp++;
+          }
+        }
+      }
+      else
+      if (m_trnssize != 0)
+      {
+        coltype = 2;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = dp = frames[n].p;
+          for (j=0; j<m_size; j++)
+          {
+            r = *sp++;
+            g = *sp++;
+            b = *sp++;
+            a = *sp++;
+            if (a == 0)
+            {
+              *dp++ = m_trns[1];
+              *dp++ = m_trns[3];
+              *dp++ = m_trns[5];
+            }
+            else
+            {
+              *dp++ = r;
+              *dp++ = g;
+              *dp++ = b;
+            }
+          }
+        }
+      }
+    }
+  }
+  else
+  if (coltype == 2)
+  {
+    int grayscale = 1;
+
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      sp = frames[n].p;
+      for (j=0; j<m_size; j++)
+      {
+        r = *sp++;
+        g = *sp++;
+        b = *sp++;
+
+        if (frames[n].ts == 0)
+          if (((r | g | b) & 15) == 0)
+            cube[(r<<4) + g + (b>>4)] = 1;
+
+        if (r != g || g != b)
+          grayscale = 0;
+        else
+          gray[r] = 1;
+
+        if (colors <= 256)
+        {
+          int found = 0;
+          for (k=0; k<colors; k++)
+          if (col[k].r == r && col[k].g == g && col[k].b == b)
+          {
+            found = 1;
+            col[k].num++;
+            break;
+          }
+          if (found == 0)
+          {
+            if (colors < 256)
+            {
+              col[colors].num++;
+              col[colors].r = r;
+              col[colors].g = g;
+              col[colors].b = b;
+              if (frames[n].ts == 6 && frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
+              {
+                col[colors].a = 0;
+                has_tcolor = 1;
+              }
+            }
+            colors++;
+          }
+        }
+      }
+    }
+
+    if (grayscale && colors<=256 && !keep_coltype) /* 2 -> 0 */
+    {
+      for (i=0; i<256; i++)
+      if (gray[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = i;
+        m_trnssize = 2;
+        break;
+      }
+      if (frames[0].ts == 0)
+      {
+        coltype = 0;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = dp = frames[n].p;
+          for (j=0; j<m_size; j++, sp+=3)
+            *dp++ = *sp;
+        }
+      }
+      else
+      if (m_trnssize != 0)
+      {
+        coltype = 0;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = dp = frames[n].p;
+          for (j=0; j<m_size; j++)
+          {
+            r = *sp++;
+            g = *sp++;
+            b = *sp++;
+            if (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
+              *dp++ = m_trns[1];
+            else
+              *dp++ = g;
+          }
+        }
+      }
+    }
+    else
+    if (colors<=256 && !keep_coltype)   /* 2 -> 3 */
+    {
+      coltype = 3;
+
+      if (has_tcolor==0 && colors<256)
+        col[colors++].a = 0;
+
+      qsort(&col[0], colors, sizeof(COLORS), compareColors);
+
+      m_palsize = colors;
+      for (i=0; i<colors; i++)
+      {
+        m_palette[i].r = col[i].r;
+        m_palette[i].g = col[i].g;
+        m_palette[i].b = col[i].b;
+        m_trns[i]      = col[i].a;
+        if (m_trns[i] != 255) m_trnssize = i+1;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          r = *sp++;
+          g = *sp++;
+          b = *sp++;
+
+          for (k=0; k<colors; k++)
+            if (col[k].r == r && col[k].g == g && col[k].b == b)
+              break;
+          *dp++ = k;
+        }
+      }
+    }
+    else /* 2 -> 2 */
+    {
+      if (frames[0].ts != 0)
+      {
+        memcpy(m_trns, frames[0].tr, frames[0].ts);
+        m_trnssize = frames[0].ts;
+      }
+      else
+      for (i=0; i<4096; i++)
+      if (cube[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = (i>>4)&0xF0;
+        m_trns[2] = 0;
+        m_trns[3] = i&0xF0;
+        m_trns[4] = 0;
+        m_trns[5] = (i<<4)&0xF0;
+        m_trnssize = 6;
+        break;
+      }
+    }
+  }
+  else
+  if (coltype == 4 && !keep_coltype)
+  {
+    int simple_trans = 1;
+
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      sp = frames[n].p;
+      for (j=0; j<m_size; j++)
+      {
+        g = *sp++;
+        a = *sp++;
+
+        if (a != 0)
+        {
+          if (a != 255)
+            simple_trans = 0;
+          else
+            gray[g] = 1;
+        }
+
+        if (colors <= 256)
+        {
+          int found = 0;
+          for (k=0; k<colors; k++)
+          if (col[k].g == g && col[k].a == a)
+          {
+            found = 1;
+            col[k].num++;
+            break;
+          }
+          if (found == 0)
+          {
+            if (colors < 256)
+            {
+              col[colors].num++;
+              col[colors].r = g;
+              col[colors].g = g;
+              col[colors].b = g;
+              col[colors].a = a;
+              if (a == 0) has_tcolor = 1;
+            }
+            colors++;
+          }
+        }
+      }
+    }
+
+    if (simple_trans && colors<=256)   /* 4 -> 0 */
+    {
+      coltype = 0;
+
+      for (i=0; i<256; i++)
+      if (gray[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = i;
+        m_trnssize = 2;
+        break;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          g = *sp++;
+          if (*sp++ == 0)
+            *dp++ = m_trns[1];
+          else
+            *dp++ = g;
+        }
+      }
+    }
+    else
+    if (colors<=256)   /* 4 -> 3 */
+    {
+      coltype = 3;
+
+      if (has_tcolor==0 && colors<256)
+        col[colors++].a = 0;
+
+      qsort(&col[0], colors, sizeof(COLORS), compareColors);
+
+      m_palsize = colors;
+      for (i=0; i<colors; i++)
+      {
+        m_palette[i].r = col[i].r;
+        m_palette[i].g = col[i].g;
+        m_palette[i].b = col[i].b;
+        m_trns[i]      = col[i].a;
+        if (m_trns[i] != 255) m_trnssize = i+1;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = dp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          g = *sp++;
+          a = *sp++;
+          for (k=0; k<colors; k++)
+            if (col[k].g == g && col[k].a == a)
+              break;
+          *dp++ = k;
+        }
+      }
+    }
+  }
+  else
+  if (coltype == 3)
+  {
+    int simple_trans = 1;
+    int grayscale = 1;
+
+    for (int c=0; c<frames[0].ps; c++)
+    {
+      col[c].r = frames[0].pl[c].r;
+      col[c].g = frames[0].pl[c].g;
+      col[c].b = frames[0].pl[c].b;
+      col[c].a = frames[0].tr[c];
+    }
+
+    for (size_t n = 0; n < frames.size(); ++n)
+    {
+      sp = frames[n].p;
+      for (j=0; j<m_size; j++)
+        col[*sp++].num++;
+    }
+
+    for (i=0; i<256; i++)
+    if (col[i].num != 0)
+    {
+      colors = i+1;
+      if (col[i].a != 0)
+      {
+        if (col[i].a != 255)
+          simple_trans = 0;
+        else
+        if (col[i].r != col[i].g || col[i].g != col[i].b)
+          grayscale = 0;
+        else
+          gray[col[i].g] = 1;
+      }
+      else
+        has_tcolor = 1;
+    }
+
+    if (grayscale && simple_trans && !keep_coltype) /* 3 -> 0 */
+    {
+      for (i=0; i<256; i++)
+      if (gray[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = i;
+        m_trnssize = 2;
+        break;
+      }
+      if (!has_tcolor)
+      {
+        coltype = 0;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = frames[n].p;
+          for (j=0; j<m_size; j++, sp++)
+            *sp = frames[n].pl[*sp].g;
+        }
+      }
+      else
+      if (m_trnssize != 0)
+      {
+        coltype = 0;
+        for (size_t n = 0; n < frames.size(); ++n)
+        {
+          sp = frames[n].p;
+          for (j=0; j<m_size; j++, sp++)
+          {
+            if (col[*sp].a == 0)
+              *sp = m_trns[1];
+            else
+              *sp = frames[n].pl[*sp].g;
+          }
+        }
+      }
+    }
+    else
+    if (!keep_palette)                 /* 3 -> 3 */
+    {
+      for (i=0; i<256; i++)
+      if (col[i].num == 0)
+      {
+        col[i].a = 255;
+        if (!has_tcolor)
+        {
+          col[i].a = 0;
+          has_tcolor = 1;
+        }
+      }
+
+      qsort(&col[0], 256, sizeof(COLORS), compareColors);
+
+      for (i=0; i<256; i++)
+      {
+        m_palette[i].r = col[i].r;
+        m_palette[i].g = col[i].g;
+        m_palette[i].b = col[i].b;
+        m_trns[i]      = col[i].a;
+        if (col[i].num != 0)
+          m_palsize = i+1;
+        if (m_trns[i] != 255)
+          m_trnssize = i+1;
+      }
+
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = frames[n].p;
+        for (j=0; j<m_size; j++)
+        {
+          r = frames[n].pl[*sp].r;
+          g = frames[n].pl[*sp].g;
+          b = frames[n].pl[*sp].b;
+          a = frames[n].tr[*sp];
+
+          for (k=0; k<m_palsize; k++)
+            if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
+              break;
+          *sp++ = k;
+        }
+      }
+    }
+    else
+    {
+      m_palsize = frames[0].ps;
+      m_trnssize = frames[0].ts;
+      for (i=0; i<m_palsize; i++)
+      {
+        m_palette[i].r = col[i].r;
+        m_palette[i].g = col[i].g;
+        m_palette[i].b = col[i].b;
+      }
+      for (i=0; i<m_trnssize; i++)
+        m_trns[i] = col[i].a;
+    }
+  }
+  else
+  if (coltype == 0)  /* 0 -> 0 */
+  {
+    if (frames[0].ts != 0)
+    {
+      memcpy(m_trns, frames[0].tr, frames[0].ts);
+      m_trnssize = frames[0].ts;
+    }
+    else
+    {
+      for (size_t n = 0; n < frames.size(); ++n)
+      {
+        sp = frames[n].p;
+        for (j=0; j<m_size; j++)
+          gray[*sp++] = 1;
+      }
+      for (i=0; i<256; i++)
+      if (gray[i] == 0)
+      {
+        m_trns[0] = 0;
+        m_trns[1] = i;
+        m_trnssize = 2;
+        break;
+      }
+    }
+  }
+  return coltype;
 }
