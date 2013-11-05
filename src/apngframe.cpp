@@ -49,9 +49,8 @@ APNGFrame::APNGFrame(const std::string &filePath, unsigned delay_num, unsigned d
       info_ptr = png_create_info_struct(png_ptr);
       if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
       {
-        APNGFrame frame;
-        frame.delay_num = delay_num;
-        frame.delay_den = delay_den;
+        delay_num = delay_num;
+        delay_den = delay_den;
 
         png_byte       depth;
         png_uint_32    rowbytes, i;
@@ -63,13 +62,13 @@ APNGFrame::APNGFrame(const std::string &filePath, unsigned delay_num, unsigned d
         png_init_io(png_ptr, f);
         png_set_sig_bytes(png_ptr, 8);
         png_read_info(png_ptr, info_ptr);
-        frame.w = png_get_image_width(png_ptr, info_ptr);
-        frame.h = png_get_image_height(png_ptr, info_ptr);
-        frame.t = png_get_color_type(png_ptr, info_ptr);
+        w = png_get_image_width(png_ptr, info_ptr);
+        h = png_get_image_height(png_ptr, info_ptr);
+        t = png_get_color_type(png_ptr, info_ptr);
         depth   = png_get_bit_depth(png_ptr, info_ptr);
         if (depth < 8)
         {
-          if (frame.t == PNG_COLOR_TYPE_PALETTE)
+          if (t == PNG_COLOR_TYPE_PALETTE)
             png_set_packing(png_ptr);
           else
             png_set_expand(png_ptr);
@@ -82,54 +81,54 @@ APNGFrame::APNGFrame(const std::string &filePath, unsigned delay_num, unsigned d
         }
         (void)png_set_interlace_handling(png_ptr);
         png_read_update_info(png_ptr, info_ptr);
-        frame.t = png_get_color_type(png_ptr, info_ptr);
+        t = png_get_color_type(png_ptr, info_ptr);
         rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-        memset(frame.pl, 255, sizeof(frame.pl));
-        memset(frame.tr, 255, sizeof(frame.tr));
+        memset(pl, 255, sizeof(pl));
+        memset(tr, 255, sizeof(tr));
 
-        if (png_get_PLTE(png_ptr, info_ptr, &palette, &frame.ps))
-          memcpy(frame.pl, palette, frame.ps * 3);
+        if (png_get_PLTE(png_ptr, info_ptr, &palette, &ps))
+          memcpy(pl, palette, ps * 3);
         else
-          frame.ps = 0;
+          ps = 0;
 
-        if (png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &frame.ts, &trans_color))
+        if (png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &ts, &trans_color))
         {
-          if (frame.ts > 0)
+          if (ts > 0)
           {
-            if (frame.t == PNG_COLOR_TYPE_GRAY)
+            if (t == PNG_COLOR_TYPE_GRAY)
             {
-              frame.tr[0] = 0;
-              frame.tr[1] = trans_color->gray & 0xFF;
-              frame.ts = 2;
+              tr[0] = 0;
+              tr[1] = trans_color->gray & 0xFF;
+              ts = 2;
             }
             else
-            if (frame.t == PNG_COLOR_TYPE_RGB)
+            if (t == PNG_COLOR_TYPE_RGB)
             {
-              frame.tr[0] = 0;
-              frame.tr[1] = trans_color->red & 0xFF;
-              frame.tr[2] = 0;
-              frame.tr[3] = trans_color->green & 0xFF;
-              frame.tr[4] = 0;
-              frame.tr[5] = trans_color->blue & 0xFF;
-              frame.ts = 6;
+              tr[0] = 0;
+              tr[1] = trans_color->red & 0xFF;
+              tr[2] = 0;
+              tr[3] = trans_color->green & 0xFF;
+              tr[4] = 0;
+              tr[5] = trans_color->blue & 0xFF;
+              ts = 6;
             }
             else
-            if (frame.t == PNG_COLOR_TYPE_PALETTE)
-              memcpy(frame.tr, trans_alpha, frame.ts);
+            if (t == PNG_COLOR_TYPE_PALETTE)
+              memcpy(tr, trans_alpha, ts);
             else
-              frame.ts = 0;
+              ts = 0;
           }
         }
         else
-          frame.ts = 0;
+          ts = 0;
 
-        frame.p = (unsigned char *)malloc(frame.h * rowbytes);
-        row_ptr  = (png_bytepp)malloc(frame.h * sizeof(png_bytep));
+        p = (unsigned char *)malloc(h * rowbytes);
+        row_ptr  = (png_bytepp)malloc(h * sizeof(png_bytep));
 
-        if (frame.p != NULL && row_ptr != NULL)
+        if (p != NULL && row_ptr != NULL)
         {
-          for (i=0; i<frame.h; i++)
-            row_ptr[i] = frame.p + i*rowbytes;
+          for (i=0; i<h; i++)
+            row_ptr[i] = p + i*rowbytes;
 
           png_read_image(png_ptr, row_ptr);
           free(row_ptr);
