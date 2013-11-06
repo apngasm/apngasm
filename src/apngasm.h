@@ -1,11 +1,13 @@
 #ifndef _APNGASM_H_
 #define _APNGASM_H_
 
+#include <vector>
+#include <string>
 #include "apngframe.h"
 #include "version.h"
 
 namespace apngasm {
-	
+
 	class APNGAsm {
 	public:
 		std::vector<APNGFrame> frames;
@@ -104,6 +106,7 @@ namespace apngasm {
 
 		std::vector<CHUNK>   all_chunks;
 	};	// class APNGAsm
+	
 }	// namespace apngasm
 
 #endif  // _APNGASM_H_
