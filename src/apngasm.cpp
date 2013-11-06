@@ -23,12 +23,12 @@ namespace apngasm {
   APNGAsm::APNGAsm(void){}
 
   //Construct APNGAsm object
-  APNGAsm::APNGAsm(const vector<APNGFrame> &frames)
+  APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
   {
     this->frames.insert(this->frames.end(), frames.begin(), frames.end());
   }
 
-  string APNGAsm::version(void)
+  std::string APNGAsm::version(void)
   {
     return APNGASM_VERSION;
   }
@@ -56,7 +56,7 @@ namespace apngasm {
   //Adds a frame from a file
   //Returns the frame number in the frame vector
   //Uses default delay of 10ms if not specified
-  size_t APNGAsm::addFrame(const string &filePath, unsigned int delay_num, unsigned int delay_den)
+  size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delay_num, unsigned int delay_den)
   {
   	APNGFrame frame = APNGFrame(filePath, delay_num, delay_den);
   	frames.push_back(frame);
@@ -82,10 +82,10 @@ namespace apngasm {
   //Loads an animation spec from JSON or XML
   //Returns a frame vector with the loaded frames
   //Loaded frames are added to the end of the frame vector
-  const vector<APNGFrame>& APNGAsm::loadAnimationSpec(const string &filePath)
+  const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
     const bool isJSON = true;
-    const vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
+    const std::vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
     frames.insert(frames.end(), newFrames.begin(), newFrames.end());
     return frames;
   }
@@ -117,7 +117,7 @@ namespace apngasm {
   }
 
 
-  bool APNGAsm::Save(const string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
+  bool APNGAsm::Save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
   {
     unsigned int    j, k;
     unsigned int    has_tcolor = 0;
@@ -426,7 +426,7 @@ namespace apngasm {
   //Assembles and outputs an APNG file
   //Returns the assembled file object
   //If no output path is specified only the file object is returned
-  bool APNGAsm::assemble(const string &outputPath)
+  bool APNGAsm::assemble(const std::string &outputPath)
   {
     if (frames.empty())
       return false;
@@ -854,7 +854,7 @@ namespace apngasm {
 
   namespace
   {
-    vector<APNGFrame> tmpFrames;
+    std::vector<APNGFrame> tmpFrames;
   }
 
   void info_fn(png_structp png_ptr, png_infop info_ptr)
@@ -979,7 +979,7 @@ namespace apngasm {
     }
   }
 
-  const vector<APNGFrame>& APNGAsm::disassemble(const string &filePath)
+  const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
   {
     unsigned int   i, j, id;
     unsigned int   w, h;
@@ -1176,14 +1176,14 @@ namespace apngasm {
 
   //Loads an animation spec from JSON
   //Returns a frame vector with the loaded frames
-  const vector<APNGFrame>& APNGAsm::loadJSONSpec(const string &filePath)
+  const std::vector<APNGFrame>& APNGAsm::loadJSONSpec(const std::string &filePath)
   {
     return tmpFrames;
   }
 
   //Loads an animation spec from XML
   //Returns a frame vector with the loaded frames
-  const vector<APNGFrame>& APNGAsm::loadXMLSpec(const string &filePath)
+  const std::vector<APNGFrame>& APNGAsm::loadXMLSpec(const std::string &filePath)
   {
     return tmpFrames;
   }
@@ -1988,5 +1988,5 @@ namespace apngasm {
     }
     return coltype;
   }
-  
+
 } // namespace apngasm

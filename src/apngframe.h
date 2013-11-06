@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
-using namespace std;
 
 namespace apngasm {
 
@@ -97,7 +96,7 @@ namespace apngasm {
 
   private:
   };  // class APNGFrame
-  
+
 } // namespace apngasm
 
 #endif /* _APNGFRAME_H_ */
