@@ -18,7 +18,7 @@ namespace apngasm_cli {
 	class CLI {
 	private:
 		Options options;
-		APNGAsm assembler;
+		apngasm::APNGAsm assembler;
 
 		// true: create succeeded
 		bool create_parent_dirs(const std::string &filepath);

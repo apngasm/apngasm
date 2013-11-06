@@ -7,7 +7,7 @@ static void warn(const boost::program_options::error &e)
 
 int main(int argc, char* argv[])
 try {
-	APNGAsm apngasm;
+	apngasm::APNGAsm apngasm;
 	apngasm_cli::CLI cli(argc, argv);
 	return cli.start();
 } catch(const boost::program_options::invalid_command_line_syntax &e) {

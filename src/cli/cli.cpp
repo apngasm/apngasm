@@ -151,7 +151,7 @@ namespace apngasm_cli {
 
 	int CLI::disassemble(const std::string &src)
 	{
-		std::vector<APNGFrame> frames = assembler.disassemble(src);
+		std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
 		std::cout << frames.size() << std::endl;
 		std::string outdir;
 		if(!options.outputFile(outdir)) {
@@ -159,7 +159,7 @@ namespace apngasm_cli {
 			outdir = path.replace_extension("").string();
 		}
 		for(unsigned i=0; i<frames.size(); ++i) {
-			APNGAsm out;
+			apngasm::APNGAsm out;
 			out.addFrame(frames[i]);
 			std::ostringstream filename;
 			filename << outdir << "/" << i << ".png";
