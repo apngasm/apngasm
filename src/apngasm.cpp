@@ -2,6 +2,37 @@
 
 namespace apngasm {
 
+  #if defined(_MSC_VER) && _MSC_VER >= 1300
+  #define swap16(data) _byteswap_ushort(data)
+  #define swap32(data) _byteswap_ulong(data)
+  #elif defined(__linux__)
+  #include <byteswap.h>
+  #define swap16(data) bswap_16(data)
+  #define swap32(data) bswap_32(data)
+  #elif defined(__FreeBSD__)
+  #include <sys/endian.h>
+  #define swap16(data) bswap16(data)
+  #define swap32(data) bswap32(data)
+  #elif defined(__APPLE__)
+  #include <libkern/OSByteOrder.h>
+  #define swap16(data) OSSwapInt16(data)
+  #define swap32(data) OSSwapInt32(data)
+  #else
+  unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data >> 8) & 0xFF);}
+  unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
+  #endif
+
+  #define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
+
+  #define id_IHDR 0x52444849
+  #define id_acTL 0x4C546361
+  #define id_fcTL 0x4C546366
+  #define id_IDAT 0x54414449
+  #define id_fdAT 0x54416466
+  #define id_IEND 0x444E4549
+
+  typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
+
   static int compareColors(const void *arg1, const void *arg2)
   {
     if ( ((COLORS*)arg1)->a != ((COLORS*)arg2)->a )
@@ -28,7 +59,8 @@ namespace apngasm {
     this->frames.insert(this->frames.end(), frames.begin(), frames.end());
   }
 
-  std::string APNGAsm::version(void)
+  //Returns the version of APNGAsm
+  const char* APNGAsm::version(void) const
   {
     return APNGASM_VERSION;
   }

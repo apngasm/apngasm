@@ -8,6 +8,15 @@
 
 namespace apngasm {
 
+  typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
+
+  struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
+  struct FramePNG {
+    std::vector<CHUNK> chunkSet;
+    unsigned w, h, x, y, delay_num, delay_den;
+    unsigned char dop, bop;
+  };
+
 	class APNGAsm {
 	public:
 		std::vector<APNGFrame> frames;
@@ -52,7 +61,8 @@ namespace apngasm {
 		//Throw away all frames, start over
 		size_t reset();
 
-		std::string version(void);
+    //Returns the version of APNGAsm
+		const char* version(void) const;
 
 	private:
 		unsigned char FindCommonType(void);

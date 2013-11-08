@@ -1,4 +1,5 @@
 #include "apngframe.h"
+#include <zlib.h>
 
 namespace apngasm {
 

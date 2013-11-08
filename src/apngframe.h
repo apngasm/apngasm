@@ -2,53 +2,12 @@
 #define _APNGFRAME_H_
 
 #include <png.h>
-#include <zlib.h>
 #include <cstdlib>
-#include <vector>
 #include <string>
 
 namespace apngasm {
 
-  #if defined(_MSC_VER) && _MSC_VER >= 1300
-  #define swap16(data) _byteswap_ushort(data)
-  #define swap32(data) _byteswap_ulong(data)
-  #elif defined(__linux__)
-  #include <byteswap.h>
-  #define swap16(data) bswap_16(data)
-  #define swap32(data) bswap_32(data)
-  #elif defined(__FreeBSD__)
-  #include <sys/endian.h>
-  #define swap16(data) bswap16(data)
-  #define swap32(data) bswap32(data)
-  #elif defined(__APPLE__)
-  #include <libkern/OSByteOrder.h>
-  #define swap16(data) OSSwapInt16(data)
-  #define swap32(data) OSSwapInt32(data)
-  #else
-  unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data >> 8) & 0xFF);}
-  unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
-  #endif
-
-  #define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-
-  #define id_IHDR 0x52444849
-  #define id_acTL 0x4C546361
-  #define id_fcTL 0x4C546366
-  #define id_IDAT 0x54414449
-  #define id_fdAT 0x54416466
-  #define id_IEND 0x444E4549
-
-  typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
-  typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
-
-  struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
-  struct FramePNG {
-  	std::vector<CHUNK> chunkSet;
-  	unsigned w, h, x, y, delay_num, delay_den;
-  	unsigned char dop, bop;
-  };
-
-  #define DEFAULT_FRAME_NUMERATOR 100
+  const unsigned DEFAULT_FRAME_NUMERATOR = 100;
   #define DEFAULT_FRAME_DENOMINATOR 1000
 
   typedef struct { unsigned char r, g, b; } rgb;
