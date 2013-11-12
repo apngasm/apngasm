@@ -56,7 +56,7 @@ namespace apngasm {
   //Construct APNGAsm object
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
   {
-    this->frames.insert(this->frames.end(), frames.begin(), frames.end());
+    _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
 
   //Returns the version of APNGAsm
@@ -67,40 +67,40 @@ namespace apngasm {
 
   size_t APNGAsm::frameCount()
   {
-    return frames.size();
+    return _frames.size();
   }
 
   size_t APNGAsm::reset()
   {
-    if (frames.empty())
+    if (_frames.empty())
       return 0;
 
-    for (size_t n = 0; n < frames.size(); ++n)
+    for (size_t n = 0; n < _frames.size(); ++n)
     {
-      if (frames[n].p != NULL)
-        free(frames[n].p);
+      if (_frames[n]._pixels != NULL)
+        free(_frames[n]._pixels);
     }
-    frames.clear();
+    _frames.clear();
 
-    return frames.size();
+    return _frames.size();
   }
 
   //Adds a frame from a file
   //Returns the frame number in the frame vector
   //Uses default delay of 10ms if not specified
-  size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delay_num, unsigned int delay_den)
+  size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
   {
-  	APNGFrame frame = APNGFrame(filePath, delay_num, delay_den);
-  	frames.push_back(frame);
-    return frames.size();
+  	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
+  	_frames.push_back(frame);
+    return _frames.size();
   }
 
   //Adds an APNGFrame object to the frame vector
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(const APNGFrame &frame)
   {
-    frames.push_back(frame);
-    return frames.size();
+    _frames.push_back(frame);
+    return _frames.size();
   }
 
   //Adds an APNGFrame object to the frame vector
@@ -118,26 +118,26 @@ namespace apngasm {
   {
     const bool isJSON = true;
     const std::vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
-    frames.insert(frames.end(), newFrames.begin(), newFrames.end());
-    return frames;
+    _frames.insert(_frames.end(), newFrames.begin(), newFrames.end());
+    return _frames;
   }
 
   unsigned char APNGAsm::FindCommonType(void)
   {
-    unsigned char coltype = frames[0].t;
+    unsigned char coltype = _frames[0]._colorType;
 
-    for (size_t n = 1; n < frames.size(); ++n)
+    for (size_t n = 1; n < _frames.size(); ++n)
     {
-      if (frames[0].ps != frames[n].ps || memcmp(frames[0].pl, frames[n].pl, frames[0].ps*3) != 0)
+      if (_frames[0]._palleteSize != _frames[n]._palleteSize || memcmp(_frames[0]._palette, _frames[n]._palette, _frames[0]._palleteSize*3) != 0)
         coltype = 6;
       else
-      if (frames[0].ts != frames[n].ts || memcmp(frames[0].tr, frames[n].tr, frames[0].ts) != 0)
+      if (_frames[0]._transparencySize != _frames[n]._transparencySize || memcmp(_frames[0]._transparency, _frames[n]._transparency, _frames[0]._transparencySize) != 0)
         coltype = 6;
       else
-      if (frames[n].t != 3)
+      if (_frames[n]._colorType != 3)
       {
         if (coltype != 3)
-          coltype |= frames[n].t;
+          coltype |= _frames[n]._colorType;
         else
           coltype = 6;
       }
@@ -236,7 +236,7 @@ namespace apngasm {
       {
         unsigned int    mFrameCount;
         unsigned int    mLoopCount;
-      } actl = { swap32(frames.size()-first), swap32(loops) };
+      } actl = { swap32(_frames.size()-first), swap32(loops) };
 
       struct fcTL
       {
@@ -255,7 +255,7 @@ namespace apngasm {
 
       write_chunk(f, "IHDR", (unsigned char *)(&ihdr), 13);
 
-      if (frames.size() > 1)
+      if (_frames.size() > 1)
         write_chunk(f, "acTL", (unsigned char *)(&actl), 8);
       else
         first = 0;
@@ -317,7 +317,7 @@ namespace apngasm {
 
       for (j=0; j<6; j++)
         op[j].valid = 0;
-      deflate_rect_op(frames[0].p, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
+      deflate_rect_op(_frames[0]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
       deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
 
       if (first)
@@ -326,11 +326,11 @@ namespace apngasm {
 
         for (j=0; j<6; j++)
           op[j].valid = 0;
-        deflate_rect_op(frames[1].p, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
+        deflate_rect_op(_frames[1]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
         deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
       }
 
-      for (size_t n = first; n < frames.size()-1; ++n)
+      for (size_t n = first; n < _frames.size()-1; ++n)
       {
         unsigned int op_min;
         int          op_best;
@@ -339,12 +339,12 @@ namespace apngasm {
           op[j].valid = 0;
 
         /* dispose = none */
-        get_rect(m_width, m_height, frames[n].p, frames[n+1].p, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
+        get_rect(m_width, m_height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
 
         /* dispose = background */
         if (has_tcolor)
         {
-          memcpy(temp, frames[n].p, imagesize);
+          memcpy(temp, _frames[n]._pixels, imagesize);
           if (coltype == 2)
             for (j=0; j<h0; j++)
               for (k=0; k<w0; k++)
@@ -353,12 +353,12 @@ namespace apngasm {
             for (j=0; j<h0; j++)
               memset(temp + ((j+y0)*m_width + x0)*bpp, tcolor, w0*bpp);
 
-          get_rect(m_width, m_height, temp, frames[n+1].p, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
+          get_rect(m_width, m_height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
         }
 
         /* dispose = previous */
         if (n > first)
-          get_rect(m_width, m_height, frames[n-1].p, frames[n+1].p, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
+          get_rect(m_width, m_height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
 
         op_min = op[0].size;
         op_best = 0;
@@ -378,8 +378,8 @@ namespace apngasm {
         fctl.mHeight    = swap32(h0);
         fctl.mXOffset   = swap32(x0);
         fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(frames[n].delay_num);
-        fctl.mDelayDen  = swap16(frames[n].delay_den);
+        fctl.mDelayNum  = swap16(_frames[n]._delayNum);
+        fctl.mDelayDen  = swap16(_frames[n]._delayDen);
         fctl.mDisposeOp = dop;
         fctl.mBlendOp   = bop;
         write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
@@ -392,16 +392,16 @@ namespace apngasm {
           if (coltype == 2)
             for (j=0; j<h0; j++)
               for (k=0; k<w0; k++)
-                memcpy(frames[n].p + ((j+y0)*m_width + (k+x0))*3, &tcolor, 3);
+                memcpy(_frames[n]._pixels + ((j+y0)*m_width + (k+x0))*3, &tcolor, 3);
           else
             for (j=0; j<h0; j++)
-              memset(frames[n].p + ((j+y0)*m_width + x0)*bpp, tcolor, w0*bpp);
+              memset(_frames[n]._pixels + ((j+y0)*m_width + x0)*bpp, tcolor, w0*bpp);
         }
         else
         if (dop == 2)
         {
           for (j=0; j<h0; j++)
-            memcpy(frames[n].p + ((j+y0)*m_width + x0)*bpp, frames[n-1].p + ((j+y0)*m_width + x0)*bpp, w0*bpp);
+            memcpy(_frames[n]._pixels + ((j+y0)*m_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*m_width + x0)*bpp, w0*bpp);
         }
         /* process apng dispose - end */
 
@@ -414,21 +414,21 @@ namespace apngasm {
         deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, op_best);
       }
 
-      if (frames.size() > 1)
+      if (_frames.size() > 1)
       {
         fctl.mSeq       = swap32(m_next_seq_num++);
         fctl.mWidth     = swap32(w0);
         fctl.mHeight    = swap32(h0);
         fctl.mXOffset   = swap32(x0);
         fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(frames[frames.size()-1].delay_num);
-        fctl.mDelayDen  = swap16(frames[frames.size()-1].delay_den);
+        fctl.mDelayNum  = swap16(_frames[_frames.size()-1]._delayNum);
+        fctl.mDelayDen  = swap16(_frames[_frames.size()-1]._delayDen);
         fctl.mDisposeOp = 0;
         fctl.mBlendOp   = bop;
         write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
       }
 
-      write_IDATs(f, frames.size()-1, zbuf, zsize, idat_size);
+      write_IDATs(f, _frames.size()-1, zbuf, zsize, idat_size);
 
       write_chunk(f, "tEXt", png_Software, 27);
       write_chunk(f, "IEND", 0, 0);
@@ -460,11 +460,11 @@ namespace apngasm {
   //If no output path is specified only the file object is returned
   bool APNGAsm::assemble(const std::string &outputPath)
   {
-    if (frames.empty())
+    if (_frames.empty())
       return false;
 
-    m_width  = frames[0].w;
-    m_height = frames[0].h;
+    m_width  = _frames[0]._width;
+    m_height = _frames[0]._height;
     m_size   = m_width * m_height;
 
     unsigned char coltype = FindCommonType();
@@ -898,21 +898,21 @@ namespace apngasm {
     png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
     (void)png_set_interlace_handling(png_ptr);
     png_read_update_info(png_ptr, info_ptr);
-    frame->w = png_get_image_width(png_ptr, info_ptr);
-    frame->h = png_get_image_height(png_ptr, info_ptr);
-    unsigned int rowbytes = frame->w * 4;
+    frame->_width = png_get_image_width(png_ptr, info_ptr);
+    frame->_height = png_get_image_height(png_ptr, info_ptr);
+    unsigned int rowbytes = frame->_width * 4;
 
-    frame->p = new unsigned char[frame->h * rowbytes];
-    frame->rows = new png_bytep[frame->h * sizeof(png_bytep)];
-    if (frame->p && frame->rows)
-      for (unsigned int j=0; j<frame->h; ++j)
-        frame->rows[j] = frame->p + j * rowbytes;
+    frame->_pixels = new unsigned char[frame->_height * rowbytes];
+    frame->_rows = new png_bytep[frame->_height * sizeof(png_bytep)];
+    if (frame->_pixels && frame->_rows)
+      for (unsigned int j=0; j<frame->_height; ++j)
+        frame->_rows[j] = frame->_pixels + j * rowbytes;
   }
 
   void row_fn(png_structp png_ptr, png_bytep new_row, png_uint_32 row_num, int pass)
   {
     APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
-    png_progressive_combine_row(png_ptr, frame->rows[row_num], new_row);
+    png_progressive_combine_row(png_ptr, frame->_rows[row_num], new_row);
   }
 
   void APNGAsm::decode_frame(APNGFrame * frameOut, FramePNG * frameIn)
@@ -998,11 +998,11 @@ namespace apngasm {
       {
         png_init_io(png_ptr, f);
         png_set_compression_level(png_ptr, 9);
-        if (frame->p && frame->rows)
+        if (frame->_pixels && frame->_rows)
         {
-          png_set_IHDR(png_ptr, info_ptr, frame->w, frame->h, 8, 6, 0, 0, 0);
+          png_set_IHDR(png_ptr, info_ptr, frame->_width, frame->_height, 8, 6, 0, 0, 0);
           png_write_info(png_ptr, info_ptr);
-          png_write_image(png_ptr, frame->rows);
+          png_write_image(png_ptr, frame->_rows);
           png_write_end(png_ptr, info_ptr);
         }
       }
@@ -1045,7 +1045,7 @@ namespace apngasm {
           frame.chunkSet.push_back(chunk_sign);
           frame.chunkSet.push_back(chunk_ihdr);
           frame.w = w = swap32(pi[2]);
-          frame.h = h = swap32(pi[3]);
+          frame.w = h = swap32(pi[3]);
           frame.x = 0;
           frame.y = 0;
           frame.delay_num = 1;
@@ -1059,13 +1059,13 @@ namespace apngasm {
           APNGFrame frameCur;
           APNGFrame frameNext;
 
-          frameCur.w = w;
-          frameCur.h = h;
-          frameCur.p = new unsigned char[imagesize];
-          frameCur.rows = new png_bytep[h * sizeof(png_bytep)];
-          if (frameCur.p && frameCur.rows)
+          frameCur._width = w;
+          frameCur._height = h;
+          frameCur._pixels = new unsigned char[imagesize];
+          frameCur._rows = new png_bytep[h * sizeof(png_bytep)];
+          if (frameCur._pixels && frameCur._rows)
             for (j=0; j<h; ++j)
-              frameCur.rows[j] = frameCur.p + j * rowbytes;
+              frameCur._rows[j] = frameCur._pixels + j * rowbytes;
 
           while ( !feof(f) )
           {
@@ -1087,30 +1087,30 @@ namespace apngasm {
 
               if (flag_fctl)
               {
-                frameNext.p = new unsigned char[imagesize];
-                frameNext.rows = new png_bytep[h * sizeof(png_bytep)];
-                if (frameNext.p && frameNext.rows)
+                frameNext._pixels = new unsigned char[imagesize];
+                frameNext._rows = new png_bytep[h * sizeof(png_bytep)];
+                if (frameNext._pixels && frameNext._rows)
                   for (j=0; j<h; ++j)
-                    frameNext.rows[j] = frameNext.p + j * rowbytes;
+                    frameNext._rows[j] = frameNext._pixels + j * rowbytes;
 
                 if (frame.dop == 2)
-                  memcpy(frameNext.p, frameCur.p, imagesize);
+                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
 
                 decode_frame(&frameRaw, &frame);
-                compose_frame(frameCur.rows, frameRaw.rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
-                frameCur.delay_num = frame.delay_num;
-                frameCur.delay_den = frame.delay_den;
-                frames.push_back(frameCur);
+                compose_frame(frameCur._rows, frameRaw._rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
+                frameCur._delayNum = frame.delay_num;
+                frameCur._delayDen = frame.delay_den;
+                _frames.push_back(frameCur);
 
                 if (frame.dop != 2)
                 {
-                  memcpy(frameNext.p, frameCur.p, imagesize);
+                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
                   if (frame.dop == 1)
                     for (j=0; j<frame.h; j++)
-                      memset(frameNext.rows[frame.y + j], 0, frame.w * 4);
+                      memset(frameNext._rows[frame.y + j], 0, frame.w * 4);
                 }
-                frameCur.p = frameNext.p;
-                frameCur.rows = frameNext.rows;
+                frameCur._pixels = frameNext._pixels;
+                frameCur._rows = frameNext._rows;
               }
 
               memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
@@ -1177,10 +1177,10 @@ namespace apngasm {
               frame.chunkSet.push_back(chunk_iend);
 
               decode_frame(&frameRaw, &frame);
-              compose_frame(frameCur.rows, frameRaw.rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
-              frameCur.delay_num = frame.delay_num;
-              frameCur.delay_den = frame.delay_den;
-              frames.push_back(frameCur);
+              compose_frame(frameCur._rows, frameRaw._rows, frame.bop, frame.x, frame.y, frame.w, frame.h);
+              frameCur._delayNum = frame.delay_num;
+              frameCur._delayDen = frame.delay_den;
+              _frames.push_back(frameCur);
               break;
             }
             else
@@ -1203,7 +1203,7 @@ namespace apngasm {
 
       delete[] chunk_ihdr.p;
     }
-    return frames;
+    return _frames;
   }
 
   //Loads an animation spec from JSON
@@ -1227,19 +1227,19 @@ namespace apngasm {
     unsigned char    r, g, b;
     unsigned int     j;
 
-    for (size_t n = 0; n < frames.size(); ++n)
+    for (size_t n = 0; n < _frames.size(); ++n)
     {
-      if (coltype == 6 && frames[n].t != 6)
+      if (coltype == 6 && _frames[n]._colorType != 6)
       {
         unsigned char * dst = (unsigned char *)malloc(m_size*4);
         if (dst == NULL)
           return 1;
 
-        if (frames[n].t == 0)
+        if (_frames[n]._colorType == 0)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           dp = dst;
-          if (frames[n].ts == 0)
+          if (_frames[n]._transparencySize == 0)
           for (j=0; j<m_size; j++)
           {
             *dp++ = *sp;
@@ -1254,15 +1254,15 @@ namespace apngasm {
             *dp++ = g;
             *dp++ = g;
             *dp++ = g;
-            *dp++ = (frames[n].tr[1] == g) ? 0 : 255;
+            *dp++ = (_frames[n]._transparency[1] == g) ? 0 : 255;
           }
         }
         else
-        if (frames[n].t == 2)
+        if (_frames[n]._colorType == 2)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           dp = dst;
-          if (frames[n].ts == 0)
+          if (_frames[n]._transparencySize == 0)
           for (j=0; j<m_size; j++)
           {
             *dp++ = *sp++;
@@ -1279,26 +1279,26 @@ namespace apngasm {
             *dp++ = r;
             *dp++ = g;
             *dp++ = b;
-            *dp++ = (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b) ? 0 : 255;
+            *dp++ = (_frames[n]._transparency[1] == r && _frames[n]._transparency[3] == g && _frames[n]._transparency[5] == b) ? 0 : 255;
           }
         }
         else
-        if (frames[n].t == 3)
+        if (_frames[n]._colorType == 3)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           dp = dst;
           for (j=0; j<m_size; j++, sp++)
           {
-            *dp++ = frames[n].pl[*sp].r;
-            *dp++ = frames[n].pl[*sp].g;
-            *dp++ = frames[n].pl[*sp].b;
-            *dp++ = frames[n].tr[*sp];
+            *dp++ = _frames[n]._palette[*sp].r;
+            *dp++ = _frames[n]._palette[*sp].g;
+            *dp++ = _frames[n]._palette[*sp].b;
+            *dp++ = _frames[n]._transparency[*sp];
           }
         }
         else
-        if (frames[n].t == 4)
+        if (_frames[n]._colorType == 4)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           dp = dst;
           for (j=0; j<m_size; j++)
           {
@@ -1308,34 +1308,34 @@ namespace apngasm {
             *dp++ = *sp++;
           }
         }
-        free(frames[n].p);
-        frames[n].p = dst;
+        free(_frames[n]._pixels);
+        _frames[n]._pixels = dst;
       }
       else
-      if (coltype == 4 && frames[n].t == 0)
+      if (coltype == 4 && _frames[n]._colorType == 0)
       {
         unsigned char * dst = (unsigned char *)malloc(m_size*2);
         if (dst == NULL)
           return 1;
 
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         dp = dst;
         for (j=0; j<m_size; j++)
         {
           *dp++ = *sp++;
           *dp++ = 255;
         }
-        free(frames[n].p);
-        frames[n].p = dst;
+        free(_frames[n]._pixels);
+        _frames[n]._pixels = dst;
       }
       else
-      if (coltype == 2 && frames[n].t == 0)
+      if (coltype == 2 && _frames[n]._colorType == 0)
       {
         unsigned char * dst = (unsigned char *)malloc(m_size*3);
         if (dst == NULL)
           return 1;
 
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         dp = dst;
         for (j=0; j<m_size; j++)
         {
@@ -1343,8 +1343,8 @@ namespace apngasm {
           *dp++ = *sp;
           *dp++ = *sp++;
         }
-        free(frames[n].p);
-        frames[n].p = dst;
+        free(_frames[n]._pixels);
+        _frames[n]._pixels = dst;
       }
     }
     return 0;
@@ -1354,9 +1354,9 @@ namespace apngasm {
   {
     if (coltype == 6)
     {
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        unsigned char * sp = frames[n].p;
+        unsigned char * sp = _frames[n]._pixels;
         for (unsigned int j=0; j<m_size; j++, sp+=4)
           if (sp[3] == 0)
              sp[0] = sp[1] = sp[2] = 0;
@@ -1365,9 +1365,9 @@ namespace apngasm {
     else
     if (coltype == 4)
     {
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        unsigned char * sp = frames[n].p;
+        unsigned char * sp = _frames[n]._pixels;
         for (unsigned int j=0; j<m_size; j++, sp+=2)
           if (sp[1] == 0)
             sp[0] = 0;
@@ -1405,9 +1405,9 @@ namespace apngasm {
       int simple_trans = 1;
       int grayscale = 1;
 
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         for (j=0; j<m_size; j++)
         {
           r = *sp++;
@@ -1470,9 +1470,9 @@ namespace apngasm {
           break;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             r = *sp++;
@@ -1505,9 +1505,9 @@ namespace apngasm {
           if (m_trns[i] != 255) m_trnssize = i+1;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             r = *sp++;
@@ -1525,9 +1525,9 @@ namespace apngasm {
       if (grayscale)     /* 6 -> 4 */
       {
         coltype = 4;
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             r = *sp++;
@@ -1555,9 +1555,9 @@ namespace apngasm {
         if (transparent == 255)
         {
           coltype = 2;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = dp = frames[n].p;
+            sp = dp = _frames[n]._pixels;
             for (j=0; j<m_size; j++)
             {
               *dp++ = *sp++;
@@ -1571,9 +1571,9 @@ namespace apngasm {
         if (m_trnssize != 0)
         {
           coltype = 2;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = dp = frames[n].p;
+            sp = dp = _frames[n]._pixels;
             for (j=0; j<m_size; j++)
             {
               r = *sp++;
@@ -1602,16 +1602,16 @@ namespace apngasm {
     {
       int grayscale = 1;
 
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         for (j=0; j<m_size; j++)
         {
           r = *sp++;
           g = *sp++;
           b = *sp++;
 
-          if (frames[n].ts == 0)
+          if (_frames[n]._transparencySize == 0)
             if (((r | g | b) & 15) == 0)
               cube[(r<<4) + g + (b>>4)] = 1;
 
@@ -1638,7 +1638,7 @@ namespace apngasm {
                 col[colors].r = r;
                 col[colors].g = g;
                 col[colors].b = b;
-                if (frames[n].ts == 6 && frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
+                if (_frames[n]._transparencySize == 6 && _frames[n]._transparency[1] == r && _frames[n]._transparency[3] == g && _frames[n]._transparency[5] == b)
                 {
                   col[colors].a = 0;
                   has_tcolor = 1;
@@ -1660,12 +1660,12 @@ namespace apngasm {
           m_trnssize = 2;
           break;
         }
-        if (frames[0].ts == 0)
+        if (_frames[0]._transparencySize == 0)
         {
           coltype = 0;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = dp = frames[n].p;
+            sp = dp = _frames[n]._pixels;
             for (j=0; j<m_size; j++, sp+=3)
               *dp++ = *sp;
           }
@@ -1674,15 +1674,15 @@ namespace apngasm {
         if (m_trnssize != 0)
         {
           coltype = 0;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = dp = frames[n].p;
+            sp = dp = _frames[n]._pixels;
             for (j=0; j<m_size; j++)
             {
               r = *sp++;
               g = *sp++;
               b = *sp++;
-              if (frames[n].tr[1] == r && frames[n].tr[3] == g && frames[n].tr[5] == b)
+              if (_frames[n]._transparency[1] == r && _frames[n]._transparency[3] == g && _frames[n]._transparency[5] == b)
                 *dp++ = m_trns[1];
               else
                 *dp++ = g;
@@ -1710,9 +1710,9 @@ namespace apngasm {
           if (m_trns[i] != 255) m_trnssize = i+1;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             r = *sp++;
@@ -1728,10 +1728,10 @@ namespace apngasm {
       }
       else /* 2 -> 2 */
       {
-        if (frames[0].ts != 0)
+        if (_frames[0]._transparencySize != 0)
         {
-          memcpy(m_trns, frames[0].tr, frames[0].ts);
-          m_trnssize = frames[0].ts;
+          memcpy(m_trns, _frames[0]._transparency, _frames[0]._transparencySize);
+          m_trnssize = _frames[0]._transparencySize;
         }
         else
         for (i=0; i<4096; i++)
@@ -1753,9 +1753,9 @@ namespace apngasm {
     {
       int simple_trans = 1;
 
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         for (j=0; j<m_size; j++)
         {
           g = *sp++;
@@ -1809,9 +1809,9 @@ namespace apngasm {
           break;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             g = *sp++;
@@ -1842,9 +1842,9 @@ namespace apngasm {
           if (m_trns[i] != 255) m_trnssize = i+1;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = dp = frames[n].p;
+          sp = dp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
             g = *sp++;
@@ -1863,17 +1863,17 @@ namespace apngasm {
       int simple_trans = 1;
       int grayscale = 1;
 
-      for (int c=0; c<frames[0].ps; c++)
+      for (int c=0; c<_frames[0]._palleteSize; c++)
       {
-        col[c].r = frames[0].pl[c].r;
-        col[c].g = frames[0].pl[c].g;
-        col[c].b = frames[0].pl[c].b;
-        col[c].a = frames[0].tr[c];
+        col[c].r = _frames[0]._palette[c].r;
+        col[c].g = _frames[0]._palette[c].g;
+        col[c].b = _frames[0]._palette[c].b;
+        col[c].a = _frames[0]._transparency[c];
       }
 
-      for (size_t n = 0; n < frames.size(); ++n)
+      for (size_t n = 0; n < _frames.size(); ++n)
       {
-        sp = frames[n].p;
+        sp = _frames[n]._pixels;
         for (j=0; j<m_size; j++)
           col[*sp++].num++;
       }
@@ -1909,26 +1909,26 @@ namespace apngasm {
         if (!has_tcolor)
         {
           coltype = 0;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = frames[n].p;
+            sp = _frames[n]._pixels;
             for (j=0; j<m_size; j++, sp++)
-              *sp = frames[n].pl[*sp].g;
+              *sp = _frames[n]._palette[*sp].g;
           }
         }
         else
         if (m_trnssize != 0)
         {
           coltype = 0;
-          for (size_t n = 0; n < frames.size(); ++n)
+          for (size_t n = 0; n < _frames.size(); ++n)
           {
-            sp = frames[n].p;
+            sp = _frames[n]._pixels;
             for (j=0; j<m_size; j++, sp++)
             {
               if (col[*sp].a == 0)
                 *sp = m_trns[1];
               else
-                *sp = frames[n].pl[*sp].g;
+                *sp = _frames[n]._palette[*sp].g;
             }
           }
         }
@@ -1961,15 +1961,15 @@ namespace apngasm {
             m_trnssize = i+1;
         }
 
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
           {
-            r = frames[n].pl[*sp].r;
-            g = frames[n].pl[*sp].g;
-            b = frames[n].pl[*sp].b;
-            a = frames[n].tr[*sp];
+            r = _frames[n]._palette[*sp].r;
+            g = _frames[n]._palette[*sp].g;
+            b = _frames[n]._palette[*sp].b;
+            a = _frames[n]._transparency[*sp];
 
             for (k=0; k<m_palsize; k++)
               if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
@@ -1980,8 +1980,8 @@ namespace apngasm {
       }
       else
       {
-        m_palsize = frames[0].ps;
-        m_trnssize = frames[0].ts;
+        m_palsize = _frames[0]._palleteSize;
+        m_trnssize = _frames[0]._transparencySize;
         for (i=0; i<m_palsize; i++)
         {
           m_palette[i].r = col[i].r;
@@ -1995,16 +1995,16 @@ namespace apngasm {
     else
     if (coltype == 0)  /* 0 -> 0 */
     {
-      if (frames[0].ts != 0)
+      if (_frames[0]._transparencySize != 0)
       {
-        memcpy(m_trns, frames[0].tr, frames[0].ts);
-        m_trnssize = frames[0].ts;
+        memcpy(m_trns, _frames[0]._transparency, _frames[0]._transparencySize);
+        m_trnssize = _frames[0]._transparencySize;
       }
       else
       {
-        for (size_t n = 0; n < frames.size(); ++n)
+        for (size_t n = 0; n < _frames.size(); ++n)
         {
-          sp = frames[n].p;
+          sp = _frames[n]._pixels;
           for (j=0; j<m_size; j++)
             gray[*sp++] = 1;
         }

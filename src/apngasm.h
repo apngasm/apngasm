@@ -19,8 +19,6 @@ namespace apngasm {
 
 	class APNGAsm {
 	public:
-		std::vector<APNGFrame> frames;
-		
 		//Construct APNGAsm object
 		APNGAsm(void);
 		
@@ -30,7 +28,7 @@ namespace apngasm {
 		//Adds a frame from a file
 		//Returns the frame number in the frame vector
 		//Uses default delay of 10ms if not specified
-		size_t addFrame(const std::string &filePath, unsigned delay_num = DEFAULT_FRAME_NUMERATOR, unsigned delay_den = DEFAULT_FRAME_DENOMINATOR);
+		size_t addFrame(const std::string &filePath, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
 
 		//Adds an APNGFrame object to the frame vector
 		//Returns the frame number in the frame vector
@@ -65,6 +63,10 @@ namespace apngasm {
 		const char* version(void) const;
 
 	private:
+    //apng frame vector
+    std::vector<APNGFrame> _frames;
+
+
 		unsigned char FindCommonType(void);
 		int upconvertToCommonType(unsigned char coltype);
 		void dirtyTransparencyOptimization(unsigned char coltype);
