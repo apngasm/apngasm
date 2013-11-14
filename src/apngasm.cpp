@@ -122,7 +122,7 @@ namespace apngasm {
     return _frames;
   }
 
-  unsigned char APNGAsm::FindCommonType(void)
+  unsigned char APNGAsm::findCommonType(void)
   {
     unsigned char coltype = _frames[0]._colorType;
 
@@ -149,7 +149,7 @@ namespace apngasm {
   }
 
 
-  bool APNGAsm::Save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
+  bool APNGAsm::save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
   {
     unsigned int    j, k;
     unsigned int    has_tcolor = 0;
@@ -467,7 +467,7 @@ namespace apngasm {
     m_height = _frames[0]._height;
     m_size   = m_width * m_height;
 
-    unsigned char coltype = FindCommonType();
+    unsigned char coltype = findCommonType();
 
     if (upconvertToCommonType(coltype))
       return false;
@@ -476,7 +476,7 @@ namespace apngasm {
 
     coltype = downconvertOptimizations(coltype, false, false);
 
-    return Save(outputPath, coltype, 0, 0);
+    return save(outputPath, coltype, 0, 0);
   }
 
   void APNGAsm::process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows)
@@ -987,7 +987,7 @@ namespace apngasm {
     memcpy(pChunk->p + pChunk->size - 4, &crc, 4);
   }
 
-  void APNGAsm::SavePNG(char * szOut, APNGFrame * frame)
+  void APNGAsm::savePNG(char * szOut, APNGFrame * frame)
   {
     FILE * f;
     if ((f = fopen(szOut, "wb")) != 0)

@@ -51,7 +51,7 @@ namespace apngasm {
 		//Returns the frame vector
 		const std::vector<APNGFrame>& disassemble(const std::string &filePath);
 
-		void SavePNG(char * szOut, APNGFrame * frame);
+		void savePNG(char * szOut, APNGFrame * frame);
 
 		//Returns the number of frames
 		size_t frameCount();
@@ -67,12 +67,12 @@ namespace apngasm {
     std::vector<APNGFrame> _frames;
 
 
-		unsigned char FindCommonType(void);
+		unsigned char findCommonType(void);
 		int upconvertToCommonType(unsigned char coltype);
 		void dirtyTransparencyOptimization(unsigned char coltype);
-	    unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
+    unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
-		bool Save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
+		bool save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
 
 		void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 		void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
@@ -95,26 +95,26 @@ namespace apngasm {
 		//Returns a frame vector with the loaded frames
 		const std::vector<APNGFrame>& loadXMLSpec(const std::string &filePath);
 
-	    OP              op[6];
-	    unsigned int    m_width;
-	    unsigned int    m_height;
-	    unsigned int    m_size;
-	    rgb             m_palette[256];
-	    unsigned char   m_trns[256];
-	    unsigned int    m_palsize;
-	    unsigned int    m_trnssize;
-	    unsigned int    m_next_seq_num;
+    OP              op[6];
+    unsigned int    m_width;
+    unsigned int    m_height;
+    unsigned int    m_size;
+    rgb             m_palette[256];
+    unsigned char   m_trns[256];
+    unsigned int    m_palsize;
+    unsigned int    m_trnssize;
+    unsigned int    m_next_seq_num;
 
-	    z_stream        op_zstream1;
-	    z_stream        op_zstream2;
-	    unsigned char * op_zbuf1;
-	    unsigned char * op_zbuf2;
-	    z_stream        fin_zstream;
-	    unsigned char * row_buf;
-	    unsigned char * sub_row;
-	    unsigned char * up_row;
-	    unsigned char * avg_row;
-	    unsigned char * paeth_row;
+    z_stream        op_zstream1;
+    z_stream        op_zstream2;
+    unsigned char * op_zbuf1;
+    unsigned char * op_zbuf2;
+    z_stream        fin_zstream;
+    unsigned char * row_buf;
+    unsigned char * sub_row;
+    unsigned char * up_row;
+    unsigned char * avg_row;
+    unsigned char * paeth_row;
 
 		std::vector<CHUNK>   all_chunks;
 	};	// class APNGAsm
