@@ -95,28 +95,28 @@ namespace apngasm {
 		//Returns a frame vector with the loaded frames
 		const std::vector<APNGFrame>& loadXMLSpec(const std::string &filePath);
 
-    OP              op[6];
-    unsigned int    m_width;
-    unsigned int    m_height;
-    unsigned int    m_size;
-    rgb             m_palette[256];
-    unsigned char   m_trns[256];
-    unsigned int    m_palsize;
-    unsigned int    m_trnssize;
-    unsigned int    m_next_seq_num;
+    OP              _op[6];
+    unsigned int    _width;
+    unsigned int    _height;
+    unsigned int    _size;
+    rgb             _palette[256];
+    unsigned char   _trns[256];
+    unsigned int    _palsize;
+    unsigned int    _trnssize;
+    unsigned int    _next_seq_num;
 
-    z_stream        op_zstream1;
-    z_stream        op_zstream2;
-    unsigned char * op_zbuf1;
-    unsigned char * op_zbuf2;
-    z_stream        fin_zstream;
-    unsigned char * row_buf;
-    unsigned char * sub_row;
-    unsigned char * up_row;
-    unsigned char * avg_row;
-    unsigned char * paeth_row;
+    z_stream        _op_zstream1;
+    z_stream        _op_zstream2;
+    unsigned char * _op_zbuf1;
+    unsigned char * _op_zbuf2;
+    z_stream        _fin_zstream;
+    unsigned char * _row_buf;
+    unsigned char * _sub_row;
+    unsigned char * _up_row;
+    unsigned char * _avg_row;
+    unsigned char * _paeth_row;
 
-		std::vector<CHUNK>   all_chunks;
+		std::vector<CHUNK>   _all_chunks;
 	};	// class APNGAsm
 	
 }	// namespace apngasm

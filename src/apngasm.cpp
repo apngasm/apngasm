@@ -175,26 +175,26 @@ namespace apngasm {
 
     if (coltype == 0)
     {
-      if (m_trnssize)
+      if (_trnssize)
       {
         has_tcolor = 1;
-        tcolor = m_trns[1];
+        tcolor = _trns[1];
       }
     }
     else
     if (coltype == 2)
     {
-      if (m_trnssize)
+      if (_trnssize)
       {
         has_tcolor = 1;
-        tcolor = (((m_trns[5]<<8)+m_trns[3])<<8)+m_trns[1];
+        tcolor = (((_trns[5]<<8)+_trns[3])<<8)+_trns[1];
       }
     }
     else
     if (coltype == 3)
     {
-      for (i=0; i<m_trnssize; i++)
-      if (m_trns[i] == 0)
+      for (i=0; i<_trnssize; i++)
+      if (_trns[i] == 0)
       {
         has_tcolor = 1;
         tcolor = i;
@@ -207,14 +207,14 @@ namespace apngasm {
       tcolor = 0;
     }
 
-    rowbytes  = m_width * bpp;
-    imagesize = rowbytes * m_height;
+    rowbytes  = _width * bpp;
+    imagesize = rowbytes * _height;
 
     unsigned char * temp  = (unsigned char *)malloc(imagesize);
     unsigned char * over1 = (unsigned char *)malloc(imagesize);
     unsigned char * over2 = (unsigned char *)malloc(imagesize);
     unsigned char * over3 = (unsigned char *)malloc(imagesize);
-    unsigned char * rows  = (unsigned char *)malloc((rowbytes + 1) * m_height);
+    unsigned char * rows  = (unsigned char *)malloc((rowbytes + 1) * _height);
 
     if (!temp || !over1 || !over2 || !over3 || !rows)
       return false;
@@ -230,7 +230,7 @@ namespace apngasm {
         unsigned char   mCompression;
         unsigned char   mFilterMethod;
         unsigned char   mInterlaceMethod;
-      } ihdr = { swap32(m_width), swap32(m_height), 8, coltype, 0, 0, 0 };
+      } ihdr = { swap32(_width), swap32(_height), 8, coltype, 0, 0, 0 };
 
       struct acTL
       {
@@ -260,63 +260,63 @@ namespace apngasm {
       else
         first = 0;
 
-      if (m_palsize > 0)
-        write_chunk(f, "PLTE", (unsigned char *)(&m_palette), m_palsize*3);
+      if (_palsize > 0)
+        write_chunk(f, "PLTE", (unsigned char *)(&_palette), _palsize*3);
 
-      if (m_trnssize > 0)
-        write_chunk(f, "tRNS", m_trns, m_trnssize);
+      if (_trnssize > 0)
+        write_chunk(f, "tRNS", _trns, _trnssize);
 
-      op_zstream1.data_type = Z_BINARY;
-      op_zstream1.zalloc = Z_NULL;
-      op_zstream1.zfree = Z_NULL;
-      op_zstream1.opaque = Z_NULL;
-      deflateInit2(&op_zstream1, Z_BEST_SPEED+1, 8, 15, 8, Z_DEFAULT_STRATEGY);
+      _op_zstream1.data_type = Z_BINARY;
+      _op_zstream1.zalloc = Z_NULL;
+      _op_zstream1.zfree = Z_NULL;
+      _op_zstream1.opaque = Z_NULL;
+      deflateInit2(&_op_zstream1, Z_BEST_SPEED+1, 8, 15, 8, Z_DEFAULT_STRATEGY);
 
-      op_zstream2.data_type = Z_BINARY;
-      op_zstream2.zalloc = Z_NULL;
-      op_zstream2.zfree = Z_NULL;
-      op_zstream2.opaque = Z_NULL;
-      deflateInit2(&op_zstream2, Z_BEST_SPEED+1, 8, 15, 8, Z_FILTERED);
+      _op_zstream2.data_type = Z_BINARY;
+      _op_zstream2.zalloc = Z_NULL;
+      _op_zstream2.zfree = Z_NULL;
+      _op_zstream2.opaque = Z_NULL;
+      deflateInit2(&_op_zstream2, Z_BEST_SPEED+1, 8, 15, 8, Z_FILTERED);
 
-      fin_zstream.data_type = Z_BINARY;
-      fin_zstream.zalloc = Z_NULL;
-      fin_zstream.zfree = Z_NULL;
-      fin_zstream.opaque = Z_NULL;
-      deflateInit2(&fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
+      _fin_zstream.data_type = Z_BINARY;
+      _fin_zstream.zalloc = Z_NULL;
+      _fin_zstream.zfree = Z_NULL;
+      _fin_zstream.opaque = Z_NULL;
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
 
-      idat_size = (rowbytes + 1) * m_height;
+      idat_size = (rowbytes + 1) * _height;
       zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
 
       zbuf = (unsigned char *)malloc(zbuf_size);
-      op_zbuf1 = (unsigned char *)malloc(zbuf_size);
-      op_zbuf2 = (unsigned char *)malloc(zbuf_size);
-      row_buf = (unsigned char *)malloc(rowbytes + 1);
-      sub_row = (unsigned char *)malloc(rowbytes + 1);
-      up_row = (unsigned char *)malloc(rowbytes + 1);
-      avg_row = (unsigned char *)malloc(rowbytes + 1);
-      paeth_row = (unsigned char *)malloc(rowbytes + 1);
+      _op_zbuf1 = (unsigned char *)malloc(zbuf_size);
+      _op_zbuf2 = (unsigned char *)malloc(zbuf_size);
+      _row_buf = (unsigned char *)malloc(rowbytes + 1);
+      _sub_row = (unsigned char *)malloc(rowbytes + 1);
+      _up_row = (unsigned char *)malloc(rowbytes + 1);
+      _avg_row = (unsigned char *)malloc(rowbytes + 1);
+      _paeth_row = (unsigned char *)malloc(rowbytes + 1);
 
-      if (zbuf && op_zbuf1 && op_zbuf2 && row_buf && sub_row && up_row && avg_row && paeth_row)
+      if (zbuf && _op_zbuf1 && _op_zbuf2 && _row_buf && _sub_row && _up_row && _avg_row && _paeth_row)
       {
-        row_buf[0] = 0;
-        sub_row[0] = 1;
-        up_row[0] = 2;
-        avg_row[0] = 3;
-        paeth_row[0] = 4;
+        _row_buf[0] = 0;
+        _sub_row[0] = 1;
+        _up_row[0] = 2;
+        _avg_row[0] = 3;
+        _paeth_row[0] = 4;
       }
       else
         return false;
 
       unsigned int x0 = 0;
       unsigned int y0 = 0;
-      unsigned int w0 = m_width;
-      unsigned int h0 = m_height;
+      unsigned int w0 = _width;
+      unsigned int h0 = _height;
       unsigned char bop = 0;
       unsigned char dop = 0;
-      m_next_seq_num = 0;
+      _next_seq_num = 0;
 
       for (j=0; j<6; j++)
-        op[j].valid = 0;
+        _op[j].valid = 0;
       deflate_rect_op(_frames[0]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
       deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
 
@@ -325,7 +325,7 @@ namespace apngasm {
         write_IDATs(f, 0, zbuf, zsize, idat_size);
 
         for (j=0; j<6; j++)
-          op[j].valid = 0;
+          _op[j].valid = 0;
         deflate_rect_op(_frames[1]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
         deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
       }
@@ -336,10 +336,10 @@ namespace apngasm {
         int          op_best;
 
         for (j=0; j<6; j++)
-          op[j].valid = 0;
+          _op[j].valid = 0;
 
         /* dispose = none */
-        get_rect(m_width, m_height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
+        get_rect(_width, _height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
 
         /* dispose = background */
         if (has_tcolor)
@@ -348,32 +348,32 @@ namespace apngasm {
           if (coltype == 2)
             for (j=0; j<h0; j++)
               for (k=0; k<w0; k++)
-                memcpy(temp + ((j+y0)*m_width + (k+x0))*3, &tcolor, 3);
+                memcpy(temp + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
           else
             for (j=0; j<h0; j++)
-              memset(temp + ((j+y0)*m_width + x0)*bpp, tcolor, w0*bpp);
+              memset(temp + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
 
-          get_rect(m_width, m_height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
+          get_rect(_width, _height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
         }
 
         /* dispose = previous */
         if (n > first)
-          get_rect(m_width, m_height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
+          get_rect(_width, _height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
 
-        op_min = op[0].size;
+        op_min = _op[0].size;
         op_best = 0;
         for (j=1; j<6; j++)
         {
-          if (op[j].size < op_min && op[j].valid)
+          if (_op[j].size < op_min && _op[j].valid)
           {
-            op_min = op[j].size;
+            op_min = _op[j].size;
             op_best = j;
           }
         }
 
         dop = op_best >> 1;
 
-        fctl.mSeq       = swap32(m_next_seq_num++);
+        fctl.mSeq       = swap32(_next_seq_num++);
         fctl.mWidth     = swap32(w0);
         fctl.mHeight    = swap32(h0);
         fctl.mXOffset   = swap32(x0);
@@ -392,23 +392,23 @@ namespace apngasm {
           if (coltype == 2)
             for (j=0; j<h0; j++)
               for (k=0; k<w0; k++)
-                memcpy(_frames[n]._pixels + ((j+y0)*m_width + (k+x0))*3, &tcolor, 3);
+                memcpy(_frames[n]._pixels + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
           else
             for (j=0; j<h0; j++)
-              memset(_frames[n]._pixels + ((j+y0)*m_width + x0)*bpp, tcolor, w0*bpp);
+              memset(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
         }
         else
         if (dop == 2)
         {
           for (j=0; j<h0; j++)
-            memcpy(_frames[n]._pixels + ((j+y0)*m_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*m_width + x0)*bpp, w0*bpp);
+            memcpy(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*_width + x0)*bpp, w0*bpp);
         }
         /* process apng dispose - end */
 
-        x0 = op[op_best].x;
-        y0 = op[op_best].y;
-        w0 = op[op_best].w;
-        h0 = op[op_best].h;
+        x0 = _op[op_best].x;
+        y0 = _op[op_best].y;
+        w0 = _op[op_best].w;
+        h0 = _op[op_best].h;
         bop = op_best & 1;
 
         deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, op_best);
@@ -416,7 +416,7 @@ namespace apngasm {
 
       if (_frames.size() > 1)
       {
-        fctl.mSeq       = swap32(m_next_seq_num++);
+        fctl.mSeq       = swap32(_next_seq_num++);
         fctl.mWidth     = swap32(w0);
         fctl.mHeight    = swap32(h0);
         fctl.mXOffset   = swap32(x0);
@@ -435,13 +435,13 @@ namespace apngasm {
       fclose(f);
 
       free(zbuf);
-      free(op_zbuf1);
-      free(op_zbuf2);
-      free(row_buf);
-      free(sub_row);
-      free(up_row);
-      free(avg_row);
-      free(paeth_row);
+      free(_op_zbuf1);
+      free(_op_zbuf2);
+      free(_row_buf);
+      free(_sub_row);
+      free(_up_row);
+      free(_avg_row);
+      free(_paeth_row);
     }
     else
       return false;
@@ -463,9 +463,9 @@ namespace apngasm {
     if (_frames.empty())
       return false;
 
-    m_width  = _frames[0]._width;
-    m_height = _frames[0]._height;
-    m_size   = m_width * m_height;
+    _width  = _frames[0]._width;
+    _height = _frames[0]._height;
+    _size   = _width * _height;
 
     unsigned char coltype = findCommonType();
 
@@ -490,10 +490,10 @@ namespace apngasm {
     for (j=0; j<h; j++)
     {
       unsigned int    sum = 0;
-      unsigned char * best_row = row_buf;
+      unsigned char * best_row = _row_buf;
       unsigned int    mins = ((unsigned int)(-1)) >> 1;
 
-      out = row_buf+1;
+      out = _row_buf+1;
       for (i=0; i<rowbytes; i++)
       {
         v = out[i] = row[i];
@@ -502,7 +502,7 @@ namespace apngasm {
       mins = sum;
 
       sum = 0;
-      out = sub_row+1;
+      out = _sub_row+1;
       for (i=0; i<bpp; i++)
       {
         v = out[i] = row[i];
@@ -517,13 +517,13 @@ namespace apngasm {
       if (sum < mins)
       {
         mins = sum;
-        best_row = sub_row;
+        best_row = _sub_row;
       }
 
       if (prev)
       {
         sum = 0;
-        out = up_row+1;
+        out = _up_row+1;
         for (i=0; i<rowbytes; i++)
         {
           v = out[i] = row[i] - prev[i];
@@ -533,11 +533,11 @@ namespace apngasm {
         if (sum < mins)
         {
           mins = sum;
-          best_row = up_row;
+          best_row = _up_row;
         }
 
         sum = 0;
-        out = avg_row+1;
+        out = _avg_row+1;
         for (i=0; i<bpp; i++)
         {
           v = out[i] = row[i] - prev[i]/2;
@@ -552,11 +552,11 @@ namespace apngasm {
         if (sum < mins)
         {
           mins = sum;
-          best_row = avg_row;
+          best_row = _avg_row;
         }
 
         sum = 0;
-        out = paeth_row+1;
+        out = _paeth_row+1;
         for (i=0; i<bpp; i++)
         {
           v = out[i] = row[i] - prev[i];
@@ -579,20 +579,20 @@ namespace apngasm {
         }
         if (sum < mins)
         {
-          best_row = paeth_row;
+          best_row = _paeth_row;
         }
       }
 
       if (rows == NULL)
       {
         // deflate_rect_op()
-        op_zstream1.next_in = row_buf;
-        op_zstream1.avail_in = rowbytes + 1;
-        deflate(&op_zstream1, Z_NO_FLUSH);
+        _op_zstream1.next_in = _row_buf;
+        _op_zstream1.avail_in = rowbytes + 1;
+        deflate(&_op_zstream1, Z_NO_FLUSH);
 
-        op_zstream2.next_in = best_row;
-        op_zstream2.avail_in = rowbytes + 1;
-        deflate(&op_zstream2, Z_NO_FLUSH);
+        _op_zstream2.next_in = best_row;
+        _op_zstream2.avail_in = rowbytes + 1;
+        deflate(&_op_zstream2, Z_NO_FLUSH);
       }
       else
       {
@@ -608,14 +608,14 @@ namespace apngasm {
 
   void APNGAsm::deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n)
   {
-    unsigned char * row  = op[n].p + op[n].y*stride + op[n].x*bpp;
-    int rowbytes = op[n].w*bpp;
+    unsigned char * row  = _op[n].p + _op[n].y*stride + _op[n].x*bpp;
+    int rowbytes = _op[n].w*bpp;
 
-    if (op[n].filters == 0)
+    if (_op[n].filters == 0)
     {
-      deflateInit2(&fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
       unsigned char * dp  = rows;
-      for (int j=0; j<op[n].h; j++)
+      for (int j=0; j<_op[n].h; j++)
       {
         *dp++ = 0;
         memcpy(dp, row, rowbytes);
@@ -625,17 +625,17 @@ namespace apngasm {
     }
     else
     {
-      deflateInit2(&fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
-      process_rect(row, rowbytes, bpp, stride, op[n].h, rows);
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
+      process_rect(row, rowbytes, bpp, stride, _op[n].h, rows);
     }
 
-    fin_zstream.next_out = zbuf;
-    fin_zstream.avail_out = zbuf_size;
-    fin_zstream.next_in = rows;
-    fin_zstream.avail_in = op[n].h*(rowbytes + 1);
-    deflate(&fin_zstream, Z_FINISH);
-    *zsize = fin_zstream.total_out;
-    deflateReset(&fin_zstream);
+    _fin_zstream.next_out = zbuf;
+    _fin_zstream.avail_out = zbuf_size;
+    _fin_zstream.next_in = rows;
+    _fin_zstream.avail_in = _op[n].h*(rowbytes + 1);
+    deflate(&_fin_zstream, Z_FINISH);
+    *zsize = _fin_zstream.total_out;
+    deflateReset(&_fin_zstream);
   }
 
   void APNGAsm::deflate_rect_op(unsigned char *pdata, int x, int y, int w, int h, int bpp, int stride, int zbuf_size, int n)
@@ -643,36 +643,36 @@ namespace apngasm {
     unsigned char * row  = pdata + y*stride + x*bpp;
     int rowbytes = w * bpp;
 
-    op_zstream1.data_type = Z_BINARY;
-    op_zstream1.next_out = op_zbuf1;
-    op_zstream1.avail_out = zbuf_size;
+    _op_zstream1.data_type = Z_BINARY;
+    _op_zstream1.next_out = _op_zbuf1;
+    _op_zstream1.avail_out = zbuf_size;
 
-    op_zstream2.data_type = Z_BINARY;
-    op_zstream2.next_out = op_zbuf2;
-    op_zstream2.avail_out = zbuf_size;
+    _op_zstream2.data_type = Z_BINARY;
+    _op_zstream2.next_out = _op_zbuf2;
+    _op_zstream2.avail_out = zbuf_size;
 
     process_rect(row, rowbytes, bpp, stride, h, NULL);
 
-    deflate(&op_zstream1, Z_FINISH);
-    deflate(&op_zstream2, Z_FINISH);
-    op[n].p = pdata;
-    if (op_zstream1.total_out < op_zstream2.total_out)
+    deflate(&_op_zstream1, Z_FINISH);
+    deflate(&_op_zstream2, Z_FINISH);
+    _op[n].p = pdata;
+    if (_op_zstream1.total_out < _op_zstream2.total_out)
     {
-      op[n].size = op_zstream1.total_out;
-      op[n].filters = 0;
+      _op[n].size = _op_zstream1.total_out;
+      _op[n].filters = 0;
     }
     else
     {
-      op[n].size = op_zstream2.total_out;
-      op[n].filters = 1;
+      _op[n].size = _op_zstream2.total_out;
+      _op[n].filters = 1;
     }
-    op[n].x = x;
-    op[n].y = y;
-    op[n].w = w;
-    op[n].h = h;
-    op[n].valid = 1;
-    deflateReset(&op_zstream1);
-    deflateReset(&op_zstream2);
+    _op[n].x = x;
+    _op[n].y = y;
+    _op[n].w = w;
+    _op[n].h = h;
+    _op[n].valid = 1;
+    deflateReset(&_op_zstream1);
+    deflateReset(&_op_zstream2);
   }
 
   void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
@@ -828,7 +828,7 @@ namespace apngasm {
 
     if (memcmp(name, "fdAT", 4) == 0)
     {
-      unsigned int seq = swap32(m_next_seq_num++);
+      unsigned int seq = swap32(_next_seq_num++);
       fwrite(&seq, 1, 4, f);
       crc = crc32(crc, (const Bytef *)(&seq), 4);
       length -= 4;
@@ -1074,7 +1074,7 @@ namespace apngasm {
             if (id == id_acTL)
             {
               chunk.flag = 1;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
               pi = (unsigned int *)chunk.p;
               num_frames = swap32(pi[2]);
             }
@@ -1082,7 +1082,7 @@ namespace apngasm {
             if (id == id_fcTL)
             {
               chunk.flag = 1;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
               frame.chunkSet.push_back(chunk_iend);
 
               if (flag_fctl)
@@ -1139,12 +1139,12 @@ namespace apngasm {
             if (id == id_IDAT)
             {
               chunk.flag = flag_idat = 1;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
 
               if (frame.chunkSet.size() == 2)
-                for (i=0; i<all_chunks.size(); ++i)
-                  if (!all_chunks[i].flag)
-                    frame.chunkSet.push_back(all_chunks[i]);
+                for (i=0; i<_all_chunks.size(); ++i)
+                  if (!_all_chunks[i].flag)
+                    frame.chunkSet.push_back(_all_chunks[i]);
 
               frame.chunkSet.push_back(chunk);
             }
@@ -1152,12 +1152,12 @@ namespace apngasm {
             if (id == id_fdAT)
             {
               chunk.flag = 1;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
 
               if (frame.chunkSet.size() == 2)
-                for (i=0; i<all_chunks.size(); ++i)
-                  if (!all_chunks[i].flag)
-                    frame.chunkSet.push_back(all_chunks[i]);
+                for (i=0; i<_all_chunks.size(); ++i)
+                  if (!_all_chunks[i].flag)
+                    frame.chunkSet.push_back(_all_chunks[i]);
 
               chunk.size -= 4;
               chunk.p += 4;
@@ -1173,7 +1173,7 @@ namespace apngasm {
             if (id == id_IEND)
             {
               chunk.flag = 1;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
               frame.chunkSet.push_back(chunk_iend);
 
               decode_frame(&frameRaw, &frame);
@@ -1186,7 +1186,7 @@ namespace apngasm {
             else
             {
               chunk.flag = flag_idat;
-              all_chunks.push_back(chunk);
+              _all_chunks.push_back(chunk);
 
               if (notabc(chunk.p[4]) || notabc(chunk.p[5]) || notabc(chunk.p[6]) || notabc(chunk.p[7]))
                 break;
@@ -1196,10 +1196,10 @@ namespace apngasm {
       }
       fclose(f);
 
-      for (i=0; i<all_chunks.size(); ++i)
-        delete[] all_chunks[i].p;
+      for (i=0; i<_all_chunks.size(); ++i)
+        delete[] _all_chunks[i].p;
 
-      all_chunks.clear();
+      _all_chunks.clear();
 
       delete[] chunk_ihdr.p;
     }
@@ -1231,7 +1231,7 @@ namespace apngasm {
     {
       if (coltype == 6 && _frames[n]._colorType != 6)
       {
-        unsigned char * dst = (unsigned char *)malloc(m_size*4);
+        unsigned char * dst = (unsigned char *)malloc(_size*4);
         if (dst == NULL)
           return 1;
 
@@ -1240,7 +1240,7 @@ namespace apngasm {
           sp = _frames[n]._pixels;
           dp = dst;
           if (_frames[n]._transparencySize == 0)
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             *dp++ = *sp;
             *dp++ = *sp;
@@ -1248,7 +1248,7 @@ namespace apngasm {
             *dp++ = 255;
           }
           else
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             g = *sp++;
             *dp++ = g;
@@ -1263,7 +1263,7 @@ namespace apngasm {
           sp = _frames[n]._pixels;
           dp = dst;
           if (_frames[n]._transparencySize == 0)
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             *dp++ = *sp++;
             *dp++ = *sp++;
@@ -1271,7 +1271,7 @@ namespace apngasm {
             *dp++ = 255;
           }
           else
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = *sp++;
             g = *sp++;
@@ -1287,7 +1287,7 @@ namespace apngasm {
         {
           sp = _frames[n]._pixels;
           dp = dst;
-          for (j=0; j<m_size; j++, sp++)
+          for (j=0; j<_size; j++, sp++)
           {
             *dp++ = _frames[n]._palette[*sp].r;
             *dp++ = _frames[n]._palette[*sp].g;
@@ -1300,7 +1300,7 @@ namespace apngasm {
         {
           sp = _frames[n]._pixels;
           dp = dst;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             *dp++ = *sp;
             *dp++ = *sp;
@@ -1314,13 +1314,13 @@ namespace apngasm {
       else
       if (coltype == 4 && _frames[n]._colorType == 0)
       {
-        unsigned char * dst = (unsigned char *)malloc(m_size*2);
+        unsigned char * dst = (unsigned char *)malloc(_size*2);
         if (dst == NULL)
           return 1;
 
         sp = _frames[n]._pixels;
         dp = dst;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
         {
           *dp++ = *sp++;
           *dp++ = 255;
@@ -1331,13 +1331,13 @@ namespace apngasm {
       else
       if (coltype == 2 && _frames[n]._colorType == 0)
       {
-        unsigned char * dst = (unsigned char *)malloc(m_size*3);
+        unsigned char * dst = (unsigned char *)malloc(_size*3);
         if (dst == NULL)
           return 1;
 
         sp = _frames[n]._pixels;
         dp = dst;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
         {
           *dp++ = *sp;
           *dp++ = *sp;
@@ -1357,7 +1357,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         unsigned char * sp = _frames[n]._pixels;
-        for (unsigned int j=0; j<m_size; j++, sp+=4)
+        for (unsigned int j=0; j<_size; j++, sp+=4)
           if (sp[3] == 0)
              sp[0] = sp[1] = sp[2] = 0;
       }
@@ -1368,7 +1368,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         unsigned char * sp = _frames[n]._pixels;
-        for (unsigned int j=0; j<m_size; j++, sp+=2)
+        for (unsigned int j=0; j<_size; j++, sp+=2)
           if (sp[1] == 0)
             sp[0] = 0;
       }
@@ -1394,10 +1394,10 @@ namespace apngasm {
     {
       col[i].num = 0;
       col[i].r = col[i].g = col[i].b = i;
-      col[i].a = m_trns[i] = 255;
+      col[i].a = _trns[i] = 255;
     }
-    m_palsize = 0;
-    m_trnssize = 0;
+    _palsize = 0;
+    _trnssize = 0;
 
     if (coltype == 6 && !keep_coltype)
     {
@@ -1408,7 +1408,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         sp = _frames[n]._pixels;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
         {
           r = *sp++;
           g = *sp++;
@@ -1464,22 +1464,22 @@ namespace apngasm {
         for (i=0; i<256; i++)
         if (gray[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = i;
-          m_trnssize = 2;
+          _trns[0] = 0;
+          _trns[1] = i;
+          _trnssize = 2;
           break;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = *sp++;
             g = *sp++;
             b = *sp++;
             if (*sp++ == 0)
-              *dp++ = m_trns[1];
+              *dp++ = _trns[1];
             else
               *dp++ = g;
           }
@@ -1495,20 +1495,20 @@ namespace apngasm {
 
         qsort(&col[0], colors, sizeof(COLORS), compareColors);
 
-        m_palsize = colors;
+        _palsize = colors;
         for (i=0; i<colors; i++)
         {
-          m_palette[i].r = col[i].r;
-          m_palette[i].g = col[i].g;
-          m_palette[i].b = col[i].b;
-          m_trns[i]      = col[i].a;
-          if (m_trns[i] != 255) m_trnssize = i+1;
+          _palette[i].r = col[i].r;
+          _palette[i].g = col[i].g;
+          _palette[i].b = col[i].b;
+          _trns[i]      = col[i].a;
+          if (_trns[i] != 255) _trnssize = i+1;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = *sp++;
             g = *sp++;
@@ -1528,7 +1528,7 @@ namespace apngasm {
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = *sp++;
             g = *sp++;
@@ -1543,13 +1543,13 @@ namespace apngasm {
         for (i=0; i<4096; i++)
         if (cube[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = (i>>4)&0xF0;
-          m_trns[2] = 0;
-          m_trns[3] = i&0xF0;
-          m_trns[4] = 0;
-          m_trns[5] = (i<<4)&0xF0;
-          m_trnssize = 6;
+          _trns[0] = 0;
+          _trns[1] = (i>>4)&0xF0;
+          _trns[2] = 0;
+          _trns[3] = i&0xF0;
+          _trns[4] = 0;
+          _trns[5] = (i<<4)&0xF0;
+          _trnssize = 6;
           break;
         }
         if (transparent == 255)
@@ -1558,7 +1558,7 @@ namespace apngasm {
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = dp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++)
+            for (j=0; j<_size; j++)
             {
               *dp++ = *sp++;
               *dp++ = *sp++;
@@ -1568,13 +1568,13 @@ namespace apngasm {
           }
         }
         else
-        if (m_trnssize != 0)
+        if (_trnssize != 0)
         {
           coltype = 2;
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = dp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++)
+            for (j=0; j<_size; j++)
             {
               r = *sp++;
               g = *sp++;
@@ -1582,9 +1582,9 @@ namespace apngasm {
               a = *sp++;
               if (a == 0)
               {
-                *dp++ = m_trns[1];
-                *dp++ = m_trns[3];
-                *dp++ = m_trns[5];
+                *dp++ = _trns[1];
+                *dp++ = _trns[3];
+                *dp++ = _trns[5];
               }
               else
               {
@@ -1605,7 +1605,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         sp = _frames[n]._pixels;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
         {
           r = *sp++;
           g = *sp++;
@@ -1655,9 +1655,9 @@ namespace apngasm {
         for (i=0; i<256; i++)
         if (gray[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = i;
-          m_trnssize = 2;
+          _trns[0] = 0;
+          _trns[1] = i;
+          _trnssize = 2;
           break;
         }
         if (_frames[0]._transparencySize == 0)
@@ -1666,24 +1666,24 @@ namespace apngasm {
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = dp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++, sp+=3)
+            for (j=0; j<_size; j++, sp+=3)
               *dp++ = *sp;
           }
         }
         else
-        if (m_trnssize != 0)
+        if (_trnssize != 0)
         {
           coltype = 0;
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = dp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++)
+            for (j=0; j<_size; j++)
             {
               r = *sp++;
               g = *sp++;
               b = *sp++;
               if (_frames[n]._transparency[1] == r && _frames[n]._transparency[3] == g && _frames[n]._transparency[5] == b)
-                *dp++ = m_trns[1];
+                *dp++ = _trns[1];
               else
                 *dp++ = g;
             }
@@ -1700,20 +1700,20 @@ namespace apngasm {
 
         qsort(&col[0], colors, sizeof(COLORS), compareColors);
 
-        m_palsize = colors;
+        _palsize = colors;
         for (i=0; i<colors; i++)
         {
-          m_palette[i].r = col[i].r;
-          m_palette[i].g = col[i].g;
-          m_palette[i].b = col[i].b;
-          m_trns[i]      = col[i].a;
-          if (m_trns[i] != 255) m_trnssize = i+1;
+          _palette[i].r = col[i].r;
+          _palette[i].g = col[i].g;
+          _palette[i].b = col[i].b;
+          _trns[i]      = col[i].a;
+          if (_trns[i] != 255) _trnssize = i+1;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = *sp++;
             g = *sp++;
@@ -1730,20 +1730,20 @@ namespace apngasm {
       {
         if (_frames[0]._transparencySize != 0)
         {
-          memcpy(m_trns, _frames[0]._transparency, _frames[0]._transparencySize);
-          m_trnssize = _frames[0]._transparencySize;
+          memcpy(_trns, _frames[0]._transparency, _frames[0]._transparencySize);
+          _trnssize = _frames[0]._transparencySize;
         }
         else
         for (i=0; i<4096; i++)
         if (cube[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = (i>>4)&0xF0;
-          m_trns[2] = 0;
-          m_trns[3] = i&0xF0;
-          m_trns[4] = 0;
-          m_trns[5] = (i<<4)&0xF0;
-          m_trnssize = 6;
+          _trns[0] = 0;
+          _trns[1] = (i>>4)&0xF0;
+          _trns[2] = 0;
+          _trns[3] = i&0xF0;
+          _trns[4] = 0;
+          _trns[5] = (i<<4)&0xF0;
+          _trnssize = 6;
           break;
         }
       }
@@ -1756,7 +1756,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         sp = _frames[n]._pixels;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
         {
           g = *sp++;
           a = *sp++;
@@ -1803,20 +1803,20 @@ namespace apngasm {
         for (i=0; i<256; i++)
         if (gray[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = i;
-          m_trnssize = 2;
+          _trns[0] = 0;
+          _trns[1] = i;
+          _trnssize = 2;
           break;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             g = *sp++;
             if (*sp++ == 0)
-              *dp++ = m_trns[1];
+              *dp++ = _trns[1];
             else
               *dp++ = g;
           }
@@ -1832,20 +1832,20 @@ namespace apngasm {
 
         qsort(&col[0], colors, sizeof(COLORS), compareColors);
 
-        m_palsize = colors;
+        _palsize = colors;
         for (i=0; i<colors; i++)
         {
-          m_palette[i].r = col[i].r;
-          m_palette[i].g = col[i].g;
-          m_palette[i].b = col[i].b;
-          m_trns[i]      = col[i].a;
-          if (m_trns[i] != 255) m_trnssize = i+1;
+          _palette[i].r = col[i].r;
+          _palette[i].g = col[i].g;
+          _palette[i].b = col[i].b;
+          _trns[i]      = col[i].a;
+          if (_trns[i] != 255) _trnssize = i+1;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             g = *sp++;
             a = *sp++;
@@ -1874,7 +1874,7 @@ namespace apngasm {
       for (size_t n = 0; n < _frames.size(); ++n)
       {
         sp = _frames[n]._pixels;
-        for (j=0; j<m_size; j++)
+        for (j=0; j<_size; j++)
           col[*sp++].num++;
       }
 
@@ -1901,9 +1901,9 @@ namespace apngasm {
         for (i=0; i<256; i++)
         if (gray[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = i;
-          m_trnssize = 2;
+          _trns[0] = 0;
+          _trns[1] = i;
+          _trnssize = 2;
           break;
         }
         if (!has_tcolor)
@@ -1912,21 +1912,21 @@ namespace apngasm {
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++, sp++)
+            for (j=0; j<_size; j++, sp++)
               *sp = _frames[n]._palette[*sp].g;
           }
         }
         else
-        if (m_trnssize != 0)
+        if (_trnssize != 0)
         {
           coltype = 0;
           for (size_t n = 0; n < _frames.size(); ++n)
           {
             sp = _frames[n]._pixels;
-            for (j=0; j<m_size; j++, sp++)
+            for (j=0; j<_size; j++, sp++)
             {
               if (col[*sp].a == 0)
-                *sp = m_trns[1];
+                *sp = _trns[1];
               else
                 *sp = _frames[n]._palette[*sp].g;
             }
@@ -1951,27 +1951,27 @@ namespace apngasm {
 
         for (i=0; i<256; i++)
         {
-          m_palette[i].r = col[i].r;
-          m_palette[i].g = col[i].g;
-          m_palette[i].b = col[i].b;
-          m_trns[i]      = col[i].a;
+          _palette[i].r = col[i].r;
+          _palette[i].g = col[i].g;
+          _palette[i].b = col[i].b;
+          _trns[i]      = col[i].a;
           if (col[i].num != 0)
-            m_palsize = i+1;
-          if (m_trns[i] != 255)
-            m_trnssize = i+1;
+            _palsize = i+1;
+          if (_trns[i] != 255)
+            _trnssize = i+1;
         }
 
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
           {
             r = _frames[n]._palette[*sp].r;
             g = _frames[n]._palette[*sp].g;
             b = _frames[n]._palette[*sp].b;
             a = _frames[n]._transparency[*sp];
 
-            for (k=0; k<m_palsize; k++)
+            for (k=0; k<_palsize; k++)
               if (col[k].r == r && col[k].g == g && col[k].b == b && col[k].a == a)
                 break;
             *sp++ = k;
@@ -1980,16 +1980,16 @@ namespace apngasm {
       }
       else
       {
-        m_palsize = _frames[0]._palleteSize;
-        m_trnssize = _frames[0]._transparencySize;
-        for (i=0; i<m_palsize; i++)
+        _palsize = _frames[0]._palleteSize;
+        _trnssize = _frames[0]._transparencySize;
+        for (i=0; i<_palsize; i++)
         {
-          m_palette[i].r = col[i].r;
-          m_palette[i].g = col[i].g;
-          m_palette[i].b = col[i].b;
+          _palette[i].r = col[i].r;
+          _palette[i].g = col[i].g;
+          _palette[i].b = col[i].b;
         }
-        for (i=0; i<m_trnssize; i++)
-          m_trns[i] = col[i].a;
+        for (i=0; i<_trnssize; i++)
+          _trns[i] = col[i].a;
       }
     }
     else
@@ -1997,23 +1997,23 @@ namespace apngasm {
     {
       if (_frames[0]._transparencySize != 0)
       {
-        memcpy(m_trns, _frames[0]._transparency, _frames[0]._transparencySize);
-        m_trnssize = _frames[0]._transparencySize;
+        memcpy(_trns, _frames[0]._transparency, _frames[0]._transparencySize);
+        _trnssize = _frames[0]._transparencySize;
       }
       else
       {
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = _frames[n]._pixels;
-          for (j=0; j<m_size; j++)
+          for (j=0; j<_size; j++)
             gray[*sp++] = 1;
         }
         for (i=0; i<256; i++)
         if (gray[i] == 0)
         {
-          m_trns[0] = 0;
-          m_trns[1] = i;
-          m_trnssize = 2;
+          _trns[0] = 0;
+          _trns[1] = i;
+          _trnssize = 2;
           break;
         }
       }
