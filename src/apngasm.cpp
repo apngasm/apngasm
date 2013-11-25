@@ -1,4 +1,5 @@
 #include "apngasm.h"
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
 
@@ -116,7 +117,7 @@ namespace apngasm {
   //Loaded frames are added to the end of the frame vector
   const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
-    const bool isJSON = true;
+    const bool isJSON = boost::algorithm::iends_with(filePath, ".json");
     const std::vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
     _frames.insert(_frames.end(), newFrames.begin(), newFrames.end());
     return _frames;
