@@ -51,8 +51,6 @@ namespace apngasm {
 		//Returns the frame vector
 		const std::vector<APNGFrame>& disassemble(const std::string &filePath);
 
-		void savePNG(char * szOut, APNGFrame * frame);
-
 		//Returns the number of frames
 		size_t frameCount();
 
@@ -73,6 +71,7 @@ namespace apngasm {
     unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
 		bool save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
+		void savePNG(char * szOut, APNGFrame * frame);
 
 		void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 		void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
