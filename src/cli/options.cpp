@@ -234,6 +234,15 @@ namespace apngasm_cli {
 		return true;
 	}
 
+	bool Options::specFile(std::string &out) const
+	{
+		if(!vm.count("file")) {
+			return false;
+		}
+		out = vm["file"].as<std::string>();
+		return true;
+	}
+
 	const std::vector<std::string>::const_iterator
 		Options::inputFilesBegin(void) const
 	{

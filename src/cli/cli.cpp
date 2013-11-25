@@ -95,9 +95,14 @@ namespace apngasm_cli {
 			options.putVersionTo(cout);
 			return ERRCODE_VERSION;
 		}
-		string disasm_file;
-		if(options.disassembleFile(disasm_file)) {
-			return disassemble(disasm_file);
+		string srcFile;
+		if(options.disassembleFile(srcFile)) {
+			return disassemble(srcFile);
+		}
+		if(options.specFile(srcFile))
+		{
+			assembler.loadAnimationSpec(srcFile);
+			return assemble();
 		}
 		return assemble();
 	}
