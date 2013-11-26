@@ -1,38 +1,45 @@
 #include "apngasm.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 
-namespace apngasm {
-
-  #if defined(_MSC_VER) && _MSC_VER >= 1300
-  #define swap16(data) _byteswap_ushort(data)
-  #define swap32(data) _byteswap_ulong(data)
-  #elif defined(__linux__)
-  #include <byteswap.h>
-  #define swap16(data) bswap_16(data)
-  #define swap32(data) bswap_32(data)
-  #elif defined(__FreeBSD__)
-  #include <sys/endian.h>
-  #define swap16(data) bswap16(data)
-  #define swap32(data) bswap32(data)
-  #elif defined(__APPLE__)
-  #include <libkern/OSByteOrder.h>
-  #define swap16(data) OSSwapInt16(data)
-  #define swap32(data) OSSwapInt32(data)
-  #else
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+#define swap16(data) _byteswap_ushort(data)
+#define swap32(data) _byteswap_ulong(data)
+#elif defined(__linux__)
+#include <byteswap.h>
+#define swap16(data) bswap_16(data)
+#define swap32(data) bswap_32(data)
+#elif defined(__FreeBSD__)
+#include <sys/endian.h>
+#define swap16(data) bswap16(data)
+#define swap32(data) bswap32(data)
+#elif defined(__APPLE__)
+#include <libkern/OSByteOrder.h>
+#define swap16(data) OSSwapInt16(data)
+#define swap32(data) OSSwapInt32(data)
+#else
+namespace {
   unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data >> 8) & 0xFF);}
   unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
-  #endif
+}
+#endif
 
-  #define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
+#define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 
-  #define id_IHDR 0x52444849
-  #define id_acTL 0x4C546361
-  #define id_fcTL 0x4C546366
-  #define id_IDAT 0x54414449
-  #define id_fdAT 0x54416466
-  #define id_IEND 0x444E4549
+#define id_IHDR 0x52444849
+#define id_acTL 0x4C546361
+#define id_fcTL 0x4C546366
+#define id_IDAT 0x54414449
+#define id_fdAT 0x54416466
+#define id_IEND 0x444E4549
 
+namespace {
   typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
+  std::vector<apngasm::APNGFrame> tmpFrames;
+}
+
+namespace apngasm {
 
   static int compareColors(const void *arg1, const void *arg2)
   {
@@ -885,11 +892,6 @@ namespace apngasm {
     }
   }
 
-  namespace
-  {
-    std::vector<APNGFrame> tmpFrames;
-  }
-
   void info_fn(png_structp png_ptr, png_infop info_ptr)
   {
     APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
@@ -1211,6 +1213,63 @@ namespace apngasm {
   //Returns a frame vector with the loaded frames
   const std::vector<APNGFrame>& APNGAsm::loadJSONSpec(const std::string &filePath)
   {
+    tmpFrames.clear();
+
+    boost::property_tree::ptree root;
+    boost::property_tree::read_json(filePath, root);
+
+    // name
+    if( boost::optional<std::string> name = root.get_optional<std::string>("name") )
+    {
+      std::cout << "name = " << name.get() << std::endl;
+    }
+
+    // loops
+    if( boost::optional<int> loops = root.get_optional<int>("loops") )
+    {
+      std::cout << "loops = " << loops.get() << std::endl;
+    }
+
+    // skip_first
+    if( boost::optional<bool> skip_first = root.get_optional<bool>("skip_first") )
+    {
+      std::cout << "skip_first = " << skip_first.get() << std::endl;
+    }
+
+    // default_delay
+    int defaultDealyNum = DEFAULT_FRAME_NUMERATOR;
+    int defaultDealyDen = DEFAULT_FRAME_DENOMINATOR;
+    if( boost::optional<int> default_delay = root.get_optional<int>("default_delay") )
+    {
+      defaultDealyNum = default_delay.get();
+
+      std::cout << "default_delay = " << defaultDealyNum << std::endl;
+    }
+
+    // frames
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("frames"))
+    {
+      const boost::property_tree::ptree& frame = child.second;
+
+      // filepath only
+      if(frame.empty())
+      {
+        const std::string filepath = frame.data();
+
+        std::cout << "filepath = " << filepath << std::endl;
+      }
+
+      // filepath and delay
+      else
+      {
+        const boost::property_tree::ptree::value_type& value = frame.front();
+        const std::string filepath = value.first;
+        const std::string delay = value.second.data();
+
+        std::cout << "filepath = " << filepath << ", delay = " << delay << std::endl;
+      }
+    }
+
     return tmpFrames;
   }
 
@@ -1218,6 +1277,7 @@ namespace apngasm {
   //Returns a frame vector with the loaded frames
   const std::vector<APNGFrame>& APNGAsm::loadXMLSpec(const std::string &filePath)
   {
+    tmpFrames.clear();
     return tmpFrames;
   }
 
