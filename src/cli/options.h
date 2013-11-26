@@ -32,6 +32,7 @@ namespace apngasm_cli {
 		int getOverwriteMode(void) const;
 		bool outputFile(std::string &out) const;
 		bool disassembleFile(std::string &out) const;
+		bool specFile(std::string &out) const;
 		const INPUTS::const_iterator inputFilesBegin(void) const;
 		const INPUTS::const_iterator inputFilesEnd(void) const;
 	};

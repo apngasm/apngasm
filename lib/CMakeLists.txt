@@ -2,11 +2,13 @@
 ADD_LIBRARY(apngasm SHARED
 	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
 	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
+	${APNGASM_SOURCE_DIR}/src/apnghelper.cpp
 )
 
 #add_library(apngasm-static STATIC
 #	${APNGASM_SOURCE_DIR}/src/libapngasm.cpp
 #	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
+#	${APNGASM_SOURCE_DIR}/src/apnghelper.cpp
 #)
 
 FIND_PACKAGE(PNG REQUIRED)
