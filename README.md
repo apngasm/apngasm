@@ -25,11 +25,16 @@ cmake ./
 make
 ```
 
+4. [optional] Build packages
+```
+make package
+```
+
 Building on OS-X (with homebrew):  
 
 1. Install cmake and libpng  
 ```
-brew install cmake libpng lzlib
+brew install cmake boost libpng lzlib
 ```
 
 2. Generate makefiles with cmake  
