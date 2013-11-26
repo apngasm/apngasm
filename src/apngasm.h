@@ -12,12 +12,7 @@ namespace apngasm {
 
   typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 
-  struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
-  struct FramePNG {
-    std::vector<CHUNK> chunkSet;
-    unsigned w, h, x, y, delay_num, delay_den;
-    unsigned char dop, bop;
-  };
+  struct CHUNK { unsigned int size; unsigned char * p; };
 
 	class APNGAsm {
 	public:
@@ -83,10 +78,9 @@ namespace apngasm {
 		void write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length);
 		void write_IDATs(FILE * f, int frame, unsigned char * data, unsigned int length, unsigned int idat_size);
 
-		void decode_frame(APNGFrame * frameOut, FramePNG * frameIn);
 		void compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 		unsigned int read_chunk(FILE * f, CHUNK * pChunk);
-		void recalc_crc(CHUNK * pChunk);
+		void recalc_crc(unsigned char * p, unsigned int size);
 
 		//Loads an animation spec from JSON
 		//Returns a frame vector with the loaded frames
@@ -117,7 +111,7 @@ namespace apngasm {
     unsigned char * _avg_row;
     unsigned char * _paeth_row;
 
-		std::vector<CHUNK>   _all_chunks;
+		std::vector<CHUNK>   _info_chunks;
 	};	// class APNGAsm
 	
 }	// namespace apngasm
