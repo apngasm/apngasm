@@ -1246,6 +1246,14 @@ namespace apngasm {
       std::cout << "default_delay = " << defaultDealyNum << std::endl;
     }
 
+    // delays
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
+    {
+      const boost::property_tree::ptree& delay = child.second;
+
+      std::cout << "delay = " << delay.data() << std::endl;
+    }
+
     // frames
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("frames"))
     {
