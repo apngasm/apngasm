@@ -3,6 +3,9 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/regex.hpp>
+#include <boost/range/algorithm.hpp>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -80,6 +83,39 @@ namespace {
     }
 
     return delay;
+  }
+
+  // Get file path vector.
+  const std::vector<std::string>& getFiles(const std::string& filepath)
+  {
+    static std::vector<std::string> files;
+
+    // Clear temporary vector.
+    files.clear();
+
+    // Find files.
+    const boost::filesystem::path& absPath( boost::filesystem::absolute(filepath) );
+
+    const boost::regex filter(absPath.string());
+    const boost::filesystem::directory_iterator itEnd;
+    for(boost::filesystem::directory_iterator itCur(absPath.parent_path());  itCur != itEnd;  ++itCur)
+    {
+      // Skip if not a file.
+      if( !boost::filesystem::is_regular_file(itCur->status()) )
+        continue;
+
+      // Skip if no match.
+      if( !boost::regex_match(itCur->path().string(), filter) )
+        continue;
+
+      // Add filepath.
+      files.push_back(itCur->path().string());
+    }
+
+    // Sort vector.
+    boost::sort(files);
+
+    return files;
   }
 }
 
@@ -1306,19 +1342,37 @@ namespace apngasm {
       // filepath only
       if(frame.empty())
       {
-        const std::string& filepath = frame.data();
+        const std::string& file = frame.data();
+        const std::vector<std::string>& files = getFiles(file);
 
-        std::cout << "filepath = " << filepath << std::endl;
+        std::cout << "filepath = " << file << std::endl;
+
+        std::vector<std::string>::const_iterator itCur = files.begin();
+        const std::vector<std::string>::const_iterator itEnd = files.end();
+        while(itCur != itEnd)
+        {
+          std::cout << "  " << itCur->c_str() << std::endl;
+          ++itCur;
+        }
       }
 
       // filepath and delay
       else
       {
         const boost::property_tree::ptree::value_type& value = frame.front();
-        const std::string& filepath = value.first;
+        const std::string& file = value.first;
         const DELAY& delay = str2delay(value.second.data());
+        const std::vector<std::string>& files = getFiles(file);
 
-        std::cout << "filepath = " << filepath << ", delay = " << delay.num << " / " << delay.den << std::endl;
+        std::cout << "filepath = " << file << ", delay = " << delay.num << " / " << delay.den << std::endl;
+
+        std::vector<std::string>::const_iterator itCur = files.begin();
+        const std::vector<std::string>::const_iterator itEnd = files.end();
+        while(itCur != itEnd)
+        {
+          std::cout << "  " << itCur->c_str() << std::endl;
+          ++itCur;
+        }
       }
     }
 
