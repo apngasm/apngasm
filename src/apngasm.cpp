@@ -2,6 +2,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -36,7 +37,50 @@ namespace {
 
 namespace {
   typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
+  typedef struct { unsigned num; unsigned den; } DELAY;
   std::vector<apngasm::APNGFrame> tmpFrames;
+  std::vector<DELAY> tmpDelays;
+
+  // Convert string to unsigned.
+  unsigned s2u(const std::string& str, const unsigned defaultValue)
+  {
+    try
+    {
+      return boost::lexical_cast<unsigned>(str);
+    }
+    catch(boost::bad_lexical_cast& e)
+    {
+      return defaultValue;
+    }
+  }
+
+  // Convert string to delay parameter.
+  const DELAY& str2delay(const std::string& str)
+  {
+    static DELAY delay;
+
+    const char delimiter = '/';
+    const std::string::size_type index = str.find(delimiter, 0);
+
+    // Numerator only.
+    if(index == std::string::npos)
+    {
+      delay.num = s2u(str, apngasm::DEFAULT_FRAME_NUMERATOR);
+      delay.den = apngasm::DEFAULT_FRAME_DENOMINATOR;
+    }
+
+    // Numerator / Denominator
+    else
+    {
+      const std::string& num = str.substr(0, index);
+      const std::string& den = str.substr(index+1, str.length());
+
+      delay.num = s2u(num, apngasm::DEFAULT_FRAME_NUMERATOR);
+      delay.den = s2u(den, apngasm::DEFAULT_FRAME_DENOMINATOR);
+    }
+
+    return delay;
+  }
 }
 
 namespace apngasm {
@@ -1237,21 +1281,21 @@ namespace apngasm {
     }
 
     // default_delay
-    int defaultDealyNum = DEFAULT_FRAME_NUMERATOR;
-    int defaultDealyDen = DEFAULT_FRAME_DENOMINATOR;
-    if( boost::optional<int> default_delay = root.get_optional<int>("default_delay") )
+    DELAY defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
+    if( boost::optional<std::string> default_delay = root.get_optional<std::string>("default_delay") )
     {
-      defaultDealyNum = default_delay.get();
+      defaultDelay = str2delay(default_delay.get());
 
-      std::cout << "default_delay = " << defaultDealyNum << std::endl;
+      std::cout << "default_delay = " << defaultDelay.num << " / " << defaultDelay.den << std::endl;
     }
 
     // delays
+    tmpDelays.clear();
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
     {
-      const boost::property_tree::ptree& delay = child.second;
+      tmpDelays.push_back(str2delay(child.second.data()));
 
-      std::cout << "delay = " << delay.data() << std::endl;
+      std::cout << "delay = " << tmpDelays.back().num << " / " << tmpDelays.back().den << std::endl;
     }
 
     // frames
@@ -1262,7 +1306,7 @@ namespace apngasm {
       // filepath only
       if(frame.empty())
       {
-        const std::string filepath = frame.data();
+        const std::string& filepath = frame.data();
 
         std::cout << "filepath = " << filepath << std::endl;
       }
@@ -1271,10 +1315,10 @@ namespace apngasm {
       else
       {
         const boost::property_tree::ptree::value_type& value = frame.front();
-        const std::string filepath = value.first;
-        const std::string delay = value.second.data();
+        const std::string& filepath = value.first;
+        const DELAY& delay = str2delay(value.second.data());
 
-        std::cout << "filepath = " << filepath << ", delay = " << delay << std::endl;
+        std::cout << "filepath = " << filepath << ", delay = " << delay.num << " / " << delay.den << std::endl;
       }
     }
 
