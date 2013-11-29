@@ -93,8 +93,19 @@ namespace {
     // Clear temporary vector.
     files.clear();
 
-    // Find files.
-    const boost::filesystem::path& absPath( boost::filesystem::absolute(filepath) );
+    // File is unique.
+    if( filepath.find('*', 0) == std::string::npos )
+    {
+      if( boost::algorithm::iends_with(filepath, ".png") )
+        files.push_back(filepath);
+      else
+        files.push_back(filepath + ".png");
+
+      return files;
+    }
+
+    // Search files.
+    const boost::filesystem::path& absPath( filepath );
 
     const boost::regex filter(absPath.string());
     const boost::filesystem::directory_iterator itEnd;
@@ -105,11 +116,13 @@ namespace {
         continue;
 
       // Skip if no match.
-      if( !boost::regex_match(itCur->path().string(), filter) )
+      const std::string& curFilePath = itCur->path().string();
+      if( !boost::regex_match(curFilePath, filter) )
         continue;
 
-      // Add filepath.
-      files.push_back(itCur->path().string());
+      // Add filepath if extension is png.
+      if( boost::algorithm::iends_with(curFilePath, ".png") )
+        files.push_back(curFilePath);
     }
 
     // Sort vector.
@@ -1301,19 +1314,19 @@ namespace apngasm {
     // name
     if( boost::optional<std::string> name = root.get_optional<std::string>("name") )
     {
-      std::cout << "name = " << name.get() << std::endl;
+      // nop
     }
 
     // loops
     if( boost::optional<int> loops = root.get_optional<int>("loops") )
     {
-      std::cout << "loops = " << loops.get() << std::endl;
+      // nop
     }
 
     // skip_first
     if( boost::optional<bool> skip_first = root.get_optional<bool>("skip_first") )
     {
-      std::cout << "skip_first = " << skip_first.get() << std::endl;
+      // nop
     }
 
     // default_delay
@@ -1321,8 +1334,6 @@ namespace apngasm {
     if( boost::optional<std::string> default_delay = root.get_optional<std::string>("default_delay") )
     {
       defaultDelay = str2delay(default_delay.get());
-
-      std::cout << "default_delay = " << defaultDelay.num << " / " << defaultDelay.den << std::endl;
     }
 
     // delays
@@ -1330,50 +1341,47 @@ namespace apngasm {
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
     {
       tmpDelays.push_back(str2delay(child.second.data()));
-
-      std::cout << "delay = " << tmpDelays.back().num << " / " << tmpDelays.back().den << std::endl;
     }
 
     // frames
+    int delayIndex = 0;
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("frames"))
     {
       const boost::property_tree::ptree& frame = child.second;
 
+      std::string file;
+      DELAY delay;
+
       // filepath only
       if(frame.empty())
       {
-        const std::string& file = frame.data();
-        const std::vector<std::string>& files = getFiles(file);
-
-        std::cout << "filepath = " << file << std::endl;
-
-        std::vector<std::string>::const_iterator itCur = files.begin();
-        const std::vector<std::string>::const_iterator itEnd = files.end();
-        while(itCur != itEnd)
-        {
-          std::cout << "  " << itCur->c_str() << std::endl;
-          ++itCur;
-        }
+        file = frame.data();
+        if(delayIndex < tmpDelays.size())
+          delay = tmpDelays[delayIndex];
+        else
+          delay = defaultDelay;
       }
 
       // filepath and delay
       else
       {
         const boost::property_tree::ptree::value_type& value = frame.front();
-        const std::string& file = value.first;
-        const DELAY& delay = str2delay(value.second.data());
-        const std::vector<std::string>& files = getFiles(file);
-
-        std::cout << "filepath = " << file << ", delay = " << delay.num << " / " << delay.den << std::endl;
-
-        std::vector<std::string>::const_iterator itCur = files.begin();
-        const std::vector<std::string>::const_iterator itEnd = files.end();
-        while(itCur != itEnd)
-        {
-          std::cout << "  " << itCur->c_str() << std::endl;
-          ++itCur;
-        }
+        file = value.first;
+        delay = str2delay(value.second.data());
       }
+
+      // Create frames.
+      const std::vector<std::string>& files = getFiles(file);
+      std::vector<std::string>::const_iterator itCur = files.begin();
+      const std::vector<std::string>::const_iterator itEnd = files.end();
+      while(itCur != itEnd)
+      {
+        addFrame(itCur->c_str(), delay.num, delay.den);
+        std::cout << itCur->c_str() << " => Delay=(" << delay.num << "/" << delay.den << ") sec" << std::endl;
+        ++itCur;
+      }
+
+      ++delayIndex;
     }
 
     return tmpFrames;
