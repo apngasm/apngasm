@@ -104,12 +104,19 @@ namespace {
       return files;
     }
 
-    // Search files.
-    const boost::filesystem::path& absPath( filepath );
+    // Convert filepath.
+    static const boost::regex escape("[\\^\\.\\$\\|\\(\\)\\[\\]\\+\\?\\\\]");
+    static const boost::regex wildcard("\\*");
 
-    const boost::regex filter(absPath.string());
+    std::string newFilePath = boost::regex_replace(filepath, escape, "\\\\$0");
+    newFilePath = boost::regex_replace(newFilePath, wildcard, ".+");
+
+    // Search files.
+    const boost::filesystem::path& path( newFilePath );
+
+    const boost::regex filter(path.string());
     const boost::filesystem::directory_iterator itEnd;
-    for(boost::filesystem::directory_iterator itCur(absPath.parent_path());  itCur != itEnd;  ++itCur)
+    for(boost::filesystem::directory_iterator itCur(path.parent_path());  itCur != itEnd;  ++itCur)
     {
       // Skip if not a file.
       if( !boost::filesystem::is_regular_file(itCur->status()) )
