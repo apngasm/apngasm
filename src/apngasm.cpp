@@ -1090,30 +1090,6 @@ namespace apngasm {
     memcpy(pChunk->p + pChunk->size - 4, &crc, 4);
   }
 
-  void APNGAsm::savePNG(char * szOut, APNGFrame * frame)
-  {
-    FILE * f;
-    if ((f = fopen(szOut, "wb")) != 0)
-    {
-      png_structp  png_ptr  = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-      png_infop    info_ptr = png_create_info_struct(png_ptr);
-      if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
-      {
-        png_init_io(png_ptr, f);
-        png_set_compression_level(png_ptr, 9);
-        if (frame->_pixels && frame->_rows)
-        {
-          png_set_IHDR(png_ptr, info_ptr, frame->_width, frame->_height, 8, 6, 0, 0, 0);
-          png_write_info(png_ptr, info_ptr);
-          png_write_image(png_ptr, frame->_rows);
-          png_write_end(png_ptr, info_ptr);
-        }
-      }
-      png_destroy_write_struct(&png_ptr, &info_ptr);
-      fclose(f);
-    }
-  }
-
   const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
   {
     unsigned int   i, j, id;
