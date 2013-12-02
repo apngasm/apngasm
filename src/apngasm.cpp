@@ -1318,6 +1318,10 @@ namespace apngasm {
     boost::property_tree::ptree root;
     boost::property_tree::read_json(filePath, root);
 
+    // Set current directory.
+    const boost::filesystem::path oldPath = boost::filesystem::current_path();
+    boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
+
     // name
     if( boost::optional<std::string> name = root.get_optional<std::string>("name") )
     {
@@ -1390,6 +1394,9 @@ namespace apngasm {
 
       ++delayIndex;
     }
+
+    // Reset current directory.
+    boost::filesystem::current_path(oldPath);
 
     return tmpFrames;
   }
