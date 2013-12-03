@@ -10,4 +10,3 @@ OUT=./test.png
 
 # Run.
 ${EXEC} ${SRC} -o ${OUT}
-
