@@ -67,10 +67,12 @@ namespace specreader {
       // File is unique.
       if( absPath.string().find('*', 0) == std::string::npos )
       {
-        if( boost::algorithm::iends_with(absPath.string(), ".png") )
+        // Add extension
+        if( !boost::algorithm::iends_with(absPath.string(), ".png") )
+          absPath = absPath.string() + ".png";
+        
+        if( boost::filesystem::exists(absPath) )
           files.push_back(absPath.string());
-        else
-          files.push_back(absPath.string() + ".png");
       }
 
       // File path has wildcard.
