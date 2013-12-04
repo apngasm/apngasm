@@ -14,31 +14,39 @@ namespace apngasm {
 namespace specreader {
   namespace {
     // Convert string to unsigned int.
-    unsigned int s2u(const std::string& str, const unsigned int defaultValue)
+    // Return true if convert succeeded.
+    bool s2u(const std::string& str, unsigned int* pOut)
     {
+      if(pOut == NULL)
+        return false;
+
       try
       {
-        return boost::lexical_cast<unsigned int>(str);
+        *pOut = boost::lexical_cast<unsigned int>(str);
+        return true;
       }
       catch(boost::bad_lexical_cast& e)
       {
-        return defaultValue;
+        return false;
       }
     }
 
     // Convert string to delay parameter.
-    Delay str2delay(const std::string& str)
+    // Return true if convert succeeded.
+    bool str2delay(const std::string& str, Delay* pOut)
     {
-      static const char delimiter = '/';
+      if(pOut == NULL)
+        return false;
 
-      Delay delay;
+      static const char delimiter = '/';
       const std::string::size_type index = str.find(delimiter, 0);
 
       // Numerator only.
       if(index == std::string::npos)
       {
-        delay.num = s2u(str, DEFAULT_FRAME_NUMERATOR);
-        delay.den = DEFAULT_FRAME_DENOMINATOR;
+        if( !s2u(str, &pOut->num) )
+          return false;
+        pOut->den = DEFAULT_FRAME_DENOMINATOR;
       }
 
       // Numerator / Denominator
@@ -47,11 +55,11 @@ namespace specreader {
         const std::string& num = str.substr(0, index);
         const std::string& den = str.substr(index+1, str.length());
 
-        delay.num = s2u(num, DEFAULT_FRAME_NUMERATOR);
-        delay.den = s2u(den, DEFAULT_FRAME_DENOMINATOR);
+        if( !s2u(num, &pOut->num) || !s2u(den, &pOut->den) )
+          return false;
       }
 
-      return delay;
+      return true;
     }
 
     // Get file path vector.
@@ -205,13 +213,20 @@ namespace specreader {
     Delay defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
     if( boost::optional<std::string> value = root.get_optional<std::string>("default_delay") )
     {
-      defaultDelay = str2delay(value.get());
+      if( !str2delay(value.get(), &defaultDelay) )
+      {
+        defaultDelay.num = DEFAULT_FRAME_NUMERATOR;
+        defaultDelay.den = DEFAULT_FRAME_DENOMINATOR;
+      }
     }
 
     std::vector<Delay> delays;
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
     {
-      delays.push_back(str2delay(child.second.data()));
+      Delay delay;
+      if( !str2delay(child.second.data(), &delay) )
+        delay = defaultDelay;
+      delays.push_back(delay);
     }
 
     // frames
@@ -237,7 +252,8 @@ namespace specreader {
       {
         const boost::property_tree::ptree::value_type& value = frame.front();
         file = value.first;
-        delay = str2delay(value.second.data());
+        if( !str2delay(value.second.data(), &delay) )
+          delay = defaultDelay;
       }
 
       // Add frame informations.
@@ -290,7 +306,11 @@ namespace specreader {
     Delay defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
     if( boost::optional<std::string> value = root.get_optional<std::string>("animation.<xmlattr>.default_delay") )
     {
-      defaultDelay = str2delay(value.get());
+      if( !str2delay(value.get(), &defaultDelay) )
+      {
+        defaultDelay.num = DEFAULT_FRAME_NUMERATOR;
+        defaultDelay.den = DEFAULT_FRAME_DENOMINATOR;
+      }
     }
 
     // frames
@@ -311,7 +331,8 @@ namespace specreader {
       // delay
       if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.delay") )
       {
-        delay = str2delay(value.get());
+        if( !str2delay(value.get(), &delay) )
+          delay = defaultDelay;
       }
       else
       {
