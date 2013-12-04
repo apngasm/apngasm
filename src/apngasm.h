@@ -85,14 +85,6 @@ namespace apngasm {
 		unsigned int read_chunk(FILE * f, CHUNK * pChunk);
 		void recalc_crc(CHUNK * pChunk);
 
-		//Loads an animation spec from JSON
-		//Returns a frame vector with the loaded frames
-		const std::vector<APNGFrame>& loadJSONSpec(const std::string &filePath);
-		
-		//Loads an animation spec from XML
-		//Returns a frame vector with the loaded frames
-		const std::vector<APNGFrame>& loadXMLSpec(const std::string &filePath);
-
     OP              _op[6];
     unsigned int    _width;
     unsigned int    _height;

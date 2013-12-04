@@ -1,11 +1,6 @@
 #include "apngasm.h"
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/regex.hpp>
-#include <boost/range/algorithm.hpp>
+#include "specreader/specreader.h"
+#include <iostream>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -40,103 +35,6 @@ namespace {
 
 namespace {
   typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
-  typedef struct { unsigned num; unsigned den; } DELAY;
-  std::vector<apngasm::APNGFrame> tmpFrames;
-  std::vector<DELAY> tmpDelays;
-
-  // Convert string to unsigned.
-  unsigned s2u(const std::string& str, const unsigned defaultValue)
-  {
-    try
-    {
-      return boost::lexical_cast<unsigned>(str);
-    }
-    catch(boost::bad_lexical_cast& e)
-    {
-      return defaultValue;
-    }
-  }
-
-  // Convert string to delay parameter.
-  const DELAY& str2delay(const std::string& str)
-  {
-    static DELAY delay;
-
-    const char delimiter = '/';
-    const std::string::size_type index = str.find(delimiter, 0);
-
-    // Numerator only.
-    if(index == std::string::npos)
-    {
-      delay.num = s2u(str, apngasm::DEFAULT_FRAME_NUMERATOR);
-      delay.den = apngasm::DEFAULT_FRAME_DENOMINATOR;
-    }
-
-    // Numerator / Denominator
-    else
-    {
-      const std::string& num = str.substr(0, index);
-      const std::string& den = str.substr(index+1, str.length());
-
-      delay.num = s2u(num, apngasm::DEFAULT_FRAME_NUMERATOR);
-      delay.den = s2u(den, apngasm::DEFAULT_FRAME_DENOMINATOR);
-    }
-
-    return delay;
-  }
-
-  // Get file path vector.
-  const std::vector<std::string>& getFiles(const std::string& filepath)
-  {
-    static std::vector<std::string> files;
-
-    // Clear temporary vector.
-    files.clear();
-
-    // File is unique.
-    if( filepath.find('*', 0) == std::string::npos )
-    {
-      if( boost::algorithm::iends_with(filepath, ".png") )
-        files.push_back(filepath);
-      else
-        files.push_back(filepath + ".png");
-
-      return files;
-    }
-
-    // Convert filepath.
-    static const boost::regex escape("[\\^\\.\\$\\|\\(\\)\\[\\]\\+\\?\\\\]");
-    static const boost::regex wildcard("\\*");
-
-    std::string newFilePath = boost::regex_replace(filepath, escape, "\\\\$0");
-    newFilePath = boost::regex_replace(newFilePath, wildcard, ".+");
-
-    // Search files.
-    const boost::filesystem::path& path( newFilePath );
-
-    const boost::regex filter(path.string());
-    const boost::filesystem::directory_iterator itEnd;
-    for(boost::filesystem::directory_iterator itCur(path.parent_path());  itCur != itEnd;  ++itCur)
-    {
-      // Skip if not a file.
-      if( !boost::filesystem::is_regular_file(itCur->status()) )
-        continue;
-
-      // Skip if no match.
-      const std::string& curFilePath = itCur->path().string();
-      if( !boost::regex_match(curFilePath, filter) )
-        continue;
-
-      // Add filepath if extension is png.
-      if( boost::algorithm::iends_with(curFilePath, ".png") )
-        files.push_back(curFilePath);
-    }
-
-    // Sort vector.
-    boost::sort(files);
-
-    return files;
-  }
 }
 
 namespace apngasm {
@@ -224,9 +122,19 @@ namespace apngasm {
   //Loaded frames are added to the end of the frame vector
   const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
-    const bool isJSON = boost::algorithm::iends_with(filePath, ".json");
-    const std::vector<APNGFrame> &newFrames = isJSON ? loadJSONSpec(filePath) : loadXMLSpec(filePath);
-    _frames.insert(_frames.end(), newFrames.begin(), newFrames.end());
+    // Read spec.
+    const specreader::SpecReader reader(filePath);
+
+    // Create frames.
+    const std::vector<specreader::FrameInfo>& frameInfos = reader.getFrameInfos();
+    const int count = frameInfos.size();
+    for(int i = 0;  i < count;  ++i)
+    {
+      const specreader::FrameInfo& frameInfo = frameInfos[i];
+      addFrame(frameInfo.filePath, frameInfo.delay.num, frameInfo.delay.den);
+      std::cout << frameInfo.filePath << " => Delay=(" << frameInfo.delay.num << "/" << frameInfo.delay.den << ") sec" << std::endl;
+    }
+
     return _frames;
   }
 
@@ -1283,106 +1191,6 @@ namespace apngasm {
       delete[] chunk_ihdr.p;
     }
     return _frames;
-  }
-
-  //Loads an animation spec from JSON
-  //Returns a frame vector with the loaded frames
-  const std::vector<APNGFrame>& APNGAsm::loadJSONSpec(const std::string &filePath)
-  {
-    tmpFrames.clear();
-
-    boost::property_tree::ptree root;
-    boost::property_tree::read_json(filePath, root);
-
-    // Set current directory.
-    const boost::filesystem::path oldPath = boost::filesystem::current_path();
-    boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
-
-    // name
-    if( boost::optional<std::string> name = root.get_optional<std::string>("name") )
-    {
-      // nop
-    }
-
-    // loops
-    if( boost::optional<int> loops = root.get_optional<int>("loops") )
-    {
-      // nop
-    }
-
-    // skip_first
-    if( boost::optional<bool> skip_first = root.get_optional<bool>("skip_first") )
-    {
-      // nop
-    }
-
-    // default_delay
-    DELAY defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
-    if( boost::optional<std::string> default_delay = root.get_optional<std::string>("default_delay") )
-    {
-      defaultDelay = str2delay(default_delay.get());
-    }
-
-    // delays
-    tmpDelays.clear();
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
-    {
-      tmpDelays.push_back(str2delay(child.second.data()));
-    }
-
-    // frames
-    int delayIndex = 0;
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("frames"))
-    {
-      const boost::property_tree::ptree& frame = child.second;
-
-      std::string file;
-      DELAY delay;
-
-      // filepath only
-      if(frame.empty())
-      {
-        file = frame.data();
-        if(delayIndex < tmpDelays.size())
-          delay = tmpDelays[delayIndex];
-        else
-          delay = defaultDelay;
-      }
-
-      // filepath and delay
-      else
-      {
-        const boost::property_tree::ptree::value_type& value = frame.front();
-        file = value.first;
-        delay = str2delay(value.second.data());
-      }
-
-      // Create frames.
-      const std::vector<std::string>& files = getFiles(file);
-      std::vector<std::string>::const_iterator itCur = files.begin();
-      const std::vector<std::string>::const_iterator itEnd = files.end();
-      while(itCur != itEnd)
-      {
-        addFrame(itCur->c_str(), delay.num, delay.den);
-        std::cout << itCur->c_str() << " => Delay=(" << delay.num << "/" << delay.den << ") sec" << std::endl;
-        ++itCur;
-      }
-
-      ++delayIndex;
-    }
-
-    // Reset current directory.
-    boost::filesystem::current_path(oldPath);
-
-    return tmpFrames;
-  }
-
-  //Loads an animation spec from XML
-  //Returns a frame vector with the loaded frames
-  const std::vector<APNGFrame>& APNGAsm::loadXMLSpec(const std::string &filePath)
-  {
-    tmpFrames.clear();
-    return tmpFrames;
   }
 
   int APNGAsm::upconvertToCommonType(unsigned char coltype)
