@@ -3,6 +3,7 @@
 #include "../apngframe.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -179,29 +180,30 @@ namespace specreader {
     const boost::filesystem::path oldPath = boost::filesystem::current_path();
     boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
 
+    // Read fields.
     // name
-    if( boost::optional<std::string> name = root.get_optional<std::string>("name") )
+    if( boost::optional<std::string> value = root.get_optional<std::string>("name") )
     {
-      _name = name.get();
+      _name = value.get();
     }
 
     // loops
-    if( boost::optional<unsigned int> loops = root.get_optional<unsigned int>("loops") )
+    if( boost::optional<unsigned int> value = root.get_optional<unsigned int>("loops") )
     {
-      _loops = loops.get();
+      _loops = value.get();
     }
 
     // skip_first
-    if( boost::optional<bool> skip_first = root.get_optional<bool>("skip_first") )
+    if( boost::optional<bool> value = root.get_optional<bool>("skip_first") )
     {
-      _skipFirst = skip_first.get();
+      _skipFirst = value.get();
     }
 
     // delay
     Delay defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
-    if( boost::optional<std::string> default_delay = root.get_optional<std::string>("default_delay") )
+    if( boost::optional<std::string> value = root.get_optional<std::string>("default_delay") )
     {
-      defaultDelay = str2delay(default_delay.get());
+      defaultDelay = str2delay(value.get());
     }
 
     std::vector<Delay> delays;
@@ -255,7 +257,77 @@ namespace specreader {
   // Initialize XmlSpecReader object.
   XmlSpecReader::XmlSpecReader(const std::string& filePath)
   {
-    
+    // Read XML file.
+    boost::property_tree::ptree root;
+    boost::property_tree::read_xml(filePath, root);
+
+    // Set current directory.
+    const boost::filesystem::path oldPath = boost::filesystem::current_path();
+    boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
+
+    // Read fields.
+    // name
+    if( boost::optional<std::string> value = root.get_optional<std::string>("animation.<xmlattr>.name") )
+    {
+      _name = value.get();
+    }
+
+    // loops
+    if( boost::optional<unsigned int> value = root.get_optional<unsigned int>("animation.<xmlattr>.loops") )
+    {
+      _loops = value.get();
+    }
+
+    // skip_first
+    if( boost::optional<bool> value = root.get_optional<bool>("animation.<xmlattr>.skip_first") )
+    {
+      _skipFirst = value.get();
+    }
+
+    // delay
+    Delay defaultDelay = { DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR };
+    if( boost::optional<std::string> value = root.get_optional<std::string>("animation.<xmlattr>.default_delay") )
+    {
+      defaultDelay = str2delay(value.get());
+    }
+
+    // frames
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("animation"))
+    {
+      std::string file;
+      Delay delay;
+      const boost::property_tree::ptree& frame = child.second;
+
+      // filepath
+      if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.src") )
+      {
+        file = value.get();
+      }
+      if(file.empty())
+        continue;
+
+      // delay
+      if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.delay") )
+      {
+        delay = str2delay(value.get());
+      }
+      else
+      {
+        delay = defaultDelay;
+      }
+
+      // Add frame informations.
+      const std::vector<std::string>& files = getFiles(file);
+      const int count = files.size();
+      for(int i = 0;  i < count;  ++i)
+      {
+        const FrameInfo frameInfo = { files[i], delay };
+        _frameInfos.push_back(frameInfo);
+      }
+    }
+
+    // Reset current directory.
+    boost::filesystem::current_path(oldPath);
   }
 
 } // namespace specreader
