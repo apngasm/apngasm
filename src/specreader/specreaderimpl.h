@@ -26,21 +26,22 @@ namespace specreader {
 
   };  // interface ISpecReaderImpl
 
+
   // Abstract class.
   class AbstractSpecReader : public ISpecReaderImpl
   {
   public:
     // Return animation name.
-    const std::string& getName() const { return _name; } ;
+    const std::string& getName() const;
 
     // Return loops.
-    unsigned int getLoops() const { return _loops; };
+    unsigned int getLoops() const;
 
     // Return flag of skip first.
-    bool getSkipFirst() const { return _skipFirst; };
+    bool getSkipFirst() const;
 
     // Return frame information vector.
-    const std::vector<FrameInfo>& getFrameInfos() const { return _frameInfos; };
+    const std::vector<FrameInfo>& getFrameInfos() const;
 
   protected:
     // Initialize AbstractSpecReader object.
@@ -54,6 +55,7 @@ namespace specreader {
 
   };  // class AbstractSpecReader
 
+
   // for JSON.
   class JsonSpecReader : public AbstractSpecReader
   {
@@ -62,6 +64,7 @@ namespace specreader {
     JsonSpecReader(const std::string& filePath);
 
   };  // class JsonSpecReader
+
 
   // for XML.
   class XmlSpecReader : public AbstractSpecReader

@@ -178,6 +178,30 @@ namespace specreader {
   {
     // nop
   }
+
+  // Return animation name.
+  const std::string& AbstractSpecReader::getName() const
+  {
+    return _name;
+  }
+
+  // Return loops.
+  unsigned int AbstractSpecReader::getLoops() const
+  {
+    return _loops;
+  }
+
+  // Return flag of skip first.
+  bool AbstractSpecReader::getSkipFirst() const
+  {
+    return _skipFirst;
+  }
+
+  // Return frame information vector.
+  const std::vector<FrameInfo>& AbstractSpecReader::getFrameInfos() const
+  {
+    return _frameInfos;
+  }
   
   // Initialize JsonSpecReader object.
   JsonSpecReader::JsonSpecReader(const std::string& filePath)
