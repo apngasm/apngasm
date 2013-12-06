@@ -167,13 +167,10 @@ namespace apngasm {
       {
         png_init_io(png_ptr, f);
         png_set_compression_level(png_ptr, 9);
-        if (_pixels && _rows)
-        {
-          png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, 6, 0, 0, 0);
-          png_write_info(png_ptr, info_ptr);
-          png_write_image(png_ptr, _rows);
-          png_write_end(png_ptr, info_ptr);
-        }
+        png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, 6, 0, 0, 0);
+        png_write_info(png_ptr, info_ptr);
+        png_write_image(png_ptr, _rows);
+        png_write_end(png_ptr, info_ptr);
       }
       png_destroy_write_struct(&png_ptr, &info_ptr);
       fclose(f);

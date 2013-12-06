@@ -25,11 +25,16 @@ cmake ./
 make
 ```
 
+4. [optional] Build packages
+```
+make package
+```
+
 Building on OS-X (with homebrew):  
 
 1. Install cmake and libpng  
 ```
-brew install cmake libpng lzlib
+brew install cmake boost libpng lzlib
 ```
 
 2. Generate makefiles with cmake  
@@ -57,5 +62,5 @@ zlib/libpng
 
 Copyright
 ---------
-This version of apngasm is a joint production by Genshin Souzou Kabushiki Kaisha and Max Stepin.
-The original apngasm [found in the /legacy directory] is wholly copyright Max Stepin.
+This version of apngasm is a joint production by Max Stepin and Genshin Souzou Kabushiki Kaisha.
+The original apngasm is wholly copyright Max Stepin. The apngasm name and project is copyright Max Stepin all rights reserved.
