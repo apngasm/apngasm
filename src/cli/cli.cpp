@@ -143,7 +143,7 @@ namespace apngasm_cli {
 //		cout << "loops=" << options.getLoops() << std::endl;
 
 		if(outfile == "") {
-			return 0;
+			outfile = "out.png";
 		}
 		create_parent_dirs(outfile);
 		if(assembler.assemble(outfile)) {
