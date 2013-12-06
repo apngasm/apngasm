@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <png.h>
-#include <zlib.h>
 #include "apngframe.h"
 #include "version.h"
 

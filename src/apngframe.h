@@ -1,8 +1,6 @@
 #ifndef _APNGFRAME_H_
 #define _APNGFRAME_H_
 
-#include <png.h>
-#include <cstdlib>
 #include <string>
 
 namespace apngasm {

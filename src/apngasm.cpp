@@ -1,6 +1,7 @@
 #include "apngasm.h"
-#include "specreader/specreader.h"
 #include <iostream>
+#include <cstdlib>
+#include "specreader/specreader.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
