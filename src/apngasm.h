@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <png.h>
-#include <zlib.h>
 #include "apngframe.h"
 #include "version.h"
 
@@ -12,12 +11,7 @@ namespace apngasm {
 
   typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 
-  struct CHUNK { unsigned int size; unsigned char * p; unsigned int flag; };
-  struct FramePNG {
-    std::vector<CHUNK> chunkSet;
-    unsigned w, h, x, y, delay_num, delay_den;
-    unsigned char dop, bop;
-  };
+  struct CHUNK { unsigned int size; unsigned char * p; };
 
 	class APNGAsm {
 	public:
@@ -73,7 +67,6 @@ namespace apngasm {
     unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
 
 		bool save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
-		void savePNG(char * szOut, APNGFrame * frame);
 
 		void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
 		void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
@@ -83,18 +76,9 @@ namespace apngasm {
 		void write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length);
 		void write_IDATs(FILE * f, int frame, unsigned char * data, unsigned int length, unsigned int idat_size);
 
-		void decode_frame(APNGFrame * frameOut, FramePNG * frameIn);
 		void compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 		unsigned int read_chunk(FILE * f, CHUNK * pChunk);
-		void recalc_crc(CHUNK * pChunk);
-
-		//Loads an animation spec from JSON
-		//Returns a frame vector with the loaded frames
-		const std::vector<APNGFrame>& loadJSONSpec(const std::string &filePath);
-		
-		//Loads an animation spec from XML
-		//Returns a frame vector with the loaded frames
-		const std::vector<APNGFrame>& loadXMLSpec(const std::string &filePath);
+		void recalc_crc(unsigned char * p, unsigned int size);
 
     OP              _op[6];
     unsigned int    _width;
@@ -117,7 +101,7 @@ namespace apngasm {
     unsigned char * _avg_row;
     unsigned char * _paeth_row;
 
-		std::vector<CHUNK>   _all_chunks;
+		std::vector<CHUNK>   _info_chunks;
 	};	// class APNGAsm
 	
 }	// namespace apngasm

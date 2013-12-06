@@ -1,8 +1,6 @@
 #ifndef _APNGFRAME_H_
 #define _APNGFRAME_H_
 
-#include <png.h>
-#include <cstdlib>
 #include <string>
 
 namespace apngasm {
@@ -54,6 +52,9 @@ namespace apngasm {
     // Init frame 
     APNGFrame(rgb *pixels, unsigned char tr[] = NULL, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
     APNGFrame(rgba *pixels, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+    // Save frame to a PNG image file.
+    void save(const std::string& outPath);
 
   private:
   };  // class APNGFrame

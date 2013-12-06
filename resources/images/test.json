@@ -1,0 +1,23 @@
+{
+  "name": "myanimation",
+  "loops": 0,
+  "skip_first": false,
+  "default_delay": "800/1000",
+  "delays": [
+    100,
+    100,
+    100,
+    "100/3000"
+  ],
+  "frames": [
+    "apngasm/*",
+    {"apngasm/*": 10},
+    {"apngasm/*":"1/5"},
+    "apngasm/*",
+    "apngasm/00",
+    "apngasm/08",
+    "apngasm/16",
+    "apngasm/24",
+    "apngasm/32"
+  ]
+}
