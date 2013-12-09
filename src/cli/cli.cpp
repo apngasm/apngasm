@@ -174,8 +174,8 @@ namespace apngasm_cli {
 			}
 			create_parent_dirs(filename.str());
 			int e = out.assemble(filename.str());
-			if(e) {
-				return e;
+			if(!e) {
+				return 1;
 			}
 		}
 		return 0;

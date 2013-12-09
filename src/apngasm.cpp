@@ -1030,6 +1030,7 @@ namespace apngasm {
 
           frameCur._width = w;
           frameCur._height = h;
+          frameCur._colorType = 6;
           frameCur._pixels = new unsigned char[imagesize];
           frameCur._rows = new png_bytep[h * sizeof(png_bytep)];
           for (j=0; j<h; ++j)
