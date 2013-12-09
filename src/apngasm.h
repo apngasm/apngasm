@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <png.h>
+#include <zlib.h> // zlib must be directy included for OSX
 #include "apngframe.h"
 #include "apngasm-version.h"
 
