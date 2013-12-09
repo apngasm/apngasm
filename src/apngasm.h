@@ -5,7 +5,7 @@
 #include <string>
 #include <png.h>
 #include "apngframe.h"
-#include "version.h"
+#include "apngasm-version.h"
 
 namespace apngasm {
 
