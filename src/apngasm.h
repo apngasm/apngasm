@@ -3,8 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <png.h>
-#include <zlib.h> // zlib must be directy included for OSX
+#include <zlib.h> // z_stream
 #include "apngframe.h"
 #include "apngasm-version.h"
 

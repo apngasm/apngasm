@@ -1,6 +1,8 @@
 #include "apngasm.h"
 #include <iostream>
 #include <cstdlib>
+#include <png.h>
+#include <zlib.h>
 #include "specreader/specreader.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
