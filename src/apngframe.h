@@ -30,19 +30,28 @@ namespace apngasm {
     unsigned char _colorType;
     
     // Palette into
+    rgb* palette(rgb* setPalette = NULL);
     rgb _palette[256];
     
     //Transparency info
+    unsigned char* transparency(unsigned char* setTransparency = NULL);
     unsigned char _transparency[256];
     
     //Sizes for palette and transparency records
+    int paletteSize(int setPaletteSize = 0);
     int _paletteSize;
+
+    int transparencySize(int setTransparencySize = 0);
     int _transparencySize;
     
     //Delay is numerator/denominator ratio, in seconds
+    unsigned int delayNum(unsigned int setDelayNum = 0);
     unsigned int _delayNum;
+
+    unsigned int delayDen(unsigned int setDelayDen = 0);
     unsigned int _delayDen;
 
+    unsigned char** rows(unsigned char** setRows = NULL);
     unsigned char ** _rows;
 
     // Init empty frame for filling in manually
