@@ -27,6 +27,6 @@ INSTALL(TARGETS apngasm
 	LIBRARY DESTINATION lib
 	COMPONENT libraries)
 
-INSTALL(FILES ../src/apngasm.h ../src/apngframe.h ../apngasm-version.h
+INSTALL(FILES ../src/apngasm.h ../src/apngframe.h ../src/apngasm-version.h
 	DESTINATION include
 	COMPONENT headers)
