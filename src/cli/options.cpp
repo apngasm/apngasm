@@ -71,6 +71,9 @@ namespace apngasm_cli {
 			("output,o",
 				value<string>(),
 				"Specifies Output File (Then, 1st argument is NOT output-file)")
+			("json,j",
+				value<string>(),
+				"Specifies output json file.")
 			;
 		pack.push_back(main_opts);
 		visible_options.add(main_opts);
@@ -240,6 +243,15 @@ namespace apngasm_cli {
 			return false;
 		}
 		out = vm["file"].as<std::string>();
+		return true;
+	}
+
+	bool Options::outputJsonFile(std::string &out) const
+	{
+		if(!vm.count("json")) {
+			return false;
+		}
+		out = vm["json"].as<std::string>();
 		return true;
 	}
 
