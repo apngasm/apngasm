@@ -36,7 +36,7 @@ namespace apngasm {
     unsigned char _transparency[256];
     
     //Sizes for palette and transparency records
-    int _palleteSize;
+    int _paletteSize;
     int _transparencySize;
     
     //Delay is numerator/denominator ratio, in seconds

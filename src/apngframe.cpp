@@ -90,10 +90,10 @@ namespace apngasm {
           memset(_palette, 255, sizeof(_palette));
           memset(_transparency, 255, sizeof(_transparency));
 
-          if (png_get_PLTE(png_ptr, info_ptr, &palette, &_palleteSize))
-            memcpy(_palette, palette, _palleteSize * 3);
+          if (png_get_PLTE(png_ptr, info_ptr, &palette, &_paletteSize))
+            memcpy(_palette, palette, _paletteSize * 3);
           else
-            _palleteSize = 0;
+            _paletteSize = 0;
 
           if (png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &_transparencySize, &trans_color))
           {
