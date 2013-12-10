@@ -47,6 +47,12 @@ namespace apngasm {
 		//Returns the frame vector
 		const std::vector<APNGFrame>& disassemble(const std::string &filePath);
 
+		// Save png files.
+		bool savePNGs(const std::string& outputDir) const;
+
+		// Save json file.
+		bool saveJson(const std::string& outputPath) const;
+
 		//Returns the number of frames
 		size_t frameCount();
 

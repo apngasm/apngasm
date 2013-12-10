@@ -141,6 +141,18 @@ namespace apngasm {
     return _frames;
   }
 
+  // Save png files.
+  bool APNGAsm::savePNGs(const std::string& outputDir) const
+  {
+    return false;
+  }
+
+  // Save json file.
+  bool APNGAsm::saveJson(const std::string& outputPath) const
+  {
+    return false;
+  }
+
   unsigned char APNGAsm::findCommonType(void)
   {
     unsigned char coltype = _frames[0]._colorType;
