@@ -2,14 +2,12 @@
 ADD_LIBRARY(apngasm SHARED
 	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
 	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
-	${APNGASM_SOURCE_DIR}/src/apnghelper.cpp
 	${APNGASM_SOURCE_DIR}/src/specreader/specreaderimpl.cpp
 )
 
 #add_library(apngasm-static STATIC
 #	${APNGASM_SOURCE_DIR}/src/libapngasm.cpp
 #	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
-#	${APNGASM_SOURCE_DIR}/src/apnghelper.cpp
 #	${APNGASM_SOURCE_DIR}/src/specreader/specreaderimpl.cpp
 #)
 
@@ -21,10 +19,14 @@ TARGET_LINK_LIBRARIES(apngasm ${PNG_LIBRARY})
 INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(apngasm ${ZLIB_LIBRARIES})
 
+FIND_PACKAGE(Boost REQUIRED COMPONENTS regex filesystem system) 
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})
+
 INSTALL(TARGETS apngasm
 	LIBRARY DESTINATION lib
 	COMPONENT libraries)
 
-INSTALL(FILES ../src/apngasm.h ../src/apngframe.h
+INSTALL(FILES ../src/apngasm.h ../src/apngframe.h ../apngasm-version.h
 	DESTINATION include
 	COMPONENT headers)
