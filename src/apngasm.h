@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <string>
-#include <png.h>
+#include <zlib.h> // z_stream
 #include "apngframe.h"
-#include "version.h"
+#include "apngasm-version.h"
 
 namespace apngasm {
 

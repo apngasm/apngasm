@@ -6,7 +6,7 @@ SET(VERSION 3.0.0)
 INCLUDE_DIRECTORIES(${APNGASM_SOURCE_DIR}/src)
 
 # Generate version header
-FILE(WRITE ${APNGASM_SOURCE_DIR}/src/version.h 
+FILE(WRITE ${APNGASM_SOURCE_DIR}/src/apngasm-version.h 
 	"#ifndef _VERSION_H_\n"
 	"#define _VERSION_H_\n\n"
 	"#define APNGASM_VERSION \"${VERSION}\"\n\n"
