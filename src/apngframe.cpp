@@ -84,8 +84,18 @@ namespace apngasm {
   }
 
   APNGFrame::APNGFrame()
+    : _pixels(NULL)
+    , _width(0)
+    , _height(0)
+    , _colorType(0)
+    , _paletteSize(0)
+    , _transparencySize(0)
+    , _delayNum(0)
+    , _delayDen(0)
+    , _rows(NULL)
   {
-  	_width = _height = 0;
+    memset(_palette, 0, sizeof(_palette));
+    memset(_transparency, 0, sizeof(_transparency));
   }
 
   APNGFrame::APNGFrame(const std::string &filePath, unsigned delayNum, unsigned delayDen)
