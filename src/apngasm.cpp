@@ -1,5 +1,6 @@
 #include "apngasm.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
@@ -144,7 +145,16 @@ namespace apngasm {
   // Save png files.
   bool APNGAsm::savePNGs(const std::string& outputDir) const
   {
-    return false;
+    const int count = _frames.size();
+    for(int i = 0;  i < count;  ++i)
+    {
+      std::ostringstream outputPath;
+      outputPath << outputDir << "/" << i << ".png";
+      std::cout << outputPath.str() << std::endl;
+      if( !_frames[i].save(outputPath.str()) )
+        return false;
+    }
+    return true;
   }
 
   // Save json file.

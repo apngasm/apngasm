@@ -163,21 +163,9 @@ namespace apngasm_cli {
 			boost::filesystem::path path = src;
 			outdir = path.replace_extension("").string();
 		}
-		for(unsigned i=0; i<frames.size(); ++i) {
-			apngasm::APNGAsm out;
-			out.addFrame(frames[i]);
-			std::ostringstream filename;
-			filename << outdir << "/" << i << ".png";
-			std::cout << filename.str() << std::endl;
-			if(!checkOverwrite(filename.str())) {
-				return ERRCODE_OUTPUTFILE_ALREADYEXISTS;
-			}
-			create_parent_dirs(filename.str());
-			int e = out.assemble(filename.str());
-			if(!e) {
-				return 1;
-			}
-		}
+		create_parent_dirs(outdir + "/");
+		if( !assembler.savePNGs(outdir) )
+			return 1;
 		return 0;
 	}
 }
