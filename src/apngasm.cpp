@@ -148,7 +148,7 @@ namespace apngasm {
   }
 
   // Save json file.
-  bool APNGAsm::saveJson(const std::string& outputPath) const
+  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& currentDir) const
   {
     return false;
   }
