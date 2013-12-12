@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace apngasm {
-namespace specreader {
+namespace spec {
 
   // Delay parameter.
   typedef struct {
@@ -48,7 +48,7 @@ namespace specreader {
 
   };  // class SpecReader
 
-} // namespacce specreader
+} // namespacce spec
 } // namespacce apngasm
 
 #endif  // _SPECREADER_H_

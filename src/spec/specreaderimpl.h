@@ -6,7 +6,7 @@
 #include "specreader.h"
 
 namespace apngasm {
-namespace specreader {
+namespace spec {
 
   // Interface.
   class ISpecReaderImpl
@@ -75,7 +75,7 @@ namespace specreader {
 
   };  // class XmlSpecReader
 
-} // namespace specreader
+} // namespace spec
 } // namespace apngasm
 
 #endif  // _SPECREADERIMPL_H_

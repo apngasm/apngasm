@@ -11,7 +11,7 @@
 #include <boost/range/algorithm.hpp>
 
 namespace apngasm {
-namespace specreader {
+namespace spec {
   namespace {
     // Convert string to unsigned int.
     // Return true if convert succeeded.
@@ -377,5 +377,5 @@ namespace specreader {
     boost::filesystem::current_path(oldPath);
   }
 
-} // namespace specreader
+} // namespace spec
 } // namespace apngasm
