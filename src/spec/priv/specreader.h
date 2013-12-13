@@ -1,5 +1,5 @@
-#ifndef _SPECREADERIMPL_H_
-#define _SPECREADERIMPL_H_
+#ifndef _SPECREADER_H_
+#define _SPECREADER_H_
 
 #include <string>
 #include <vector>
@@ -20,7 +20,7 @@ namespace apngasm {
       } FrameInfo;
 
       // Interface.
-      class ISpecReaderImpl
+      class ISpecReader
       {
       public:
         // Read parameter from spec file.
@@ -39,11 +39,11 @@ namespace apngasm {
         // Return frame vector.
         virtual const std::vector<FrameInfo>& getFrameInfos() const = 0;
 
-      };  // interface ISpecReaderImpl
+      };  // interface ISpecReader
 
 
       // Abstract class.
-      class AbstractSpecReader : public ISpecReaderImpl
+      class AbstractSpecReader : public ISpecReader
       {
       public:
         // Initialize AbstractSpecReader object.
@@ -96,4 +96,4 @@ namespace apngasm {
   } // namespace spec
 } // namespace apngasm
 
-#endif  // _SPECREADERIMPL_H_
+#endif  // _SPECREADER_H_

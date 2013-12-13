@@ -1,4 +1,4 @@
-#include "specreaderimpl.h"
+#include "specreader.h"
 #include "../../apngframe.h"  // DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>

@@ -3,14 +3,14 @@ ADD_LIBRARY(apngasm SHARED
 	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
 	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/specparser.cpp
-  ${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/priv/specreader.cpp
 )
 
 #add_library(apngasm-static STATIC
 #	${APNGASM_SOURCE_DIR}/src/libapngasm.cpp
 #	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
 # ${APNGASM_SOURCE_DIR}/src/spec/specparser.cpp
-#	${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
+#	${APNGASM_SOURCE_DIR}/src/spec/priv/specreader.cpp
 #)
 
 FIND_PACKAGE(PNG REQUIRED)

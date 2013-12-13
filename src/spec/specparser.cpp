@@ -1,5 +1,5 @@
 #include "specparser.h"
-#include "priv/specreaderimpl.h"
+#include "priv/specreader.h"
 #include "../apngasm.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -35,28 +35,28 @@ namespace apngasm {
       if( !_pApngasm )
         return false;
 
-      boost::scoped_ptr<priv::ISpecReaderImpl> pImpl;
+      boost::scoped_ptr<priv::ISpecReader> pReader;
 
       // json file.
       if( isJson(filePath) )
       {
-        pImpl.reset(new priv::JsonSpecReader());
+        pReader.reset(new priv::JsonSpecReader());
       }
       // xml file.
       else if( isXml(filePath) )
       {
-        pImpl.reset(new priv::XmlSpecReader());
+        pReader.reset(new priv::XmlSpecReader());
       }
       // unknown file.
       else
         return false;
 
       // Read frame information from spec file.
-      if( !pImpl->read(filePath) )
+      if( !pReader->read(filePath) )
         return false;
 
       // Create frames from spec file.
-      const std::vector<priv::FrameInfo>& frameInfos = pImpl->getFrameInfos();
+      const std::vector<priv::FrameInfo>& frameInfos = pReader->getFrameInfos();
       const int count = frameInfos.size();
       for(int i = 0;  i < count;  ++i)
       {
