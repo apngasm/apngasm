@@ -156,8 +156,11 @@ namespace apngasm_cli {
 
 	int CLI::disassemble(const std::string &src)
 	{
+		// Dissassemble apng file.
 		std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
 		std::cout << frames.size() << std::endl;
+
+		// Output png image files.
 		std::string outdir;
 		if(!options.outputFile(outdir)) {
 			boost::filesystem::path path = src;
@@ -166,6 +169,16 @@ namespace apngasm_cli {
 		create_parent_dirs(outdir + "/");
 		if( !assembler.savePNGs(outdir) )
 			return 1;
+
+		// Output json spec files.
+		std::string outPath;
+		if( options.outputJsonFile(outPath) )
+		{
+			outPath = outdir + "/" + outPath;
+			assembler.saveJson(outPath);
+			std::cout << outPath << std::endl;
+		}
+
 		return 0;
 	}
 }

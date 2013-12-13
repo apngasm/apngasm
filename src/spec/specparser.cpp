@@ -1,5 +1,6 @@
 #include "specparser.h"
 #include "priv/specreader.h"
+#include "priv/specwriter.h"
 #include "../apngasm.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -72,7 +73,11 @@ namespace apngasm {
     // Return true if write succeeded.
     bool SpecParser::writeJson(const std::string& filePath, const std::string& currentDir) const
     {
-      return false;
+      if( !_pApngasm )
+        return false;
+
+      priv::JsonSpecWriter writer(_pApngasm);
+      return writer.write(filePath, currentDir);
     }
 
     // Write APNGAsm object to xml file.

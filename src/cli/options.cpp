@@ -72,7 +72,7 @@ namespace apngasm_cli {
 				value<string>(),
 				"Specifies Output File (Then, 1st argument is NOT output-file)")
 			("json,j",
-				value<string>(),
+				value<string>()->implicit_value("animation.json"),
 				"Specifies output json file.")
 			;
 		pack.push_back(main_opts);

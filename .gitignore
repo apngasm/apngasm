@@ -14,3 +14,4 @@ _CPack_Packages
 install_manifest.txt
 src/apngasm-version.h
 spec/*.png
+spec/*/
