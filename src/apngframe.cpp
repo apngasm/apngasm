@@ -1,6 +1,7 @@
 #include "apngframe.h"
 #include <png.h>
 #include <cstdlib>
+#include <algorithm>
 
 namespace apngasm {
 
@@ -28,13 +29,73 @@ namespace apngasm {
   unsigned char APNGFrame::colorType(unsigned char setColorType)
   {
   	if (setColorType != 255)
+
   		_colorType = setColorType;
   	return _colorType;
   }
+    
+  rgb* APNGFrame::palette(rgb* setPalette)
+  {
+    if(setPalette != NULL)
+      memcpy(_palette, setPalette, std::min(sizeof(_palette), sizeof(setPalette)));
+    return _palette;
+  }
+  
+  unsigned char* APNGFrame::transparency(unsigned char* setTransparency)
+  {
+    if(setTransparency != NULL)
+      memcpy(_transparency, setTransparency, std::min(sizeof(_transparency), sizeof(setTransparency)));
+    return _transparency;
+  }
+  
+  int APNGFrame::paletteSize(int setPaletteSize)
+  {
+    if(setPaletteSize != 0)
+      _paletteSize = setPaletteSize;
+    return _paletteSize;
+  }
+
+  int APNGFrame::transparencySize(int setTransparencySize)
+  {
+    if(setTransparencySize != 0)
+      _transparencySize = setTransparencySize;
+    return _transparencySize;
+  }
+  
+  unsigned int APNGFrame::delayNum(unsigned int setDelayNum)
+  {
+    if(setDelayNum != 0)
+      _delayNum = setDelayNum;
+    return _delayNum;
+  }
+
+  unsigned int APNGFrame::delayDen(unsigned int setDelayDen)
+  {
+    if(setDelayDen != 0)
+      _delayDen = setDelayDen;
+    return _delayDen;
+  }
+
+  unsigned char** APNGFrame::rows(unsigned char** setRows)
+  {
+    if(setRows != NULL)
+      _rows = setRows;
+    return _rows;
+  }
 
   APNGFrame::APNGFrame()
+    : _pixels(NULL)
+    , _width(0)
+    , _height(0)
+    , _colorType(0)
+    , _paletteSize(0)
+    , _transparencySize(0)
+    , _delayNum(0)
+    , _delayDen(0)
+    , _rows(NULL)
   {
-  	_width = _height = 0;
+    memset(_palette, 0, sizeof(_palette));
+    memset(_transparency, 0, sizeof(_transparency));
   }
 
   APNGFrame::APNGFrame(const std::string &filePath, unsigned delayNum, unsigned delayDen)
@@ -90,10 +151,10 @@ namespace apngasm {
           memset(_palette, 255, sizeof(_palette));
           memset(_transparency, 255, sizeof(_transparency));
 
-          if (png_get_PLTE(png_ptr, info_ptr, &palette, &_palleteSize))
-            memcpy(_palette, palette, _palleteSize * 3);
+          if (png_get_PLTE(png_ptr, info_ptr, &palette, &_paletteSize))
+            memcpy(_palette, palette, _paletteSize * 3);
           else
-            _palleteSize = 0;
+            _paletteSize = 0;
 
           if (png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &_transparencySize, &trans_color))
           {

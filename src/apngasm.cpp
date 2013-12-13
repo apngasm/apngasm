@@ -147,7 +147,7 @@ namespace apngasm {
 
     for (size_t n = 1; n < _frames.size(); ++n)
     {
-      if (_frames[0]._palleteSize != _frames[n]._palleteSize || memcmp(_frames[0]._palette, _frames[n]._palette, _frames[0]._palleteSize*3) != 0)
+      if (_frames[0]._paletteSize != _frames[n]._paletteSize || memcmp(_frames[0]._palette, _frames[n]._palette, _frames[0]._paletteSize*3) != 0)
         coltype = 6;
       else
       if (_frames[0]._transparencySize != _frames[n]._transparencySize || memcmp(_frames[0]._transparency, _frames[n]._transparency, _frames[0]._transparencySize) != 0)
@@ -1835,7 +1835,7 @@ namespace apngasm {
       int simple_trans = 1;
       int grayscale = 1;
 
-      for (int c=0; c<_frames[0]._palleteSize; c++)
+      for (int c=0; c<_frames[0]._paletteSize; c++)
       {
         col[c].r = _frames[0]._palette[c].r;
         col[c].g = _frames[0]._palette[c].g;
@@ -1952,7 +1952,7 @@ namespace apngasm {
       }
       else
       {
-        _palsize = _frames[0]._palleteSize;
+        _palsize = _frames[0]._paletteSize;
         _trnssize = _frames[0]._transparencySize;
         for (i=0; i<_palsize; i++)
         {
