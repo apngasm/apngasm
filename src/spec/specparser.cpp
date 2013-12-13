@@ -1,4 +1,4 @@
-#include "specreader.h"
+#include "specparser.h"
 #include "priv/specreaderimpl.h"
 #include "../apngasm.h"
 #include <boost/scoped_ptr.hpp>
@@ -21,8 +21,8 @@ namespace apngasm {
       }
     } // unnamed namespace
 
-    // Initialize SpecReader object.
-    SpecReader::SpecReader(APNGAsm *pApngasm)
+    // Initialize SpecParser object.
+    SpecParser::SpecParser(APNGAsm *pApngasm)
       : _pApngasm(pApngasm)
     {
       // nop
@@ -30,7 +30,7 @@ namespace apngasm {
 
     // Read APNGAsm object from spec file.
     // Return true if read succeeded.
-    bool SpecReader::read(const std::string& filePath)
+    bool SpecParser::read(const std::string& filePath)
     {
       if( !_pApngasm )
         return false;

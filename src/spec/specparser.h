@@ -1,5 +1,5 @@
-#ifndef _SPECREADER_H_
-#define _SPECREADER_H_
+#ifndef _SPECPARSER_H_
+#define _SPECPARSER_H_
 
 #include <string>
 
@@ -9,11 +9,11 @@ namespace apngasm {
 
   namespace spec {
 
-    class SpecReader
+    class SpecParser
     {
     public:
-      // Initialize SpecReader object.
-      SpecReader(APNGAsm *pApngasm);
+      // Initialize SpecParser object.
+      SpecParser(APNGAsm *pApngasm);
 
       // Read APNGAsm object from spec file.
       // Return true if read succeeded.
@@ -22,9 +22,9 @@ namespace apngasm {
     private:
       APNGAsm* const _pApngasm;
 
-    };  // class SpecReader
+    };  // class SpecParser
 
   } // namespacce spec
 } // namespacce apngasm
 
-#endif  // _SPECREADER_H_
+#endif  // _SPECPARSER_H_
