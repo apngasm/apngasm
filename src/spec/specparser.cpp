@@ -68,5 +68,19 @@ namespace apngasm {
       return true;
     }
 
+    // Write APNGAsm object to json file.
+    // Return true if write succeeded.
+    bool SpecParser::writeJson(const std::string& filePath, const std::string& currentDir) const
+    {
+      return false;
+    }
+
+    // Write APNGAsm object to xml file.
+    // Return true if write succeeded.
+    bool SpecParser::writeXml(const std::string& filePath, const std::string& currentDir) const
+    {
+      return false;
+    }
+
   } // namespace apngasm
 } //namespace spec
