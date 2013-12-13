@@ -5,50 +5,52 @@
 #include <vector>
 
 namespace apngasm {
-namespace spec {
+  namespace spec {
 
-  // Delay parameter.
-  typedef struct {
-    unsigned int num;
-    unsigned int den;
-  } Delay;
+    // Delay parameter.
+    typedef struct {
+      unsigned int num;
+      unsigned int den;
+    } Delay;
 
-  // Frame information.
-  typedef struct {
-    std::string filePath;
-    Delay delay;
-  } FrameInfo;
+    // Frame information.
+    typedef struct {
+      std::string filePath;
+      Delay delay;
+    } FrameInfo;
 
-  class ISpecReaderImpl;
+    namespace priv {
+      class ISpecReaderImpl;
+    }
 
-  class SpecReader
-  {
-  public:
-    // Initialize SpecReader object.
-    SpecReader(const std::string& filePath);
+    class SpecReader
+    {
+    public:
+      // Initialize SpecReader object.
+      SpecReader(const std::string& filePath);
 
-    // Finalize SpecReader object.
-    ~SpecReader();
+      // Finalize SpecReader object.
+      ~SpecReader();
 
-    // Return animation name.
-    const std::string& getName() const;
+      // Return animation name.
+      const std::string& getName() const;
 
-    // Return loops.
-    unsigned int getLoops() const;
+      // Return loops.
+      unsigned int getLoops() const;
 
-    // Return flag of skip first.
-    bool getSkipFirst() const;
+      // Return flag of skip first.
+      bool getSkipFirst() const;
 
-    // Return frame information vector.
-    const std::vector<FrameInfo>& getFrameInfos() const;
+      // Return frame information vector.
+      const std::vector<FrameInfo>& getFrameInfos() const;
 
-  private:
-    // Implements object pointer.
-    const ISpecReaderImpl* _pImpl;
+    private:
+      // Implements object pointer.
+      const priv::ISpecReaderImpl* _pImpl;
 
-  };  // class SpecReader
+    };  // class SpecReader
 
-} // namespacce spec
+  } // namespacce spec
 } // namespacce apngasm
 
 #endif  // _SPECREADER_H_

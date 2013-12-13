@@ -1,5 +1,5 @@
 #include "specreader.h"
-#include "specreaderimpl.h"
+#include "priv/specreaderimpl.h"
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
@@ -10,10 +10,10 @@ namespace apngasm {
     {
       // File is JSON.
       if( boost::algorithm::iends_with(filePath, ".json") )
-        _pImpl = new JsonSpecReader(filePath);
+        _pImpl = new priv::JsonSpecReader(filePath);
       // File is XML.
       else
-        _pImpl = new XmlSpecReader(filePath);
+        _pImpl = new priv::XmlSpecReader(filePath);
     }
 
     // Finalize SpecReader object.
