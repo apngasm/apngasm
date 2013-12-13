@@ -1,53 +1,71 @@
 #include "specreader.h"
 #include "priv/specreaderimpl.h"
+#include "../apngasm.h"
+#include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
   namespace spec {
 
-    // Initialize SpecReader object.
-    SpecReader::SpecReader(const std::string& filePath)
-    {
-      // File is JSON.
-      if( boost::algorithm::iends_with(filePath, ".json") )
-        _pImpl = new priv::JsonSpecReader(filePath);
-      // File is XML.
-      else
-        _pImpl = new priv::XmlSpecReader(filePath);
-    }
-
-    // Finalize SpecReader object.
-    SpecReader::~SpecReader()
-    {
-      if(_pImpl)
+    namespace {
+      // Return true if file is json.
+      bool isJson(const std::string& filePath)
       {
-        delete _pImpl;
-        _pImpl = NULL;
+        return boost::algorithm::iends_with(filePath, ".json");
       }
+
+      // Return true if file is xml.
+      bool isXml(const std::string& filePath)
+      {
+        return boost::algorithm::iends_with(filePath, ".xml");
+      }
+    } // unnamed namespace
+
+    // Initialize SpecReader object.
+    SpecReader::SpecReader(APNGAsm *pApngasm)
+      : _pApngasm(pApngasm)
+    {
+      // nop
     }
 
-    // Return animation name.
-    const std::string& SpecReader::getName() const
+    // Read APNGAsm object from spec file.
+    // Return true if read succeeded.
+    bool SpecReader::read(const std::string& filePath)
     {
-      return _pImpl->getName();
-    }
+      if( !_pApngasm )
+        return false;
 
-    // Return loops.
-    unsigned int SpecReader::getLoops() const
-    {
-      return _pImpl->getLoops();
-    }
+      boost::scoped_ptr<priv::ISpecReaderImpl> pImpl;
 
-    // Return flag of skip first.
-    bool SpecReader::getSkipFirst() const
-    {
-      return _pImpl->getSkipFirst();
-    }
+      // json file.
+      if( isJson(filePath) )
+      {
+        pImpl.reset(new priv::JsonSpecReader());
+      }
+      // xml file.
+      else if( isXml(filePath) )
+      {
+        pImpl.reset(new priv::XmlSpecReader());
+      }
+      // unknown file.
+      else
+        return false;
 
-    // Return frame information vector.
-    const std::vector<FrameInfo>& SpecReader::getFrameInfos() const
-    {
-      return _pImpl->getFrameInfos();
+      // Read frame information from spec file.
+      if( !pImpl->read(filePath) )
+        return false;
+
+      // Create frames from spec file.
+      const std::vector<priv::FrameInfo>& frameInfos = pImpl->getFrameInfos();
+      const int count = frameInfos.size();
+      for(int i = 0;  i < count;  ++i)
+      {
+        const priv::FrameInfo& current = frameInfos[i];
+        _pApngasm->addFrame(current.filePath, current.delay.num, current.delay.den);
+        std::cout << current.filePath << " => Delay=(" << current.delay.num << "/" << current.delay.den << ") sec" << std::endl;
+      }
+
+      return true;
     }
 
   } // namespace apngasm

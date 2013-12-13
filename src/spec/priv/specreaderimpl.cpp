@@ -1,6 +1,5 @@
 #include "specreaderimpl.h"
-#include "../specreader.h"
-#include "../../apngframe.h"
+#include "../../apngframe.h"  // DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -160,8 +159,9 @@ namespace apngasm {
         return _frameInfos;
       }
       
-      // Initialize JsonSpecReader object.
-      JsonSpecReader::JsonSpecReader(const std::string& filePath)
+      // Read parameter from spec file.
+      // Return true if read succeeded.
+      bool JsonSpecReader::read(const std::string& filePath)
       {
         // Read JSON file.
         boost::property_tree::ptree root;
@@ -251,10 +251,13 @@ namespace apngasm {
 
         // Reset current directory.
         boost::filesystem::current_path(oldPath);
+
+        return true;
       }
       
-      // Initialize XmlSpecReader object.
-      XmlSpecReader::XmlSpecReader(const std::string& filePath)
+      // Read parameter from spec file.
+      // Return true if read succeeded.
+      bool XmlSpecReader::read(const std::string& filePath)
       {
         // Read XML file.
         boost::property_tree::ptree root;
@@ -332,6 +335,8 @@ namespace apngasm {
 
         // Reset current directory.
         boost::filesystem::current_path(oldPath);
+
+        return true;
       }
 
     } // namespace priv

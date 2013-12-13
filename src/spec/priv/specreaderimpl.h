@@ -3,16 +3,30 @@
 
 #include <string>
 #include <vector>
-#include "../specreader.h"
 
 namespace apngasm {
   namespace spec {
     namespace priv {
 
+      typedef struct {
+        unsigned int num;
+        unsigned int den;
+      } Delay;
+
+      // Frame information.
+      typedef struct {
+        std::string filePath;
+        Delay delay;
+      } FrameInfo;
+
       // Interface.
       class ISpecReaderImpl
       {
       public:
+        // Read parameter from spec file.
+        // Return true if read succeeded.
+        virtual bool read(const std::string& filePath) = 0;
+
         // Return animation name.
         virtual const std::string& getName() const = 0;
 
@@ -32,6 +46,9 @@ namespace apngasm {
       class AbstractSpecReader : public ISpecReaderImpl
       {
       public:
+        // Initialize AbstractSpecReader object.
+        AbstractSpecReader();
+
         // Return animation name.
         const std::string& getName() const;
 
@@ -45,9 +62,6 @@ namespace apngasm {
         const std::vector<FrameInfo>& getFrameInfos() const;
 
       protected:
-        // Initialize AbstractSpecReader object.
-        AbstractSpecReader();
-
         // Fields.
         std::string _name;
         unsigned int _loops;
@@ -61,8 +75,9 @@ namespace apngasm {
       class JsonSpecReader : public AbstractSpecReader
       {
       public:
-        // Initialize JsonSpecReader object.
-        JsonSpecReader(const std::string& filePath);
+        // Read parameter from spec file.
+        // Return true if read succeeded.
+        bool read(const std::string& filePath);
 
       };  // class JsonSpecReader
 
@@ -71,8 +86,9 @@ namespace apngasm {
       class XmlSpecReader : public AbstractSpecReader
       {
       public:
-        // Initialize XmlSpecReader object.
-        XmlSpecReader(const std::string& filePath);
+        // Read parameter from spec file.
+        // Return true if read succeeded.
+        bool read(const std::string& filePath);
 
       };  // class XmlSpecReader
 

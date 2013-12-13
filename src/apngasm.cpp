@@ -126,17 +126,11 @@ namespace apngasm {
   //Loaded frames are added to the end of the frame vector
   const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
-    // Read spec.
-    const spec::SpecReader reader(filePath);
+    spec::SpecReader reader(this);
 
-    // Create frames.
-    const std::vector<spec::FrameInfo>& frameInfos = reader.getFrameInfos();
-    const int count = frameInfos.size();
-    for(int i = 0;  i < count;  ++i)
+    if( !reader.read(filePath) )
     {
-      const spec::FrameInfo& frameInfo = frameInfos[i];
-      addFrame(frameInfo.filePath, frameInfo.delay.num, frameInfo.delay.den);
-      std::cout << frameInfo.filePath << " => Delay=(" << frameInfo.delay.num << "/" << frameInfo.delay.den << ") sec" << std::endl;
+      // read failed.
     }
 
     return _frames;
