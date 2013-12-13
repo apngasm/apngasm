@@ -82,5 +82,5 @@ namespace apngasm {
       return false;
     }
 
-  } // namespace apngasm
-} //namespace spec
+  } // namespace spec
+} // namespace apngasm
