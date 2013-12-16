@@ -1,4 +1,4 @@
-#include "specreader.h"
+#include "specreaderimpl.h"
 #include "../../apngframe.h"  // DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -125,8 +125,8 @@ namespace apngasm {
         }
       } // unnamed namespace
 
-      // Initialize AbstractSpecReader object.
-      AbstractSpecReader::AbstractSpecReader()
+      // Initialize AbstractSpecReaderImpl object.
+      AbstractSpecReaderImpl::AbstractSpecReaderImpl()
         : _name("")
         , _loops(0)
         , _skipFirst(false)
@@ -136,32 +136,32 @@ namespace apngasm {
       }
 
       // Return animation name.
-      const std::string& AbstractSpecReader::getName() const
+      const std::string& AbstractSpecReaderImpl::getName() const
       {
         return _name;
       }
 
       // Return loops.
-      unsigned int AbstractSpecReader::getLoops() const
+      unsigned int AbstractSpecReaderImpl::getLoops() const
       {
         return _loops;
       }
 
       // Return flag of skip first.
-      bool AbstractSpecReader::getSkipFirst() const
+      bool AbstractSpecReaderImpl::getSkipFirst() const
       {
         return _skipFirst;
       }
 
       // Return frame information vector.
-      const std::vector<FrameInfo>& AbstractSpecReader::getFrameInfos() const
+      const std::vector<FrameInfo>& AbstractSpecReaderImpl::getFrameInfos() const
       {
         return _frameInfos;
       }
       
       // Read parameter from spec file.
       // Return true if read succeeded.
-      bool JsonSpecReader::read(const std::string& filePath)
+      bool JsonSpecReaderImpl::read(const std::string& filePath)
       {
         // Read JSON file.
         boost::property_tree::ptree root;
@@ -257,7 +257,7 @@ namespace apngasm {
       
       // Read parameter from spec file.
       // Return true if read succeeded.
-      bool XmlSpecReader::read(const std::string& filePath)
+      bool XmlSpecReaderImpl::read(const std::string& filePath)
       {
         // Read XML file.
         boost::property_tree::ptree root;

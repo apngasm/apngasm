@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
-#include "spec/specparser.h"
+#include "spec/specreader.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -126,9 +126,9 @@ namespace apngasm {
   //Loaded frames are added to the end of the frame vector
   const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
-    spec::SpecParser parser(this);
+    spec::SpecReader reader(this);
 
-    if( !parser.read(filePath) )
+    if( !reader.read(filePath) )
     {
       // read failed.
     }
@@ -154,8 +154,8 @@ namespace apngasm {
   // Save json file.
   bool APNGAsm::saveJson(const std::string& outputPath, const std::string& currentDir)
   {
-    spec::SpecParser parser(this);
-    return parser.writeJson(outputPath, currentDir);
+    spec::SpecReader reader(this);
+    return reader.writeJson(outputPath, currentDir);
   }
 
   unsigned char APNGAsm::findCommonType(void)

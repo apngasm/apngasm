@@ -1,5 +1,5 @@
-#ifndef _SPECWRITER_H_
-#define _SPECWRITER_H_
+#ifndef _SPECWRITERIMPL_H_
+#define _SPECWRITERIMPL_H_
 
 #include <string>
 
@@ -11,56 +11,56 @@ namespace apngasm {
     namespace priv {
 
       // Interface.
-      class ISpecWriter
+      class ISpecWriterImpl
       {
       public:
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         virtual bool write(const std::string& filePath, const std::string& currentDir="") const = 0;
 
-      };  // class ISpecWriter
+      };  // class ISpecWriterImpl
 
       // Abstract class.
-      class AbstractSpecWriter : public ISpecWriter
+      class AbstractSpecWriterImpl : public ISpecWriterImpl
       {
       public:
-        // Initialize AbstractSpecWriter object.
-        AbstractSpecWriter(const APNGAsm* pApngasm);
+        // Initialize AbstractSpecWriterImpl object.
+        AbstractSpecWriterImpl(const APNGAsm* pApngasm);
 
       protected:
         const APNGAsm* const _pApngasm;
 
-      };  // class AbstractSpecWriter
+      };  // class AbstractSpecWriterImpl
 
       // for JSON.
-      class JsonSpecWriter : public AbstractSpecWriter
+      class JsonSpecWriterImpl : public AbstractSpecWriterImpl
       {
       public:
-        // Initialize JsonSpecWriter object.
-        JsonSpecWriter(const APNGAsm* pApngasm);
+        // Initialize JsonSpecWriterImpl object.
+        JsonSpecWriterImpl(const APNGAsm* pApngasm);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         bool write(const std::string& filePath, const std::string& currentDir="") const;
         
-      };  // class JsonSpecWriter
+      };  // class JsonSpecWriterImpl
 
       // for XML.
-      class XmlSpecWriter : public AbstractSpecWriter
+      class XmlSpecWriterImpl : public AbstractSpecWriterImpl
       {
       public:
-        // Initialize XmlSpecWriter object.
-        XmlSpecWriter(const APNGAsm* pApngasm);
+        // Initialize XmlSpecWriterImpl object.
+        XmlSpecWriterImpl(const APNGAsm* pApngasm);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         bool write(const std::string& filePath, const std::string& currentDir="") const;
         
-      };  // class XmlSpecWriter
+      };  // class XmlSpecWriterImpl
 
 
     } // namespace priv
   } // namespace spec
 } // namespace apngasm
 
-#endif  // _SPECWRITER_H_
+#endif  // _SPECWRITERIMPL_H_

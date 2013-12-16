@@ -1,5 +1,5 @@
-#ifndef _SPECREADER_H_
-#define _SPECREADER_H_
+#ifndef _SPECREADERIMPL_H_
+#define _SPECREADERIMPL_H_
 
 #include <string>
 #include <vector>
@@ -20,7 +20,7 @@ namespace apngasm {
       } FrameInfo;
 
       // Interface.
-      class ISpecReader
+      class ISpecReaderImpl
       {
       public:
         // Read parameter from spec file.
@@ -39,15 +39,15 @@ namespace apngasm {
         // Return frame vector.
         virtual const std::vector<FrameInfo>& getFrameInfos() const = 0;
 
-      };  // interface ISpecReader
+      };  // interface ISpecReaderImpl
 
 
       // Abstract class.
-      class AbstractSpecReader : public ISpecReader
+      class AbstractSpecReaderImpl : public ISpecReaderImpl
       {
       public:
-        // Initialize AbstractSpecReader object.
-        AbstractSpecReader();
+        // Initialize AbstractSpecReaderImpl object.
+        AbstractSpecReaderImpl();
 
         // Return animation name.
         const std::string& getName() const;
@@ -68,32 +68,32 @@ namespace apngasm {
         bool _skipFirst;
         std::vector<FrameInfo> _frameInfos;
 
-      };  // class AbstractSpecReader
+      };  // class AbstractSpecReaderImpl
 
 
       // for JSON.
-      class JsonSpecReader : public AbstractSpecReader
+      class JsonSpecReaderImpl : public AbstractSpecReaderImpl
       {
       public:
         // Read parameter from spec file.
         // Return true if read succeeded.
         bool read(const std::string& filePath);
 
-      };  // class JsonSpecReader
+      };  // class JsonSpecReaderImpl
 
 
       // for XML.
-      class XmlSpecReader : public AbstractSpecReader
+      class XmlSpecReaderImpl : public AbstractSpecReaderImpl
       {
       public:
         // Read parameter from spec file.
         // Return true if read succeeded.
         bool read(const std::string& filePath);
 
-      };  // class XmlSpecReader
+      };  // class XmlSpecReaderImpl
 
     } // namespace priv
   } // namespace spec
 } // namespace apngasm
 
-#endif  // _SPECREADER_H_
+#endif  // _SPECREADERIMPL_H_

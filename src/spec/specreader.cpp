@@ -1,6 +1,6 @@
-#include "specparser.h"
-#include "priv/specreader.h"
-#include "priv/specwriter.h"
+#include "specreader.h"
+#include "priv/specreaderimpl.h"
+#include "priv/specwriterimpl.h"
 #include "../apngasm.h"
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -22,8 +22,8 @@ namespace apngasm {
       }
     } // unnamed namespace
 
-    // Initialize SpecParser object.
-    SpecParser::SpecParser(APNGAsm *pApngasm)
+    // Initialize SpecReader object.
+    SpecReader::SpecReader(APNGAsm *pApngasm)
       : _pApngasm(pApngasm)
     {
       // nop
@@ -31,33 +31,33 @@ namespace apngasm {
 
     // Read APNGAsm object from spec file.
     // Return true if read succeeded.
-    bool SpecParser::read(const std::string& filePath)
+    bool SpecReader::read(const std::string& filePath)
     {
       if( !_pApngasm )
         return false;
 
-      boost::scoped_ptr<priv::ISpecReader> pReader;
+      boost::scoped_ptr<priv::ISpecReaderImpl> pImpl;
 
       // json file.
       if( isJson(filePath) )
       {
-        pReader.reset(new priv::JsonSpecReader());
+        pImpl.reset(new priv::JsonSpecReaderImpl());
       }
       // xml file.
       else if( isXml(filePath) )
       {
-        pReader.reset(new priv::XmlSpecReader());
+        pImpl.reset(new priv::XmlSpecReaderImpl());
       }
       // unknown file.
       else
         return false;
 
       // Read frame information from spec file.
-      if( !pReader->read(filePath) )
+      if( !pImpl->read(filePath) )
         return false;
 
       // Create frames from spec file.
-      const std::vector<priv::FrameInfo>& frameInfos = pReader->getFrameInfos();
+      const std::vector<priv::FrameInfo>& frameInfos = pImpl->getFrameInfos();
       const int count = frameInfos.size();
       for(int i = 0;  i < count;  ++i)
       {
@@ -71,18 +71,18 @@ namespace apngasm {
 
     // Write APNGAsm object to json file.
     // Return true if write succeeded.
-    bool SpecParser::writeJson(const std::string& filePath, const std::string& currentDir) const
+    bool SpecReader::writeJson(const std::string& filePath, const std::string& currentDir) const
     {
       if( !_pApngasm )
         return false;
 
-      priv::JsonSpecWriter writer(_pApngasm);
-      return writer.write(filePath, currentDir);
+      priv::JsonSpecWriterImpl impl(_pApngasm);
+      return impl.write(filePath, currentDir);
     }
 
     // Write APNGAsm object to xml file.
     // Return true if write succeeded.
-    bool SpecParser::writeXml(const std::string& filePath, const std::string& currentDir) const
+    bool SpecReader::writeXml(const std::string& filePath, const std::string& currentDir) const
     {
       return false;
     }
