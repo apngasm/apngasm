@@ -4,6 +4,7 @@ ADD_LIBRARY(apngasm SHARED
 	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
 	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/specreader.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/specwriter.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
 )

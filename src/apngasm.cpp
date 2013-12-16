@@ -5,6 +5,7 @@
 #include <png.h>
 #include <zlib.h>
 #include "spec/specreader.h"
+#include "spec/specwriter.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -152,10 +153,10 @@ namespace apngasm {
   }
 
   // Save json file.
-  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& currentDir)
+  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& currentDir) const
   {
-    spec::SpecReader reader(this);
-    return reader.writeJson(outputPath, currentDir);
+    spec::SpecWriter writer(this);
+    return writer.writeJson(outputPath, currentDir);
   }
 
   unsigned char APNGAsm::findCommonType(void)

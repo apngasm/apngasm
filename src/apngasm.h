@@ -51,7 +51,7 @@ namespace apngasm {
 		bool savePNGs(const std::string& outputDir) const;
 
 		// Save json file.
-		bool saveJson(const std::string& outputPath, const std::string& currentDir="");
+		bool saveJson(const std::string& outputPath, const std::string& currentDir="") const;
 
 		//Returns the number of frames
 		size_t frameCount();
