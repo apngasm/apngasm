@@ -175,7 +175,7 @@ namespace apngasm_cli {
 		if( options.outputJsonFile(outPath) )
 		{
 			outPath = outdir + "/" + outPath;
-			assembler.saveJson(outPath);
+			assembler.saveJson(outPath, outdir);
 			std::cout << outPath << std::endl;
 		}
 

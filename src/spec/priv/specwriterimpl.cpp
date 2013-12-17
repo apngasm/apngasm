@@ -23,7 +23,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool JsonSpecWriterImpl::write(const std::string& filePath, const std::string& currentDir) const
+        bool JsonSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
         {
           boost::property_tree::ptree root;
 
@@ -40,7 +40,7 @@ namespace apngasm {
             {
               std::ostringstream file;
               std::ostringstream delay;
-              file << i << ".png";
+              file << imagePathPrefix << i << ".png";
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
 
               boost::property_tree::ptree frame;
@@ -64,7 +64,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool XmlSpecWriterImpl::write(const std::string& filePath, const std::string& currentDir) const
+        bool XmlSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
         {
           return false;
         }

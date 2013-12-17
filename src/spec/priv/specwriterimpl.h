@@ -41,7 +41,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool write(const std::string& filePath, const std::string& currentDir="") const;
+        bool write(const std::string& filePath, const std::string& imagePathPrefix="") const;
         
       };  // class JsonSpecWriterImpl
 
@@ -54,7 +54,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool write(const std::string& filePath, const std::string& currentDir="") const;
+        bool write(const std::string& filePath, const std::string& imagePathPrefix="") const;
         
       };  // class XmlSpecWriterImpl
 

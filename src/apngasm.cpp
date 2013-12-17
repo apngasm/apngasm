@@ -159,10 +159,10 @@ namespace apngasm {
   }
 
   // Save json file.
-  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& currentDir) const
+  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& imageDir) const
   {
     spec::SpecWriter writer(this);
-    return writer.writeJson(outputPath, currentDir);
+    return writer.writeJson(outputPath, imageDir);
   }
 
   unsigned char APNGAsm::findCommonType(void)

@@ -17,11 +17,11 @@ namespace apngasm {
 
       // Write APNGAsm object to json file.
       // Return true if write succeeded.
-      bool writeJson(const std::string& filePath, const std::string& currentDir="") const;
+      bool writeJson(const std::string& filePath, const std::string& imageDir="") const;
 
       // Write APNGAsm object to xml file.
       // Return true if write succeeded.
-      bool writeXml(const std::string& filePath, const std::string& currentDir="") const;
+      bool writeXml(const std::string& filePath, const std::string& imageDir="") const;
 
     private:
       const APNGAsm* const _pApngasm;
