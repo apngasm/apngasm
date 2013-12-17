@@ -76,6 +76,12 @@ namespace apngasm {
     return APNGASM_VERSION;
   }
 
+  // Returns the vector of frames.
+  const std::vector<APNGFrame>& APNGAsm::getFrames() const
+  {
+    return _frames;
+  }
+
   size_t APNGAsm::frameCount()
   {
     return _frames.size();

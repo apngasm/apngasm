@@ -1,5 +1,6 @@
 #include "specwriterimpl.h"
 #include "../../apngasm.h"
+#include <sstream>
 #include <boost/property_tree/json_parser.hpp>
 
 namespace apngasm {
@@ -25,6 +26,26 @@ namespace apngasm {
         bool JsonSpecWriterImpl::write(const std::string& filePath, const std::string& currentDir) const
         {
           boost::property_tree::ptree root;
+
+          // Write apngasm fields.
+          // root.put("name", _pApngasm->name());
+          // root.put("loops", _pApngasm->loops());
+          // root.put("skip_first", _pApngasm->skipFirst());
+
+          {
+            boost::property_tree::ptree child;
+            std::vector<APNGFrame>& frames = const_cast<std::vector<APNGFrame>&>(_pApngasm->getFrames());
+            const int count = frames.size();
+            for(int i = 0;  i < count;  ++i)
+            {
+              std::ostringstream file;
+              std::ostringstream delay;
+              file << i << ".png";
+              delay << frames[i].delayNum() << "/" << frames[i].delayDen();
+              child.push_back(std::make_pair(file.str(), delay.str()));
+            }
+            root.add_child("frames", child);
+          }
 
           write_json(filePath, root);
           return true;

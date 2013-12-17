@@ -53,6 +53,9 @@ namespace apngasm {
 		// Save json file.
 		bool saveJson(const std::string& outputPath, const std::string& currentDir="") const;
 
+		// Returns the vector of frames.
+		const std::vector<APNGFrame>& getFrames() const;
+
 		//Returns the number of frames
 		size_t frameCount();
 
