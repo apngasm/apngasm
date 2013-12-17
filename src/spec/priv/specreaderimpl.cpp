@@ -202,51 +202,57 @@ namespace apngasm {
         }
 
         std::vector<Delay> delays;
-        BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("delays"))
+        if( boost::optional<boost::property_tree::ptree&> child = root.get_child_optional("delays") )
         {
-          Delay delay;
-          if( !str2delay(child.second.data(), &delay) )
-            delay = defaultDelay;
-          delays.push_back(delay);
+          BOOST_FOREACH(const boost::property_tree::ptree::value_type& current, child.get())
+          {
+            Delay delay;
+            if( !str2delay(current.second.data(), &delay) )
+              delay = defaultDelay;
+            delays.push_back(delay);
+          }
         }
 
         // frames
-        int delayIndex = 0;
-        BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("frames"))
+        if( boost::optional<boost::property_tree::ptree&> child = root.get_child_optional("frames") )
         {
-          std::string file;
-          Delay delay;
-          const boost::property_tree::ptree& frame = child.second;
-
-          // filepath only.
-          if(frame.empty())
+          int delayIndex = 0;
+          BOOST_FOREACH(const boost::property_tree::ptree::value_type& current, child.get())
           {
-            file = frame.data();
-            if(delayIndex < delays.size())
-              delay = delays[delayIndex];
+            std::string file;
+            Delay delay;
+            const boost::property_tree::ptree& frame = current.second;
+
+            // filepath only.
+            if(frame.empty())
+            {
+              file = frame.data();
+              if(delayIndex < delays.size())
+                delay = delays[delayIndex];
+              else
+                delay = defaultDelay;
+            }
+
+            // filepath and delay
             else
-              delay = defaultDelay;
-          }
+            {
+              const boost::property_tree::ptree::value_type& value = frame.front();
+              file = value.first;
+              if( !str2delay(value.second.data(), &delay) )
+                delay = defaultDelay;
+            }
 
-          // filepath and delay
-          else
-          {
-            const boost::property_tree::ptree::value_type& value = frame.front();
-            file = value.first;
-            if( !str2delay(value.second.data(), &delay) )
-              delay = defaultDelay;
-          }
+            // Add frame informations.
+            const std::vector<std::string>& files = getFiles(file);
+            const int count = files.size();
+            for(int i = 0;  i < count;  ++i)
+            {
+              const FrameInfo frameInfo = { files[i], delay };
+              _frameInfos.push_back(frameInfo);
+            }
 
-          // Add frame informations.
-          const std::vector<std::string>& files = getFiles(file);
-          const int count = files.size();
-          for(int i = 0;  i < count;  ++i)
-          {
-            const FrameInfo frameInfo = { files[i], delay };
-            _frameInfos.push_back(frameInfo);
+            ++delayIndex;
           }
-
-          ++delayIndex;
         }
 
         // Reset current directory.
@@ -298,38 +304,41 @@ namespace apngasm {
         }
 
         // frames
-        BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, root.get_child("animation"))
+        if( boost::optional<boost::property_tree::ptree&> child = root.get_child_optional("animation") )
         {
-          std::string file;
-          Delay delay;
-          const boost::property_tree::ptree& frame = child.second;
-
-          // filepath
-          if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.src") )
+          BOOST_FOREACH(const boost::property_tree::ptree::value_type& current, child.get())
           {
-            file = value.get();
-          }
-          if(file.empty())
-            continue;
+            std::string file;
+            Delay delay;
+            const boost::property_tree::ptree& frame = current.second;
 
-          // delay
-          if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.delay") )
-          {
-            if( !str2delay(value.get(), &delay) )
+            // filepath
+            if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.src") )
+            {
+              file = value.get();
+            }
+            if(file.empty())
+              continue;
+
+            // delay
+            if( boost::optional<std::string> value = frame.get_optional<std::string>("<xmlattr>.delay") )
+            {
+              if( !str2delay(value.get(), &delay) )
+                delay = defaultDelay;
+            }
+            else
+            {
               delay = defaultDelay;
-          }
-          else
-          {
-            delay = defaultDelay;
-          }
+            }
 
-          // Add frame informations.
-          const std::vector<std::string>& files = getFiles(file);
-          const int count = files.size();
-          for(int i = 0;  i < count;  ++i)
-          {
-            const FrameInfo frameInfo = { files[i], delay };
-            _frameInfos.push_back(frameInfo);
+            // Add frame informations.
+            const std::vector<std::string>& files = getFiles(file);
+            const int count = files.size();
+            for(int i = 0;  i < count;  ++i)
+            {
+              const FrameInfo frameInfo = { files[i], delay };
+              _frameInfos.push_back(frameInfo);
+            }
           }
         }
 
