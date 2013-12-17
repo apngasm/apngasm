@@ -34,7 +34,7 @@ namespace apngasm {
 
           {
             boost::property_tree::ptree child;
-            std::vector<APNGFrame>& frames = const_cast<std::vector<APNGFrame>&>(_pApngasm->getFrames());
+            std::vector<APNGFrame>& frames = const_cast<std::vector<APNGFrame>&>(_pApngasm->getFrames()); // gununu...
             const int count = frames.size();
             for(int i = 0;  i < count;  ++i)
             {
@@ -42,7 +42,11 @@ namespace apngasm {
               std::ostringstream delay;
               file << i << ".png";
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
-              child.push_back(std::make_pair(file.str(), delay.str()));
+
+              boost::property_tree::ptree frame;
+              frame.push_back(std::make_pair(file.str(), delay.str()));
+
+              child.push_back(std::make_pair("", frame));
             }
             root.add_child("frames", child);
           }
