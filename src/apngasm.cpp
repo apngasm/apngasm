@@ -4,7 +4,7 @@
 #include <zlib.h>
 #include "spec/specreader.h"
 #include "spec/specwriter.h"
-#include "listener/savelistener.h"
+#include "listener/apngasmlistener.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -41,7 +41,7 @@ namespace {
 
   typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
 
-  apngasm::listener::SaveListener defaultSaveListener;
+  apngasm::listener::APNGAsmListener defaultListener;
 
   int compareColors(const void *arg1, const void *arg2)
   {
@@ -66,14 +66,14 @@ namespace apngasm {
 
   //Construct APNGAsm object
   APNGAsm::APNGAsm(void)
-    : _pSaveListener(&defaultSaveListener)
+    : _pListener(&defaultListener)
   {
     // nop
   }
 
   //Construct APNGAsm object
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
-    : _pSaveListener(&defaultSaveListener)
+    : _pListener(&defaultListener)
   {
     _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
@@ -157,15 +157,15 @@ namespace apngasm {
     const int count = _frames.size();
     for(int i = 0;  i < count;  ++i)
     {
-      const std::string outputPath = _pSaveListener->onCreatePngPath(outputDir, i);
+      const std::string outputPath = _pListener->onCreatePngPath(outputDir, i);
 
-      if( !_pSaveListener->onPreSave(outputPath) )
+      if( !_pListener->onPreSave(outputPath) )
         return false;
 
       if( !_frames[i].save(outputPath) )
         return false;
 
-      _pSaveListener->onPostSave(outputPath);
+      _pListener->onPostSave(outputPath);
     }
     return true;
   }
@@ -174,11 +174,11 @@ namespace apngasm {
   bool APNGAsm::saveJson(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
-    if( _pSaveListener->onPreSave(outputPath) )
+    if( _pListener->onPreSave(outputPath) )
     {
-      spec::SpecWriter writer(this, _pSaveListener);
+      spec::SpecWriter writer(this, _pListener);
       if( result = writer.writeJson(outputPath, imageDir) )
-        _pSaveListener->onPostSave(outputPath);
+        _pListener->onPostSave(outputPath);
     }
     return result;
   }
@@ -187,11 +187,11 @@ namespace apngasm {
   bool APNGAsm::saveXml(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
-    if( _pSaveListener->onPreSave(outputPath) )
+    if( _pListener->onPreSave(outputPath) )
     {
-      spec::SpecWriter writer(this, _pSaveListener);
+      spec::SpecWriter writer(this, _pListener);
       if( result = writer.writeXml(outputPath, imageDir) )
-        _pSaveListener->onPostSave(outputPath);
+        _pListener->onPostSave(outputPath);
     }
     return result;
   }
@@ -537,7 +537,7 @@ namespace apngasm {
     if (_frames.empty())
       return false;
 
-    if( !_pSaveListener->onPreSave(outputPath) )
+    if( !_pListener->onPreSave(outputPath) )
       return false;
 
     _width  = _frames[0]._width;
@@ -556,7 +556,7 @@ namespace apngasm {
     if( !save(outputPath, coltype, 0, 0) )
       return false;
 
-    _pSaveListener->onPostSave(outputPath);
+    _pListener->onPostSave(outputPath);
     return true;
   }
 

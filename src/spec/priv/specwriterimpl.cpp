@@ -1,6 +1,6 @@
 #include "specwriterimpl.h"
 #include "../../apngasm.h"
-#include "../../listener/savelistener.h"
+#include "../../listener/apngasmlistener.h"
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -10,16 +10,16 @@ namespace apngasm {
     namespace priv {
 
         // Initialize AbstractSpecWriterImpl object.
-        AbstractSpecWriterImpl::AbstractSpecWriterImpl(const APNGAsm* pApngasm, const listener::ISaveListener* pSaveListener)
+        AbstractSpecWriterImpl::AbstractSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
           : _pApngasm(pApngasm)
-          , _pSaveListener(pSaveListener)
+          , _pListener(pListener)
         {
           // nop
         }
 
         // Initialize JsonSpecWriterImpl object.
-        JsonSpecWriterImpl::JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::ISaveListener* pSaveListener)
-          : AbstractSpecWriterImpl(pApngasm, pSaveListener)
+        JsonSpecWriterImpl::JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+          : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
         }
@@ -41,7 +41,7 @@ namespace apngasm {
             const int count = frames.size();
             for(int i = 0;  i < count;  ++i)
             {
-              const std::string file = _pSaveListener->onCreatePngPath(imagePathPrefix, i);
+              const std::string file = _pListener->onCreatePngPath(imagePathPrefix, i);
               
               std::ostringstream delay;
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
@@ -59,8 +59,8 @@ namespace apngasm {
         }
 
         // Initialize XmlSpecWriterImpl object.
-        XmlSpecWriterImpl::XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::ISaveListener* pSaveListener)
-          : AbstractSpecWriterImpl(pApngasm, pSaveListener)
+        XmlSpecWriterImpl::XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+          : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
         }
@@ -82,7 +82,7 @@ namespace apngasm {
             const int count = frames.size();
             for(int i = 0;  i < count;  ++i)
             {
-              const std::string file = _pSaveListener->onCreatePngPath(imagePathPrefix, i);
+              const std::string file = _pListener->onCreatePngPath(imagePathPrefix, i);
               
               std::ostringstream delay;
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();

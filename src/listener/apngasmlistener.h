@@ -1,12 +1,12 @@
-#ifndef _SAVELISTENER_H_
-#define _SAVELISTENER_H_
+#ifndef _APNGASMLISTENER_H_
+#define _APNGASMLISTENER_H_
 
 #include <string>
 
 namespace apngasm {
   namespace listener {
 
-    class ISaveListener
+    class IAPNGAsmListener
     {
     public:
       // Called before save.
@@ -20,9 +20,9 @@ namespace apngasm {
       // Return output path.
       virtual const std::string onCreatePngPath(const std::string& outputDir, int index) const = 0;
 
-    };  // class ISaveListener
+    };  // class IAPNGAsmListener
 
-    class SaveListener : public ISaveListener
+    class APNGAsmListener : public IAPNGAsmListener
     {
     public:
       // Called before save.
@@ -36,9 +36,9 @@ namespace apngasm {
       // Return output path.
       const std::string onCreatePngPath(const std::string& outputDir, int index) const;
 
-    };  // class SaveListener
+    };  // class APNGAsmListener
 
   } // namespace listener
 } // namespace apngasm
 
-#endif  // _SAVELISTENER_H_
+#endif  // _APNGASMLISTENER_H_
