@@ -165,6 +165,13 @@ namespace apngasm {
     return writer.writeJson(outputPath, imageDir);
   }
 
+  // Save xml file.
+  bool APNGAsm::saveXml(const std::string& outputPath, const std::string& imageDir) const
+  {
+    spec::SpecWriter writer(this);
+    return writer.writeXml(outputPath, imageDir);
+  }
+
   unsigned char APNGAsm::findCommonType(void)
   {
     unsigned char coltype = _frames[0]._colorType;

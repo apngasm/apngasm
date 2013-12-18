@@ -106,7 +106,11 @@ namespace apngasm {
     // Return true if write succeeded.
     bool SpecWriter::writeXml(const std::string& filePath, const std::string& imageDir) const
     {
-      return false;
+      if( !_pApngasm )
+        return false;
+
+      priv::XmlSpecWriterImpl impl(_pApngasm);
+      return impl.write(filePath, createRelativeDir(filePath, imageDir + "/"));
     }
 
   } // namespace spec

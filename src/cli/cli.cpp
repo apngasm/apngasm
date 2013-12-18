@@ -171,15 +171,28 @@ namespace apngasm_cli {
 			return 1;
 
 		// Output json spec files.
-		std::string outJsonFile;
-		if( options.outputJsonFile(outJsonFile) )
+		std::string outSpecFile;
+		if( options.outputJsonFile(outSpecFile) )
 		{
-			boost::filesystem::path path = outJsonFile;
+			boost::filesystem::path path = outSpecFile;
 			if(path.is_relative())
-				outJsonFile = outdir + "/" + outJsonFile;
+				outSpecFile = outdir + "/" + outSpecFile;
 
-			assembler.saveJson(outJsonFile, outdir);
-			std::cout << outJsonFile << std::endl;
+			create_parent_dirs(outSpecFile);
+			assembler.saveJson(outSpecFile, outdir);
+			std::cout << outSpecFile << std::endl;
+		}
+
+		// Output xml spec files.
+		if( options.outputXmlFile(outSpecFile) )
+		{
+			boost::filesystem::path path = outSpecFile;
+			if(path.is_relative())
+				outSpecFile = outdir + "/" + outSpecFile;
+
+			create_parent_dirs(outSpecFile);
+			assembler.saveXml(outSpecFile, outdir);
+			std::cout << outSpecFile << std::endl;
 		}
 
 		return 0;

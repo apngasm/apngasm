@@ -53,6 +53,9 @@ namespace apngasm {
 		// Save json file.
 		bool saveJson(const std::string& outputPath, const std::string& imageDir="") const;
 
+		// Save xml file.
+		bool saveXml(const std::string& outputPath, const std::string& imageDir="") const;
+
 		// Returns the vector of frames.
 		const std::vector<APNGFrame>& getFrames() const;
 
