@@ -115,8 +115,12 @@ namespace apngasm {
   //Uses default delay of 10ms if not specified
   size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
   {
-  	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
-  	_frames.push_back(frame);
+    if( _pListener->onPreAddFrame(filePath, delayNum, delayDen) )
+    {
+    	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
+    	_frames.push_back(frame);
+      _pListener->onPostAddFrame(filePath, delayNum, delayDen);
+    }
     return _frames.size();
   }
 
@@ -124,7 +128,11 @@ namespace apngasm {
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(const APNGFrame &frame)
   {
-    _frames.push_back(frame);
+    if( _pListener->onPreAddFrame(frame) )
+    {
+      _frames.push_back(frame);
+      _pListener->onPostAddFrame(frame);
+    }
     return _frames.size();
   }
 

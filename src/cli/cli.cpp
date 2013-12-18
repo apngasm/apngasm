@@ -49,6 +49,19 @@ public:
 		// nop
 	}
 
+  // Called after add frame.
+  void onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const
+  {
+  	std::cout << filePath << " => Delay=(" << delayNum << "/" << delayDen << ") sec" << std::endl;
+  }
+
+  // Called after add frame.
+  void onPostAddFrame(const apngasm::APNGFrame& frame) const
+  {
+  	apngasm::APNGFrame& tmp = const_cast<apngasm::APNGFrame&>(frame);
+  	std::cout << "New Frame => Delay=(" << tmp.delayNum() << "/" << tmp.delayDen() << ") sec" << std::endl;
+  }
+
   // Called before save.
   // Return true if can save.
   bool onPreSave(const std::string& filePath) const
@@ -165,8 +178,6 @@ namespace apngasm_cli {
 				return ERRCODE_INVALIDARGUMENT;
 			}
 			assembler.addFrame(*arg, delay.num, delay.den);
-			cout << (*arg) << " => Delay=(" << delay.num
-				<< "/" << delay.den << ") sec" << std::endl;
 			delay = FrameDelay();
 		}
 		cout << "FrameCount=" << assembler.frameCount() << std::endl;

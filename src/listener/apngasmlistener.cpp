@@ -5,6 +5,32 @@
 namespace apngasm {
   namespace listener {
 
+    // Called before add frame.
+    // Return true if can add.
+    bool APNGAsmListener::onPreAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const
+    {
+      return true;
+    }
+
+    // Called before add frame.
+    // Return true if can add.
+    bool APNGAsmListener::onPreAddFrame(const APNGFrame& frame) const
+    {
+      return true;
+    }
+
+    // Called after add frame.
+    void APNGAsmListener::onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const
+    {
+      // nop
+    }
+
+    // Called after add frame.
+    void APNGAsmListener::onPostAddFrame(const APNGFrame& frame) const
+    {
+      // nop
+    }
+
     // Called before save.
     // Return true if can save.
     bool APNGAsmListener::onPreSave(const std::string& filePath) const

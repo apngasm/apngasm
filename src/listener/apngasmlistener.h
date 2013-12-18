@@ -2,6 +2,7 @@
 #define _APNGASMLISTENER_H_
 
 #include <string>
+#include "../apngframe.h"
 
 namespace apngasm {
   namespace listener {
@@ -9,6 +10,20 @@ namespace apngasm {
     class IAPNGAsmListener
     {
     public:
+      // Called before add frame.
+      // Return true if can add.
+      virtual bool onPreAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const = 0;
+      
+      // Called before add frame.
+      // Return true if can add.
+      virtual bool onPreAddFrame(const APNGFrame& frame) const = 0;
+
+      // Called after add frame.
+      virtual void onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const = 0;
+      
+      // Called after add frame.
+      virtual void onPostAddFrame(const APNGFrame& frame) const = 0;
+
       // Called before save.
       // Return true if can save.
       virtual bool onPreSave(const std::string& filePath) const = 0;
@@ -25,6 +40,20 @@ namespace apngasm {
     class APNGAsmListener : public IAPNGAsmListener
     {
     public:
+      // Called before add frame.
+      // Return true if can add.
+      bool onPreAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const;
+
+      // Called before add frame.
+      // Return true if can add.
+      bool onPreAddFrame(const APNGFrame& frame) const;
+
+      // Called after add frame.
+      void onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const;
+
+      // Called after add frame.
+      void onPostAddFrame(const APNGFrame& frame) const;
+
       // Called before save.
       // Return true if can save.
       bool onPreSave(const std::string& filePath) const;
