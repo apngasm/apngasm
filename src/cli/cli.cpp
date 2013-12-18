@@ -2,6 +2,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
+#include "listener/apngasmlistener.h"
 
 static bool isNumber(const std::string s)
 {
@@ -38,33 +39,33 @@ public:
 	}
 };
 
-namespace apngasm_cli {
-	const std::string CLI::VERSION = "0.1.1";
-
-	bool CLI::create_parent_dirs(const std::string &filepath)
+class CustomAPNGAsmListener : public apngasm::listener::APNGAsmListener
+{
+public:
+	// Initialize CustomAPNGAsmListener object.
+	CustomAPNGAsmListener(int overwriteMode)
+		: _overwriteMode(overwriteMode)
 	{
-		boost::filesystem::path path = filepath;
-		boost::filesystem::path parent = path.parent_path();
-		if(parent == "") {
-			return true;
-		}
-		return boost::filesystem::create_directories(parent);
+		// nop
 	}
 
-	bool CLI::checkOverwrite(const std::string &path) const
-	{
+  // Called before save.
+  // Return true if can save.
+  bool onPreSave(const std::string& filePath) const
+  {
 		using namespace std;
 		using namespace boost;
 
-		int mode = options.getOverwriteMode();
-		if(mode == Options::OVERWRITE_FORCE) {
+		if(_overwriteMode == apngasm_cli::Options::OVERWRITE_FORCE) {
+			createParentDirs(filePath);
 			return true;
 		}
-		if(!filesystem::exists(filesystem::path(path))) {
+		if(!filesystem::exists(filesystem::path(filePath))) {
+			createParentDirs(filePath);
 			return true;
 		}
-		cout << "file `" << path << "' is already exists.";
-		if(mode == Options::OVERWRITE_INTERACTIVE) {
+		cout << "file `" << filePath << "' is already exists.";
+		if(_overwriteMode == apngasm_cli::Options::OVERWRITE_INTERACTIVE) {
 			cout << " overwrite?[y/N]: ";
 			string reply;
 			getline(cin, reply);
@@ -76,12 +77,42 @@ namespace apngasm_cli {
 			cout << "\nuse `--interactive' or `--force' to overwrite." << endl;
 		}
 		return false;
+  }
+
+  // Called after save.
+  void onPostSave(const std::string& filePath) const
+  {
+  	std::cout << filePath << std::endl;
+  }
+
+private:
+	const int _overwriteMode;
+
+	// Return true if create succeeded.
+	bool createParentDirs(const std::string& filePath) const
+	{
+		boost::filesystem::path path = filePath;
+		boost::filesystem::path parent = path.parent_path();
+		if(parent == "") {
+			return true;
+		}
+		return boost::filesystem::create_directories(parent);
 	}
+};	// class CustomAPNGAsmListener
+
+namespace apngasm_cli {
+	const std::string CLI::VERSION = "0.1.1";
 
 	CLI::CLI(int argc, char **argv)
 		: options(argc, argv), assembler()
 	{
-		// nop
+		pListener = new CustomAPNGAsmListener(options.getOverwriteMode());
+		assembler.setAPNGAsmListener(pListener);
+	}
+
+	CLI::~CLI()
+	{
+		delete pListener;
 	}
 
 	int CLI::start(void)
@@ -113,9 +144,9 @@ namespace apngasm_cli {
 		std::string outfile;
 		options.outputFile(outfile);
 
-		if(!checkOverwrite(outfile)) {
-			return ERRCODE_OUTPUTFILE_ALREADYEXISTS;
-		}
+		// if(!checkOverwrite(outfile)) {
+		// 	return ERRCODE_OUTPUTFILE_ALREADYEXISTS;
+		// }
 
 		static const boost::regex PNG_RE(".+\\.png\\z");
 		static const boost::regex DELAY_RE("[0-9]+[:[0-9]+]?");
@@ -145,7 +176,6 @@ namespace apngasm_cli {
 		if(outfile == "") {
 			outfile = "out.png";
 		}
-		create_parent_dirs(outfile);
 		if(assembler.assemble(outfile)) {
 			cout << "assemble succeeded => " << outfile << std::endl;
 			return 0;
@@ -158,7 +188,7 @@ namespace apngasm_cli {
 	{
 		// Dissassemble apng file.
 		std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
-		std::cout << frames.size() << std::endl;
+		std::cout << "FrameCount=" << frames.size() << std::endl;
 
 		// Output png image files.
 		std::string outdir;
@@ -166,7 +196,6 @@ namespace apngasm_cli {
 			boost::filesystem::path path = src;
 			outdir = path.replace_extension("").string();
 		}
-		create_parent_dirs(outdir + "/");
 		if( !assembler.savePNGs(outdir) )
 			return 1;
 
@@ -178,7 +207,6 @@ namespace apngasm_cli {
 			if(path.is_relative())
 				outSpecFile = outdir + "/" + outSpecFile;
 
-			create_parent_dirs(outSpecFile);
 			assembler.saveJson(outSpecFile, outdir);
 		}
 
@@ -189,7 +217,6 @@ namespace apngasm_cli {
 			if(path.is_relative())
 				outSpecFile = outdir + "/" + outSpecFile;
 
-			create_parent_dirs(outSpecFile);
 			assembler.saveXml(outSpecFile, outdir);
 		}
 

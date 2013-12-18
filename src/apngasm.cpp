@@ -196,6 +196,13 @@ namespace apngasm {
     return result;
   }
 
+  // Set APNGAsmListener.
+  // If argument is NULL, set default APNGAsmListener.
+  void APNGAsm::setAPNGAsmListener(listener::IAPNGAsmListener* pListener)
+  {
+    _pListener = (pListener==NULL) ? &defaultListener : pListener;
+  }
+
   unsigned char APNGAsm::findCommonType(void)
   {
     unsigned char coltype = _frames[0]._colorType;

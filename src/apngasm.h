@@ -59,6 +59,10 @@ namespace apngasm {
 		// Save xml file.
 		bool saveXml(const std::string& outputPath, const std::string& imageDir="") const;
 
+		// Set APNGAsmListener.
+		// If argument is NULL, set default APNGAsmListener.
+		void setAPNGAsmListener(listener::IAPNGAsmListener* pListener=NULL);
+
 		// Returns the vector of frames.
 		const std::vector<APNGFrame>& getFrames() const;
 
