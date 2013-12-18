@@ -1,9 +1,11 @@
 #include "apngasm.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
-#include "specreader/specreader.h"
+#include "spec/specreader.h"
+#include "spec/specwriter.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -74,6 +76,12 @@ namespace apngasm {
     return APNGASM_VERSION;
   }
 
+  // Returns the vector of frames.
+  const std::vector<APNGFrame>& APNGAsm::getFrames() const
+  {
+    return _frames;
+  }
+
   size_t APNGAsm::frameCount()
   {
     return _frames.size();
@@ -125,20 +133,43 @@ namespace apngasm {
   //Loaded frames are added to the end of the frame vector
   const std::vector<APNGFrame>& APNGAsm::loadAnimationSpec(const std::string &filePath)
   {
-    // Read spec.
-    const specreader::SpecReader reader(filePath);
+    spec::SpecReader reader(this);
 
-    // Create frames.
-    const std::vector<specreader::FrameInfo>& frameInfos = reader.getFrameInfos();
-    const int count = frameInfos.size();
-    for(int i = 0;  i < count;  ++i)
+    if( !reader.read(filePath) )
     {
-      const specreader::FrameInfo& frameInfo = frameInfos[i];
-      addFrame(frameInfo.filePath, frameInfo.delay.num, frameInfo.delay.den);
-      std::cout << frameInfo.filePath << " => Delay=(" << frameInfo.delay.num << "/" << frameInfo.delay.den << ") sec" << std::endl;
+      // read failed.
     }
 
     return _frames;
+  }
+
+  // Save png files.
+  bool APNGAsm::savePNGs(const std::string& outputDir) const
+  {
+    const int count = _frames.size();
+    for(int i = 0;  i < count;  ++i)
+    {
+      std::ostringstream outputPath;
+      outputPath << outputDir << "/" << i << ".png";
+      std::cout << outputPath.str() << std::endl;
+      if( !_frames[i].save(outputPath.str()) )
+        return false;
+    }
+    return true;
+  }
+
+  // Save json file.
+  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& imageDir) const
+  {
+    spec::SpecWriter writer(this);
+    return writer.writeJson(outputPath, imageDir);
+  }
+
+  // Save xml file.
+  bool APNGAsm::saveXml(const std::string& outputPath, const std::string& imageDir) const
+  {
+    spec::SpecWriter writer(this);
+    return writer.writeXml(outputPath, imageDir);
   }
 
   unsigned char APNGAsm::findCommonType(void)

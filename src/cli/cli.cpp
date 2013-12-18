@@ -156,28 +156,45 @@ namespace apngasm_cli {
 
 	int CLI::disassemble(const std::string &src)
 	{
+		// Dissassemble apng file.
 		std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
 		std::cout << frames.size() << std::endl;
+
+		// Output png image files.
 		std::string outdir;
 		if(!options.outputFile(outdir)) {
 			boost::filesystem::path path = src;
 			outdir = path.replace_extension("").string();
 		}
-		for(unsigned i=0; i<frames.size(); ++i) {
-			apngasm::APNGAsm out;
-			out.addFrame(frames[i]);
-			std::ostringstream filename;
-			filename << outdir << "/" << i << ".png";
-			std::cout << filename.str() << std::endl;
-			if(!checkOverwrite(filename.str())) {
-				return ERRCODE_OUTPUTFILE_ALREADYEXISTS;
-			}
-			create_parent_dirs(filename.str());
-			int e = out.assemble(filename.str());
-			if(!e) {
-				return 1;
-			}
+		create_parent_dirs(outdir + "/");
+		if( !assembler.savePNGs(outdir) )
+			return 1;
+
+		// Output json spec files.
+		std::string outSpecFile;
+		if( options.outputJsonFile(outSpecFile) )
+		{
+			boost::filesystem::path path = outSpecFile;
+			if(path.is_relative())
+				outSpecFile = outdir + "/" + outSpecFile;
+
+			create_parent_dirs(outSpecFile);
+			assembler.saveJson(outSpecFile, outdir);
+			std::cout << outSpecFile << std::endl;
 		}
+
+		// Output xml spec files.
+		if( options.outputXmlFile(outSpecFile) )
+		{
+			boost::filesystem::path path = outSpecFile;
+			if(path.is_relative())
+				outSpecFile = outdir + "/" + outSpecFile;
+
+			create_parent_dirs(outSpecFile);
+			assembler.saveXml(outSpecFile, outdir);
+			std::cout << outSpecFile << std::endl;
+		}
+
 		return 0;
 	}
 }

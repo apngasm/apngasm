@@ -71,6 +71,12 @@ namespace apngasm_cli {
 			("output,o",
 				value<string>(),
 				"Specifies Output File (Then, 1st argument is NOT output-file)")
+			("json,j",
+				value<string>()->implicit_value("animation.json"),
+				"Specifies output json file.")
+			("xml,x",
+				value<string>()->implicit_value("animation.xml"),
+				"Specifies output xml file.")
 			;
 		pack.push_back(main_opts);
 		visible_options.add(main_opts);
@@ -240,6 +246,24 @@ namespace apngasm_cli {
 			return false;
 		}
 		out = vm["file"].as<std::string>();
+		return true;
+	}
+
+	bool Options::outputJsonFile(std::string &out) const
+	{
+		if(!vm.count("json")) {
+			return false;
+		}
+		out = vm["json"].as<std::string>();
+		return true;
+	}
+
+	bool Options::outputXmlFile(std::string &out) const
+	{
+		if(!vm.count("xml")) {
+			return false;
+		}
+		out = vm["xml"].as<std::string>();
 		return true;
 	}
 

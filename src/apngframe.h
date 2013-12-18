@@ -63,7 +63,8 @@ namespace apngasm {
     APNGFrame(rgba *pixels, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
 
     // Save frame to a PNG image file.
-    void save(const std::string& outPath);
+    // Return true if save succeeded.
+    bool save(const std::string& outPath) const;
 
   private:
   };  // class APNGFrame

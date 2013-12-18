@@ -218,8 +218,10 @@ namespace apngasm {
   }
 
   // Save frame to a PNG image file.
-  void APNGFrame::save(const std::string& outPath)
+  // Return true if save succeeded.
+  bool APNGFrame::save(const std::string& outPath) const
   {
+    bool result = true;
     FILE * f;
     if ((f = fopen(outPath.c_str(), "wb")) != 0)
     {
@@ -234,9 +236,14 @@ namespace apngasm {
         png_write_image(png_ptr, _rows);
         png_write_end(png_ptr, info_ptr);
       }
+      else
+        result = false;
       png_destroy_write_struct(&png_ptr, &info_ptr);
       fclose(f);
     }
+    else
+      result = false;
+    return result;
   }
 
 } // namespace apngasm

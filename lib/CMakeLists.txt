@@ -1,15 +1,13 @@
 # shared library and sources
 ADD_LIBRARY(apngasm SHARED
+#ADD_LIBRARY(apngasm-static STATIC
 	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
 	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
-	${APNGASM_SOURCE_DIR}/src/specreader/specreaderimpl.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/specreader.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/specwriter.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
+  ${APNGASM_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
 )
-
-#add_library(apngasm-static STATIC
-#	${APNGASM_SOURCE_DIR}/src/libapngasm.cpp
-#	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
-#	${APNGASM_SOURCE_DIR}/src/specreader/specreaderimpl.cpp
-#)
 
 FIND_PACKAGE(PNG REQUIRED)
 INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR})
