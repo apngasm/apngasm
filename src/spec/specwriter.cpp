@@ -23,8 +23,15 @@ namespace apngasm {
       }
       const std::string createRelativeDir(const std::string& from, const std::string& to)
       {
-        std::string fromDir = createAbsolutePath(from).string() + "/";
-        std::string toDir = createAbsolutePath(to).string() + "/";
+        const boost::filesystem::path fromPath = createAbsolutePath(from);
+        const boost::filesystem::path toPath = createAbsolutePath(to);
+
+        // Other drive.
+        if(fromPath.root_name() != toPath.root_name())
+          return fromPath.string() + "/";
+
+        std::string fromDir = fromPath.string() + "/";
+        std::string toDir = toPath.string() + "/";
 
         {
           const int count = std::min(fromDir.length(), toDir.length());
