@@ -15,3 +15,9 @@ install_manifest.txt
 src/apngasm-version.h
 spec/*.png
 spec/*/
+.DS_Store
+apngasm-3.0.0.dmg
+install_manifest_ApplicationData.txt
+install_manifest_Libraries.txt
+lib/libapngasm.dylib
+src/version.h
