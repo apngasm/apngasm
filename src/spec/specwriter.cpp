@@ -85,8 +85,9 @@ namespace apngasm {
     } // unnnamed namespace
 
     // Initialize SpecWriter object.
-    SpecWriter::SpecWriter(const APNGAsm *pApngasm)
+    SpecWriter::SpecWriter(const APNGAsm *pApngasm, const listener::ISaveListener* pSaveListener)
       : _pApngasm(pApngasm)
+      , _pSaveListener(pSaveListener)
     {
       // nop
     }
@@ -98,7 +99,7 @@ namespace apngasm {
       if( !_pApngasm )
         return false;
 
-      priv::JsonSpecWriterImpl impl(_pApngasm);
+      priv::JsonSpecWriterImpl impl(_pApngasm, _pSaveListener);
       return impl.write(filePath, createRelativeDir(filePath, imageDir + "/"));
     }
 
@@ -109,7 +110,7 @@ namespace apngasm {
       if( !_pApngasm )
         return false;
 
-      priv::XmlSpecWriterImpl impl(_pApngasm);
+      priv::XmlSpecWriterImpl impl(_pApngasm, _pSaveListener);
       return impl.write(filePath, createRelativeDir(filePath, imageDir + "/"));
     }
 

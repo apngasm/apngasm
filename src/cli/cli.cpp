@@ -180,7 +180,6 @@ namespace apngasm_cli {
 
 			create_parent_dirs(outSpecFile);
 			assembler.saveJson(outSpecFile, outdir);
-			std::cout << outSpecFile << std::endl;
 		}
 
 		// Output xml spec files.
@@ -192,7 +191,6 @@ namespace apngasm_cli {
 
 			create_parent_dirs(outSpecFile);
 			assembler.saveXml(outSpecFile, outdir);
-			std::cout << outSpecFile << std::endl;
 		}
 
 		return 0;

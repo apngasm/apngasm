@@ -7,7 +7,10 @@
 #include "apngframe.h"
 #include "apngasm-version.h"
 
+
 namespace apngasm {
+
+	namespace listener { class ISaveListener; }
 
   typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 
@@ -71,6 +74,9 @@ namespace apngasm {
 	private:
     //apng frame vector
     std::vector<APNGFrame> _frames;
+
+    // Save event listener.
+    listener::ISaveListener* _pSaveListener;
 
 
 		unsigned char findCommonType(void);
