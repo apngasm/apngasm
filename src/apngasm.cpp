@@ -1,11 +1,10 @@
 #include "apngasm.h"
-#include <iostream>
-#include <sstream>
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
 #include "spec/specreader.h"
 #include "spec/specwriter.h"
+#include "listener/apngasmlistener.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 #define swap16(data) _byteswap_ushort(data)
@@ -39,7 +38,10 @@ namespace {
 #define id_IEND 0x444E4549
 
 namespace {
+
   typedef struct { unsigned int num; unsigned char r, g, b, a; } COLORS;
+
+  apngasm::listener::APNGAsmListener defaultListener;
 
   int compareColors(const void *arg1, const void *arg2)
   {
@@ -57,15 +59,21 @@ namespace {
 
     return (int)(((COLORS*)arg1)->b) - (int)(((COLORS*)arg2)->b);
   }
-}
+
+} // unnamed namespace
 
 namespace apngasm {
 
   //Construct APNGAsm object
-  APNGAsm::APNGAsm(void){}
+  APNGAsm::APNGAsm(void)
+    : _pListener(&defaultListener)
+  {
+    // nop
+  }
 
   //Construct APNGAsm object
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
+    : _pListener(&defaultListener)
   {
     _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
@@ -107,8 +115,12 @@ namespace apngasm {
   //Uses default delay of 10ms if not specified
   size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
   {
-  	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
-  	_frames.push_back(frame);
+    if( _pListener->onPreAddFrame(filePath, delayNum, delayDen) )
+    {
+    	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
+    	_frames.push_back(frame);
+      _pListener->onPostAddFrame(filePath, delayNum, delayDen);
+    }
     return _frames.size();
   }
 
@@ -116,7 +128,11 @@ namespace apngasm {
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(const APNGFrame &frame)
   {
-    _frames.push_back(frame);
+    if( _pListener->onPreAddFrame(frame) )
+    {
+      _frames.push_back(frame);
+      _pListener->onPostAddFrame(frame);
+    }
     return _frames.size();
   }
 
@@ -149,11 +165,15 @@ namespace apngasm {
     const int count = _frames.size();
     for(int i = 0;  i < count;  ++i)
     {
-      std::ostringstream outputPath;
-      outputPath << outputDir << "/" << i << ".png";
-      std::cout << outputPath.str() << std::endl;
-      if( !_frames[i].save(outputPath.str()) )
+      const std::string outputPath = _pListener->onCreatePngPath(outputDir, i);
+
+      if( !_pListener->onPreSave(outputPath) )
         return false;
+
+      if( !_frames[i].save(outputPath) )
+        return false;
+
+      _pListener->onPostSave(outputPath);
     }
     return true;
   }
@@ -161,15 +181,34 @@ namespace apngasm {
   // Save json file.
   bool APNGAsm::saveJson(const std::string& outputPath, const std::string& imageDir) const
   {
-    spec::SpecWriter writer(this);
-    return writer.writeJson(outputPath, imageDir);
+    bool result = false;
+    if( _pListener->onPreSave(outputPath) )
+    {
+      spec::SpecWriter writer(this, _pListener);
+      if( result = writer.writeJson(outputPath, imageDir) )
+        _pListener->onPostSave(outputPath);
+    }
+    return result;
   }
 
   // Save xml file.
   bool APNGAsm::saveXml(const std::string& outputPath, const std::string& imageDir) const
   {
-    spec::SpecWriter writer(this);
-    return writer.writeXml(outputPath, imageDir);
+    bool result = false;
+    if( _pListener->onPreSave(outputPath) )
+    {
+      spec::SpecWriter writer(this, _pListener);
+      if( result = writer.writeXml(outputPath, imageDir) )
+        _pListener->onPostSave(outputPath);
+    }
+    return result;
+  }
+
+  // Set APNGAsmListener.
+  // If argument is NULL, set default APNGAsmListener.
+  void APNGAsm::setAPNGAsmListener(listener::IAPNGAsmListener* pListener)
+  {
+    _pListener = (pListener==NULL) ? &defaultListener : pListener;
   }
 
   unsigned char APNGAsm::findCommonType(void)
@@ -513,6 +552,9 @@ namespace apngasm {
     if (_frames.empty())
       return false;
 
+    if( !_pListener->onPreSave(outputPath) )
+      return false;
+
     _width  = _frames[0]._width;
     _height = _frames[0]._height;
     _size   = _width * _height;
@@ -526,7 +568,11 @@ namespace apngasm {
 
     coltype = downconvertOptimizations(coltype, false, false);
 
-    return save(outputPath, coltype, 0, 0);
+    if( !save(outputPath, coltype, 0, 0) )
+      return false;
+
+    _pListener->onPostSave(outputPath);
+    return true;
   }
 
   void APNGAsm::process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows)

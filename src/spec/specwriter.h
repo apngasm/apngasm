@@ -6,6 +6,7 @@
 namespace apngasm {
 
   class APNGAsm;
+  namespace listener { class IAPNGAsmListener; }
 
   namespace spec {
 
@@ -13,7 +14,7 @@ namespace apngasm {
     {
     public:
       // Initialize SpecWriter object.
-      SpecWriter(const APNGAsm *pApngasm);
+      SpecWriter(const APNGAsm *pApngasm, const listener::IAPNGAsmListener* pListener);
 
       // Write APNGAsm object to json file.
       // Return true if write succeeded.
@@ -25,6 +26,7 @@ namespace apngasm {
 
     private:
       const APNGAsm* const _pApngasm;
+      const listener::IAPNGAsmListener* const _pListener;
     };  // class SpecWriter
 
   } // namespace spec

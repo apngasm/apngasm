@@ -7,7 +7,10 @@
 #include "apngframe.h"
 #include "apngasm-version.h"
 
+
 namespace apngasm {
+
+	namespace listener { class IAPNGAsmListener; }
 
   typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 
@@ -56,6 +59,10 @@ namespace apngasm {
 		// Save xml file.
 		bool saveXml(const std::string& outputPath, const std::string& imageDir="") const;
 
+		// Set APNGAsmListener.
+		// If argument is NULL, set default APNGAsmListener.
+		void setAPNGAsmListener(listener::IAPNGAsmListener* pListener=NULL);
+
 		// Returns the vector of frames.
 		const std::vector<APNGFrame>& getFrames() const;
 
@@ -71,6 +78,9 @@ namespace apngasm {
 	private:
     //apng frame vector
     std::vector<APNGFrame> _frames;
+
+    // APNGAsm event listener.
+    listener::IAPNGAsmListener* _pListener;
 
 
 		unsigned char findCommonType(void);

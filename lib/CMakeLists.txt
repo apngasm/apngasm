@@ -7,6 +7,7 @@ ADD_LIBRARY(apngasm SHARED
   ${APNGASM_SOURCE_DIR}/src/spec/specwriter.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
+  ${APNGASM_SOURCE_DIR}/src/listener/apngasmlistener.cpp
 )
 
 FIND_PACKAGE(PNG REQUIRED)

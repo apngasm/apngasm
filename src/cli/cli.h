@@ -4,6 +4,8 @@
 #include "options.h"
 #include "apngasm.h"
 
+namespace apngasm { namespace listener { class IAPNGAsmListener; } }
+
 namespace apngasm_cli {
 	typedef enum ERRCODE_tag {
 		ERRCODE_NOERRORS = 0,
@@ -19,18 +21,16 @@ namespace apngasm_cli {
 	private:
 		Options options;
 		apngasm::APNGAsm assembler;
-
-		// true: create succeeded
-		bool create_parent_dirs(const std::string &filepath);
-
-		// true: write ok
-		bool checkOverwrite(const std::string &path) const;
+		apngasm::listener::IAPNGAsmListener *pListener;
 
 	public:
 		static const std::string VERSION;
 
 		// arguments is main's
 		CLI(int argc, char **argv);
+
+		// finalize.
+		~CLI();
 
 		// 0=succeeded, other=err
 		int start(void);
