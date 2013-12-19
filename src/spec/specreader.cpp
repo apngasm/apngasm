@@ -62,7 +62,6 @@ namespace apngasm {
       {
         const priv::FrameInfo& current = frameInfos[i];
         _pApngasm->addFrame(current.filePath, current.delay.num, current.delay.den);
-        std::cout << current.filePath << " => Delay=(" << current.delay.num << "/" << current.delay.den << ") sec" << std::endl;
       }
 
       return true;

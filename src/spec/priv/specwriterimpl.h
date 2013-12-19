@@ -6,6 +6,7 @@
 namespace apngasm {
 
   class APNGAsm;
+  namespace listener { class IAPNGAsmListener; }
 
   namespace spec {
     namespace priv {
@@ -25,10 +26,11 @@ namespace apngasm {
       {
       public:
         // Initialize AbstractSpecWriterImpl object.
-        AbstractSpecWriterImpl(const APNGAsm* pApngasm);
+        AbstractSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
 
       protected:
         const APNGAsm* const _pApngasm;
+        const listener::IAPNGAsmListener* const _pListener;
 
       };  // class AbstractSpecWriterImpl
 
@@ -37,7 +39,7 @@ namespace apngasm {
       {
       public:
         // Initialize JsonSpecWriterImpl object.
-        JsonSpecWriterImpl(const APNGAsm* pApngasm);
+        JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
@@ -50,7 +52,7 @@ namespace apngasm {
       {
       public:
         // Initialize XmlSpecWriterImpl object.
-        XmlSpecWriterImpl(const APNGAsm* pApngasm);
+        XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.

@@ -1,5 +1,6 @@
 #include "specwriterimpl.h"
 #include "../../apngasm.h"
+#include "../../listener/apngasmlistener.h"
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -9,15 +10,16 @@ namespace apngasm {
     namespace priv {
 
         // Initialize AbstractSpecWriterImpl object.
-        AbstractSpecWriterImpl::AbstractSpecWriterImpl(const APNGAsm* pApngasm)
+        AbstractSpecWriterImpl::AbstractSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
           : _pApngasm(pApngasm)
+          , _pListener(pListener)
         {
           // nop
         }
 
         // Initialize JsonSpecWriterImpl object.
-        JsonSpecWriterImpl::JsonSpecWriterImpl(const APNGAsm* pApngasm)
-          : AbstractSpecWriterImpl(pApngasm)
+        JsonSpecWriterImpl::JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+          : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
         }
@@ -39,13 +41,13 @@ namespace apngasm {
             const int count = frames.size();
             for(int i = 0;  i < count;  ++i)
             {
-              std::ostringstream file;
+              const std::string file = _pListener->onCreatePngPath(imagePathPrefix, i);
+              
               std::ostringstream delay;
-              file << imagePathPrefix << i << ".png";
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
 
               boost::property_tree::ptree frame;
-              frame.push_back(std::make_pair(file.str(), delay.str()));
+              frame.push_back(std::make_pair(file, delay.str()));
 
               child.push_back(std::make_pair("", frame));
             }
@@ -57,8 +59,8 @@ namespace apngasm {
         }
 
         // Initialize XmlSpecWriterImpl object.
-        XmlSpecWriterImpl::XmlSpecWriterImpl(const APNGAsm* pApngasm)
-          : AbstractSpecWriterImpl(pApngasm)
+        XmlSpecWriterImpl::XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+          : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
         }
@@ -80,13 +82,13 @@ namespace apngasm {
             const int count = frames.size();
             for(int i = 0;  i < count;  ++i)
             {
-              std::ostringstream file;
+              const std::string file = _pListener->onCreatePngPath(imagePathPrefix, i);
+              
               std::ostringstream delay;
-              file << imagePathPrefix << i << ".png";
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
 
               boost::property_tree::ptree& frame = root.add("animation.frame", "");
-              frame.put("<xmlattr>.src", file.str());
+              frame.put("<xmlattr>.src", file);
               frame.put("<xmlattr>.delay", delay.str());
             }
           }
