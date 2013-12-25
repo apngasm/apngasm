@@ -12,7 +12,7 @@ TARGET_LINK_LIBRARIES(apngasm-cli apngasm)
 
 FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options regex filesystem system) 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}) 
-TARGET_LINK_LIBRARIES(apngasm-cli ${Boost_LIBRARIES})                                                                                                                                                                                                                            
+TARGET_LINK_LIBRARIES(apngasm-cli ${Boost_LIBRARIES})
 
 INSTALL(TARGETS apngasm-cli
 	RUNTIME	DESTINATION bin

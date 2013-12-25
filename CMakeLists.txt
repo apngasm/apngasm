@@ -22,7 +22,6 @@ ADD_SUBDIRECTORY(${APNGASM_SOURCE_DIR}/bin)
 ##CPack definitions for package creation
 INCLUDE(InstallRequiredSystemLibraries)
 
-SET(CPACK_PACKAGE_CONTACT "zero@genshin.org")
 IF(UNIX)
 	SET(CPACK_GENERATOR "DEB")
 	SET(CPACK_DEBIAN_DEPENDS "libpng, libboost-program-options, libboost-regex, libboost-system, libboost-filesystem")
@@ -38,8 +37,9 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
 SET(CPACK_PACKAGE_DESCRIPTION "apngasm APNG assembler libraries and command line tool")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "apngasm APNG assembler libraries and command line tool")
+SET(CPACK_PACKAGE_CONTACT "zero@genshin.org")
 SET(CPACK_PACKAGE_FILE_NAME "apngasm-${VERSION}")
-SET(CPACK_COMPONENTS_ALL Libraries ApplicationData)
+SET(CPACK_COMPONENTS_ALL libraries headers applications)
 
 INCLUDE(CPack)
 

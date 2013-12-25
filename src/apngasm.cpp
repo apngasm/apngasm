@@ -185,7 +185,7 @@ namespace apngasm {
     if( _pListener->onPreSave(outputPath) )
     {
       spec::SpecWriter writer(this, _pListener);
-      if( result = writer.writeJson(outputPath, imageDir) )
+      if( (result = writer.writeJson(outputPath, imageDir)) )
         _pListener->onPostSave(outputPath);
     }
     return result;
@@ -198,7 +198,7 @@ namespace apngasm {
     if( _pListener->onPreSave(outputPath) )
     {
       spec::SpecWriter writer(this, _pListener);
-      if( result = writer.writeXml(outputPath, imageDir) )
+      if( (result = writer.writeXml(outputPath, imageDir)) )
         _pListener->onPostSave(outputPath);
     }
     return result;
