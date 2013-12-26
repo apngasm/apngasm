@@ -180,14 +180,18 @@ namespace apngasm_cli {
 			assembler.addFrame(*arg, delay.num, delay.den);
 			delay = FrameDelay();
 		}
-		cout << "FrameCount=" << assembler.frameCount() << std::endl;
+		
+		if (assembler.frameCount() == 0)
+			cout << "apngasm " << assembler.version() << "\nNo arguments passed. Use --help for help" << std::endl;
+		else
+			cout << assembler.frameCount() << " Frames" << std::endl;
 
 //		cout << "loops=" << options.getLoops() << std::endl;
 
-		if(outfile == "") {
+		if (outfile == "") {
 			outfile = "out.png";
 		}
-		if(assembler.assemble(outfile)) {
+		if (assembler.assemble(outfile)) {
 			cout << "assemble succeeded => " << outfile << std::endl;
 			return 0;
 		} else {
