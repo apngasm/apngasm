@@ -77,9 +77,9 @@ public:
 			createParentDirs(filePath);
 			return true;
 		}
-		cout << "file `" << filePath << "' is already exists.";
+		cout << "The file '" << filePath << "' already exists.";
 		if(_overwriteMode == apngasm_cli::Options::OVERWRITE_INTERACTIVE) {
-			cout << " overwrite?[y/N]: ";
+			cout << " Overwrite? [y/N]: ";
 			string reply;
 			getline(cin, reply);
 			static const regex RE("\\Ay(es)?\\z", regex::icase);
@@ -192,7 +192,7 @@ namespace apngasm_cli {
 			outfile = "out.png";
 		}
 		if (assembler.assemble(outfile)) {
-			cout << "assemble succeeded => " << outfile << std::endl;
+			cout << "APNG assembled successfully => " << outfile << std::endl;
 			return 0;
 		} else {
 			return ERRCODE_ASSEMBLEERR;
@@ -203,7 +203,7 @@ namespace apngasm_cli {
 	{
 		// Dissassemble apng file.
 		std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
-		std::cout << "FrameCount=" << frames.size() << std::endl;
+		std::cout << frames.size() << " Frames" << std::endl;
 
 		// Output png image files.
 		std::string outdir;
