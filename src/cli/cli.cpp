@@ -182,7 +182,7 @@ namespace apngasm_cli {
 		}
 		
 		if (assembler.frameCount() == 0)
-			cout << "apngasm " << assembler.version() << "\nNo arguments passed. Use --help for help" << std::endl;
+			cout << "apngasm " << assembler.version() << "\nNo source frames were specified. Use --help for usage information." << std::endl;
 		else
 			cout << assembler.frameCount() << " Frames" << std::endl;
 
