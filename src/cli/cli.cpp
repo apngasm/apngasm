@@ -165,20 +165,37 @@ namespace apngasm_cli {
 		static const boost::regex DELAY_RE("[0-9]+[:[0-9]+]?");
 		const FrameDelay DEFAULT_DELAY = options.getDefaultDelay();
 
-		FrameDelay delay = DEFAULT_DELAY;
+		std::string lastFile;
 		Options::INPUTS::const_iterator arg = options.inputFilesBegin();
 		for(; arg != options.inputFilesEnd(); ++arg) {
 			if(regex_match(*arg, DELAY_RE)) {
-				delay = FrameDelay(*arg);
+				if(!lastFile.empty())
+				{
+					const FrameDelay delay = *arg;
+					assembler.addFrame(lastFile, delay.num, delay.den);
+					lastFile.clear();
+					continue;
+				}
+			}
+			else if(regex_match(*arg, PNG_RE)) {
+				if(!lastFile.empty())
+				{
+					const FrameDelay delay = DEFAULT_DELAY;
+					assembler.addFrame(lastFile, delay.num, delay.den);
+				}
+				lastFile = *arg;
 				continue;
 			}
-			if(!regex_match(*arg, PNG_RE)) {
-				cout << "argument `" << (*arg)
-					<< "' is invalid." << std::endl;
-				return ERRCODE_INVALIDARGUMENT;
-			}
-			assembler.addFrame(*arg, delay.num, delay.den);
-			delay = DEFAULT_DELAY;
+
+			// Error.
+			cout << "argument `" << (*arg)
+				<< "' is invalid." << std::endl;
+			return ERRCODE_INVALIDARGUMENT;
+		}
+		if(!lastFile.empty())
+		{
+			const FrameDelay delay = DEFAULT_DELAY;
+			assembler.addFrame(lastFile, delay.num, delay.den);
 		}
 		
 		if (assembler.frameCount() == 0)
