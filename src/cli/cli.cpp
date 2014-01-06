@@ -165,7 +165,7 @@ namespace apngasm_cli {
 		static const boost::regex DELAY_RE("[0-9]+[:[0-9]+]?");
 		const FrameDelay DEFAULT_DELAY = options.getDefaultDelay();
 
-		FrameDelay delay;
+		FrameDelay delay = DEFAULT_DELAY;
 		Options::INPUTS::const_iterator arg = options.inputFilesBegin();
 		for(; arg != options.inputFilesEnd(); ++arg) {
 			if(regex_match(*arg, DELAY_RE)) {
@@ -178,7 +178,7 @@ namespace apngasm_cli {
 				return ERRCODE_INVALIDARGUMENT;
 			}
 			assembler.addFrame(*arg, delay.num, delay.den);
-			delay = FrameDelay();
+			delay = DEFAULT_DELAY;
 		}
 		
 		if (assembler.frameCount() == 0)
