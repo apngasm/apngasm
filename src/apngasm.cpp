@@ -2,8 +2,10 @@
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
+#ifdef APNG_SPECS_SUPPORTED
 #include "spec/specreader.h"
 #include "spec/specwriter.h"
+#endif
 #include "listener/apngasmlistener.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
@@ -102,8 +104,8 @@ namespace apngasm {
 
     for (size_t n = 0; n < _frames.size(); ++n)
     {
-      if (_frames[n]._pixels != NULL)
-        free(_frames[n]._pixels);
+      delete[] _frames[n]._pixels;
+      delete[] _frames[n]._rows;
     }
     _frames.clear();
 
@@ -144,6 +146,7 @@ namespace apngasm {
     return *this;
   }
 
+#ifdef APNG_SPECS_SUPPORTED
   //Loads an animation spec from JSON or XML
   //Returns a frame vector with the loaded frames
   //Loaded frames are added to the end of the frame vector
@@ -157,25 +160,6 @@ namespace apngasm {
     }
 
     return _frames;
-  }
-
-  // Save png files.
-  bool APNGAsm::savePNGs(const std::string& outputDir) const
-  {
-    const int count = _frames.size();
-    for(int i = 0;  i < count;  ++i)
-    {
-      const std::string outputPath = _pListener->onCreatePngPath(outputDir, i);
-
-      if( !_pListener->onPreSave(outputPath) )
-        return false;
-
-      if( !_frames[i].save(outputPath) )
-        return false;
-
-      _pListener->onPostSave(outputPath);
-    }
-    return true;
   }
 
   // Save json file.
@@ -203,6 +187,7 @@ namespace apngasm {
     }
     return result;
   }
+#endif
 
   // Set APNGAsmListener.
   // If argument is NULL, set default APNGAsmListener.
@@ -211,339 +196,7 @@ namespace apngasm {
     _pListener = (pListener==NULL) ? &defaultListener : pListener;
   }
 
-  unsigned char APNGAsm::findCommonType(void)
-  {
-    unsigned char coltype = _frames[0]._colorType;
-
-    for (size_t n = 1; n < _frames.size(); ++n)
-    {
-      if (_frames[0]._paletteSize != _frames[n]._paletteSize || memcmp(_frames[0]._palette, _frames[n]._palette, _frames[0]._paletteSize*3) != 0)
-        coltype = 6;
-      else
-      if (_frames[0]._transparencySize != _frames[n]._transparencySize || memcmp(_frames[0]._transparency, _frames[n]._transparency, _frames[0]._transparencySize) != 0)
-        coltype = 6;
-      else
-      if (_frames[n]._colorType != 3)
-      {
-        if (coltype != 3)
-          coltype |= _frames[n]._colorType;
-        else
-          coltype = 6;
-      }
-      else
-        if (coltype != 3)
-          coltype = 6;
-    }
-    return coltype;
-  }
-
-
-  bool APNGAsm::save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
-  {
-    unsigned int    j, k;
-    unsigned int    has_tcolor = 0;
-    unsigned int    tcolor = 0;
-    unsigned int    i, rowbytes, imagesize;
-    unsigned int    idat_size, zbuf_size, zsize;
-    unsigned char * zbuf;
-    FILE*           f;
-    unsigned char   png_sign[8] = {137,  80,  78,  71,  13,  10,  26,  10};
-    unsigned char   png_Software[27] = { 83, 111, 102, 116, 119, 97, 114, 101, '\0',
-                                         65,  80,  78,  71,  32, 65, 115, 115, 101,
-                                        109,  98, 108, 101, 114, 32,  50,  46,  56};
-
-    unsigned int bpp = 1;
-    if (coltype == 2)
-      bpp = 3;
-    else
-    if (coltype == 4)
-      bpp = 2;
-    else
-    if (coltype == 6)
-      bpp = 4;
-
-    if (coltype == 0)
-    {
-      if (_trnssize)
-      {
-        has_tcolor = 1;
-        tcolor = _trns[1];
-      }
-    }
-    else
-    if (coltype == 2)
-    {
-      if (_trnssize)
-      {
-        has_tcolor = 1;
-        tcolor = (((_trns[5]<<8)+_trns[3])<<8)+_trns[1];
-      }
-    }
-    else
-    if (coltype == 3)
-    {
-      for (i=0; i<_trnssize; i++)
-      if (_trns[i] == 0)
-      {
-        has_tcolor = 1;
-        tcolor = i;
-        break;
-      }
-    }
-    else
-    {
-      has_tcolor = 1;
-      tcolor = 0;
-    }
-
-    rowbytes  = _width * bpp;
-    imagesize = rowbytes * _height;
-
-    unsigned char * temp  = (unsigned char *)malloc(imagesize);
-    unsigned char * over1 = (unsigned char *)malloc(imagesize);
-    unsigned char * over2 = (unsigned char *)malloc(imagesize);
-    unsigned char * over3 = (unsigned char *)malloc(imagesize);
-    unsigned char * rows  = (unsigned char *)malloc((rowbytes + 1) * _height);
-
-    if (!temp || !over1 || !over2 || !over3 || !rows)
-      return false;
-
-    if ((f = fopen(outputPath.c_str(), "wb")) != 0)
-    {
-      struct IHDR
-      {
-        unsigned int    mWidth;
-        unsigned int    mHeight;
-        unsigned char   mDepth;
-        unsigned char   mColorType;
-        unsigned char   mCompression;
-        unsigned char   mFilterMethod;
-        unsigned char   mInterlaceMethod;
-      } ihdr = { swap32(_width), swap32(_height), 8, coltype, 0, 0, 0 };
-
-      struct acTL
-      {
-        unsigned int    mFrameCount;
-        unsigned int    mLoopCount;
-      } actl = { swap32(_frames.size()-first), swap32(loops) };
-
-      struct fcTL
-      {
-        unsigned int    mSeq;
-        unsigned int    mWidth;
-        unsigned int    mHeight;
-        unsigned int    mXOffset;
-        unsigned int    mYOffset;
-        unsigned short  mDelayNum;
-        unsigned short  mDelayDen;
-        unsigned char   mDisposeOp;
-        unsigned char   mBlendOp;
-      } fctl;
-
-      fwrite(png_sign, 1, 8, f);
-
-      write_chunk(f, "IHDR", (unsigned char *)(&ihdr), 13);
-
-      if (_frames.size() > 1)
-        write_chunk(f, "acTL", (unsigned char *)(&actl), 8);
-      else
-        first = 0;
-
-      if (_palsize > 0)
-        write_chunk(f, "PLTE", (unsigned char *)(&_palette), _palsize*3);
-
-      if (_trnssize > 0)
-        write_chunk(f, "tRNS", _trns, _trnssize);
-
-      _op_zstream1.data_type = Z_BINARY;
-      _op_zstream1.zalloc = Z_NULL;
-      _op_zstream1.zfree = Z_NULL;
-      _op_zstream1.opaque = Z_NULL;
-      deflateInit2(&_op_zstream1, Z_BEST_SPEED+1, 8, 15, 8, Z_DEFAULT_STRATEGY);
-
-      _op_zstream2.data_type = Z_BINARY;
-      _op_zstream2.zalloc = Z_NULL;
-      _op_zstream2.zfree = Z_NULL;
-      _op_zstream2.opaque = Z_NULL;
-      deflateInit2(&_op_zstream2, Z_BEST_SPEED+1, 8, 15, 8, Z_FILTERED);
-
-      _fin_zstream.data_type = Z_BINARY;
-      _fin_zstream.zalloc = Z_NULL;
-      _fin_zstream.zfree = Z_NULL;
-      _fin_zstream.opaque = Z_NULL;
-      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
-
-      idat_size = (rowbytes + 1) * _height;
-      zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
-
-      zbuf = (unsigned char *)malloc(zbuf_size);
-      _op_zbuf1 = (unsigned char *)malloc(zbuf_size);
-      _op_zbuf2 = (unsigned char *)malloc(zbuf_size);
-      _row_buf = (unsigned char *)malloc(rowbytes + 1);
-      _sub_row = (unsigned char *)malloc(rowbytes + 1);
-      _up_row = (unsigned char *)malloc(rowbytes + 1);
-      _avg_row = (unsigned char *)malloc(rowbytes + 1);
-      _paeth_row = (unsigned char *)malloc(rowbytes + 1);
-
-      if (zbuf && _op_zbuf1 && _op_zbuf2 && _row_buf && _sub_row && _up_row && _avg_row && _paeth_row)
-      {
-        _row_buf[0] = 0;
-        _sub_row[0] = 1;
-        _up_row[0] = 2;
-        _avg_row[0] = 3;
-        _paeth_row[0] = 4;
-      }
-      else
-        return false;
-
-      unsigned int x0 = 0;
-      unsigned int y0 = 0;
-      unsigned int w0 = _width;
-      unsigned int h0 = _height;
-      unsigned char bop = 0;
-      unsigned char dop = 0;
-      _next_seq_num = 0;
-
-      for (j=0; j<6; j++)
-        _op[j].valid = 0;
-      deflate_rect_op(_frames[0]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
-      deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
-
-      if (first)
-      {
-        write_IDATs(f, 0, zbuf, zsize, idat_size);
-
-        for (j=0; j<6; j++)
-          _op[j].valid = 0;
-        deflate_rect_op(_frames[1]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
-        deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
-      }
-
-      for (size_t n = first; n < _frames.size()-1; ++n)
-      {
-        unsigned int op_min;
-        int          op_best;
-
-        for (j=0; j<6; j++)
-          _op[j].valid = 0;
-
-        /* dispose = none */
-        get_rect(_width, _height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
-
-        /* dispose = background */
-        if (has_tcolor)
-        {
-          memcpy(temp, _frames[n]._pixels, imagesize);
-          if (coltype == 2)
-            for (j=0; j<h0; j++)
-              for (k=0; k<w0; k++)
-                memcpy(temp + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
-          else
-            for (j=0; j<h0; j++)
-              memset(temp + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
-
-          get_rect(_width, _height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
-        }
-
-        /* dispose = previous */
-        if (n > first)
-          get_rect(_width, _height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
-
-        op_min = _op[0].size;
-        op_best = 0;
-        for (j=1; j<6; j++)
-        {
-          if (_op[j].size < op_min && _op[j].valid)
-          {
-            op_min = _op[j].size;
-            op_best = j;
-          }
-        }
-
-        dop = op_best >> 1;
-
-        fctl.mSeq       = swap32(_next_seq_num++);
-        fctl.mWidth     = swap32(w0);
-        fctl.mHeight    = swap32(h0);
-        fctl.mXOffset   = swap32(x0);
-        fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(_frames[n]._delayNum);
-        fctl.mDelayDen  = swap16(_frames[n]._delayDen);
-        fctl.mDisposeOp = dop;
-        fctl.mBlendOp   = bop;
-        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
-
-        write_IDATs(f, n, zbuf, zsize, idat_size);
-
-        /* process apng dispose - begin */
-        if (dop == 1)
-        {
-          if (coltype == 2)
-            for (j=0; j<h0; j++)
-              for (k=0; k<w0; k++)
-                memcpy(_frames[n]._pixels + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
-          else
-            for (j=0; j<h0; j++)
-              memset(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
-        }
-        else
-        if (dop == 2)
-        {
-          for (j=0; j<h0; j++)
-            memcpy(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*_width + x0)*bpp, w0*bpp);
-        }
-        /* process apng dispose - end */
-
-        x0 = _op[op_best].x;
-        y0 = _op[op_best].y;
-        w0 = _op[op_best].w;
-        h0 = _op[op_best].h;
-        bop = op_best & 1;
-
-        deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, op_best);
-      }
-
-      if (_frames.size() > 1)
-      {
-        fctl.mSeq       = swap32(_next_seq_num++);
-        fctl.mWidth     = swap32(w0);
-        fctl.mHeight    = swap32(h0);
-        fctl.mXOffset   = swap32(x0);
-        fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(_frames[_frames.size()-1]._delayNum);
-        fctl.mDelayDen  = swap16(_frames[_frames.size()-1]._delayDen);
-        fctl.mDisposeOp = 0;
-        fctl.mBlendOp   = bop;
-        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
-      }
-
-      write_IDATs(f, _frames.size()-1, zbuf, zsize, idat_size);
-
-      write_chunk(f, "tEXt", png_Software, 27);
-      write_chunk(f, "IEND", 0, 0);
-      fclose(f);
-
-      free(zbuf);
-      free(_op_zbuf1);
-      free(_op_zbuf2);
-      free(_row_buf);
-      free(_sub_row);
-      free(_up_row);
-      free(_avg_row);
-      free(_paeth_row);
-    }
-    else
-      return false;
-
-    free(temp);
-    free(over1);
-    free(over2);
-    free(over3);
-    free(rows);
-
-    return true;
-  }
-
+#ifdef APNG_WRITE_SUPPORTED
   //Assembles and outputs an APNG file
   //Returns the assembled file object
   //If no output path is specified only the file object is returned
@@ -575,698 +228,30 @@ namespace apngasm {
     return true;
   }
 
-  void APNGAsm::process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows)
+  unsigned char APNGAsm::findCommonType(void)
   {
-    int i, j, v;
-    int a, b, c, pa, pb, pc, p;
-    unsigned char * prev = NULL;
-    unsigned char * dp  = rows;
-    unsigned char * out;
+    unsigned char coltype = _frames[0]._colorType;
 
-    for (j=0; j<h; j++)
+    for (size_t n = 1; n < _frames.size(); ++n)
     {
-      unsigned int    sum = 0;
-      unsigned char * best_row = _row_buf;
-      unsigned int    mins = ((unsigned int)(-1)) >> 1;
-
-      out = _row_buf+1;
-      for (i=0; i<rowbytes; i++)
+      if (_frames[0]._paletteSize != _frames[n]._paletteSize || memcmp(_frames[0]._palette, _frames[n]._palette, _frames[0]._paletteSize*3) != 0)
+        coltype = 6;
+      else
+      if (_frames[0]._transparencySize != _frames[n]._transparencySize || memcmp(_frames[0]._transparency, _frames[n]._transparency, _frames[0]._transparencySize) != 0)
+        coltype = 6;
+      else
+      if (_frames[n]._colorType != 3)
       {
-        v = out[i] = row[i];
-        sum += (v < 128) ? v : 256 - v;
-      }
-      mins = sum;
-
-      sum = 0;
-      out = _sub_row+1;
-      for (i=0; i<bpp; i++)
-      {
-        v = out[i] = row[i];
-        sum += (v < 128) ? v : 256 - v;
-      }
-      for (i=bpp; i<rowbytes; i++)
-      {
-        v = out[i] = row[i] - row[i-bpp];
-        sum += (v < 128) ? v : 256 - v;
-        if (sum > mins) break;
-      }
-      if (sum < mins)
-      {
-        mins = sum;
-        best_row = _sub_row;
-      }
-
-      if (prev)
-      {
-        sum = 0;
-        out = _up_row+1;
-        for (i=0; i<rowbytes; i++)
-        {
-          v = out[i] = row[i] - prev[i];
-          sum += (v < 128) ? v : 256 - v;
-          if (sum > mins) break;
-        }
-        if (sum < mins)
-        {
-          mins = sum;
-          best_row = _up_row;
-        }
-
-        sum = 0;
-        out = _avg_row+1;
-        for (i=0; i<bpp; i++)
-        {
-          v = out[i] = row[i] - prev[i]/2;
-          sum += (v < 128) ? v : 256 - v;
-        }
-        for (i=bpp; i<rowbytes; i++)
-        {
-          v = out[i] = row[i] - (prev[i] + row[i-bpp])/2;
-          sum += (v < 128) ? v : 256 - v;
-          if (sum > mins) break;
-        }
-        if (sum < mins)
-        {
-          mins = sum;
-          best_row = _avg_row;
-        }
-
-        sum = 0;
-        out = _paeth_row+1;
-        for (i=0; i<bpp; i++)
-        {
-          v = out[i] = row[i] - prev[i];
-          sum += (v < 128) ? v : 256 - v;
-        }
-        for (i=bpp; i<rowbytes; i++)
-        {
-          a = row[i-bpp];
-          b = prev[i];
-          c = prev[i-bpp];
-          p = b - c;
-          pc = a - c;
-          pa = abs(p);
-          pb = abs(pc);
-          pc = abs(p + pc);
-          p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
-          v = out[i] = row[i] - p;
-          sum += (v < 128) ? v : 256 - v;
-          if (sum > mins) break;
-        }
-        if (sum < mins)
-        {
-          best_row = _paeth_row;
-        }
-      }
-
-      if (rows == NULL)
-      {
-        // deflate_rect_op()
-        _op_zstream1.next_in = _row_buf;
-        _op_zstream1.avail_in = rowbytes + 1;
-        deflate(&_op_zstream1, Z_NO_FLUSH);
-
-        _op_zstream2.next_in = best_row;
-        _op_zstream2.avail_in = rowbytes + 1;
-        deflate(&_op_zstream2, Z_NO_FLUSH);
+        if (coltype != 3)
+          coltype |= _frames[n]._colorType;
+        else
+          coltype = 6;
       }
       else
-      {
-        // deflate_rect_fin()
-        memcpy(dp, best_row, rowbytes+1);
-        dp += rowbytes+1;
-      }
-
-      prev = row;
-      row += stride;
+        if (coltype != 3)
+          coltype = 6;
     }
-  }
-
-  void APNGAsm::deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n)
-  {
-    unsigned char * row  = _op[n].p + _op[n].y*stride + _op[n].x*bpp;
-    int rowbytes = _op[n].w*bpp;
-
-    if (_op[n].filters == 0)
-    {
-      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
-      unsigned char * dp  = rows;
-      for (int j=0; j<_op[n].h; j++)
-      {
-        *dp++ = 0;
-        memcpy(dp, row, rowbytes);
-        dp += rowbytes;
-        row += stride;
-      }
-    }
-    else
-    {
-      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
-      process_rect(row, rowbytes, bpp, stride, _op[n].h, rows);
-    }
-
-    _fin_zstream.next_out = zbuf;
-    _fin_zstream.avail_out = zbuf_size;
-    _fin_zstream.next_in = rows;
-    _fin_zstream.avail_in = _op[n].h*(rowbytes + 1);
-    deflate(&_fin_zstream, Z_FINISH);
-    *zsize = _fin_zstream.total_out;
-    deflateReset(&_fin_zstream);
-  }
-
-  void APNGAsm::deflate_rect_op(unsigned char *pdata, int x, int y, int w, int h, int bpp, int stride, int zbuf_size, int n)
-  {
-    unsigned char * row  = pdata + y*stride + x*bpp;
-    int rowbytes = w * bpp;
-
-    _op_zstream1.data_type = Z_BINARY;
-    _op_zstream1.next_out = _op_zbuf1;
-    _op_zstream1.avail_out = zbuf_size;
-
-    _op_zstream2.data_type = Z_BINARY;
-    _op_zstream2.next_out = _op_zbuf2;
-    _op_zstream2.avail_out = zbuf_size;
-
-    process_rect(row, rowbytes, bpp, stride, h, NULL);
-
-    deflate(&_op_zstream1, Z_FINISH);
-    deflate(&_op_zstream2, Z_FINISH);
-    _op[n].p = pdata;
-    if (_op_zstream1.total_out < _op_zstream2.total_out)
-    {
-      _op[n].size = _op_zstream1.total_out;
-      _op[n].filters = 0;
-    }
-    else
-    {
-      _op[n].size = _op_zstream2.total_out;
-      _op[n].filters = 1;
-    }
-    _op[n].x = x;
-    _op[n].y = y;
-    _op[n].w = w;
-    _op[n].h = h;
-    _op[n].valid = 1;
-    deflateReset(&_op_zstream1);
-    deflateReset(&_op_zstream2);
-  }
-
-  void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
-  {
-    unsigned int   i, j, x0, y0, w0, h0;
-    unsigned int   x_min = w-1;
-    unsigned int   y_min = h-1;
-    unsigned int   x_max = 0;
-    unsigned int   y_max = 0;
-    unsigned int   diffnum = 0;
-    unsigned int   over_is_possible = 1;
-
-    if (!has_tcolor)
-      over_is_possible = 0;
-
-    if (bpp == 1)
-    {
-      unsigned char *pa = pimage1;
-      unsigned char *pb = pimage2;
-      unsigned char *pc = ptemp;
-
-      for (j=0; j<h; j++)
-      for (i=0; i<w; i++)
-      {
-        unsigned char c = *pb++;
-        if (*pa++ != c)
-        {
-          diffnum++;
-          if (has_tcolor && c == tcolor) over_is_possible = 0;
-          if (i<x_min) x_min = i;
-          if (i>x_max) x_max = i;
-          if (j<y_min) y_min = j;
-          if (j>y_max) y_max = j;
-        }
-        else
-          c = tcolor;
-
-        *pc++ = c;
-      }
-    }
-    else
-    if (bpp == 2)
-    {
-      unsigned short *pa = (unsigned short *)pimage1;
-      unsigned short *pb = (unsigned short *)pimage2;
-      unsigned short *pc = (unsigned short *)ptemp;
-
-      for (j=0; j<h; j++)
-      for (i=0; i<w; i++)
-      {
-        unsigned int c1 = *pa++;
-        unsigned int c2 = *pb++;
-        if ((c1 != c2) && ((c1>>8) || (c2>>8)))
-        {
-          diffnum++;
-          if ((c2 >> 8) != 0xFF) over_is_possible = 0;
-          if (i<x_min) x_min = i;
-          if (i>x_max) x_max = i;
-          if (j<y_min) y_min = j;
-          if (j>y_max) y_max = j;
-        }
-        else
-          c2 = 0;
-
-        *pc++ = c2;
-      }
-    }
-    else
-    if (bpp == 3)
-    {
-      unsigned char *pa = pimage1;
-      unsigned char *pb = pimage2;
-      unsigned char *pc = ptemp;
-
-      for (j=0; j<h; j++)
-      for (i=0; i<w; i++)
-      {
-        unsigned int c1 = (pa[2]<<16) + (pa[1]<<8) + pa[0];
-        unsigned int c2 = (pb[2]<<16) + (pb[1]<<8) + pb[0];
-        if (c1 != c2)
-        {
-          diffnum++;
-          if (has_tcolor && c2 == tcolor) over_is_possible = 0;
-          if (i<x_min) x_min = i;
-          if (i>x_max) x_max = i;
-          if (j<y_min) y_min = j;
-          if (j>y_max) y_max = j;
-        }
-        else
-          c2 = tcolor;
-
-        memcpy(pc, &c2, 3);
-        pa += 3;
-        pb += 3;
-        pc += 3;
-      }
-    }
-    else
-    if (bpp == 4)
-    {
-      unsigned int *pa = (unsigned int *)pimage1;
-      unsigned int *pb = (unsigned int *)pimage2;
-      unsigned int *pc = (unsigned int *)ptemp;
-
-      for (j=0; j<h; j++)
-      for (i=0; i<w; i++)
-      {
-        unsigned int c1 = *pa++;
-        unsigned int c2 = *pb++;
-        if ((c1 != c2) && ((c1>>24) || (c2>>24)))
-        {
-          diffnum++;
-          if ((c2 >> 24) != 0xFF) over_is_possible = 0;
-          if (i<x_min) x_min = i;
-          if (i>x_max) x_max = i;
-          if (j<y_min) y_min = j;
-          if (j>y_max) y_max = j;
-        }
-        else
-          c2 = 0;
-
-        *pc++ = c2;
-      }
-    }
-
-    if (diffnum == 0)
-    {
-      x0 = y0 = 0;
-      w0 = h0 = 1;
-    }
-    else
-    {
-      x0 = x_min;
-      y0 = y_min;
-      w0 = x_max-x_min+1;
-      h0 = y_max-y_min+1;
-    }
-
-    deflate_rect_op(pimage2, x0, y0, w0, h0, bpp, stride, zbuf_size, n*2);
-
-    if (over_is_possible)
-      deflate_rect_op(ptemp, x0, y0, w0, h0, bpp, stride, zbuf_size, n*2+1);
-  }
-
-  void APNGAsm::write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length)
-  {
-    unsigned int crc = crc32(0, Z_NULL, 0);
-    unsigned int len = swap32(length);
-
-    fwrite(&len, 1, 4, f);
-    fwrite(name, 1, 4, f);
-    crc = crc32(crc, (const Bytef *)name, 4);
-
-    if (memcmp(name, "fdAT", 4) == 0)
-    {
-      unsigned int seq = swap32(_next_seq_num++);
-      fwrite(&seq, 1, 4, f);
-      crc = crc32(crc, (const Bytef *)(&seq), 4);
-      length -= 4;
-    }
-
-    if (data != NULL && length > 0)
-    {
-      fwrite(data, 1, length, f);
-      crc = crc32(crc, data, length);
-    }
-
-    crc = swap32(crc);
-    fwrite(&crc, 1, 4, f);
-  }
-
-  void APNGAsm::write_IDATs(FILE * f, int n, unsigned char * data, unsigned int length, unsigned int idat_size)
-  {
-    unsigned int z_cmf = data[0];
-    if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
-    {
-      if (length >= 2)
-      {
-        unsigned int z_cinfo = z_cmf >> 4;
-        unsigned int half_z_window_size = 1 << (z_cinfo + 7);
-        while (idat_size <= half_z_window_size && half_z_window_size >= 256)
-        {
-          z_cinfo--;
-          half_z_window_size >>= 1;
-        }
-        z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
-        if (data[0] != (unsigned char)z_cmf)
-        {
-          data[0] = (unsigned char)z_cmf;
-          data[1] &= 0xe0;
-          data[1] += (unsigned char)(0x1f - ((z_cmf << 8) + data[1]) % 0x1f);
-        }
-      }
-    }
-
-    while (length > 0)
-    {
-      unsigned int ds = length;
-      if (ds > 32768)
-        ds = 32768;
-
-      if (n == 0)
-        write_chunk(f, "IDAT", data, ds);
-      else
-        write_chunk(f, "fdAT", data, ds+4);
-
-      data += ds;
-      length -= ds;
-    }
-  }
-
-  void info_fn(png_structp png_ptr, png_infop info_ptr)
-  {
-    png_set_expand(png_ptr);
-    png_set_strip_16(png_ptr);
-    png_set_gray_to_rgb(png_ptr);
-    png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
-    (void)png_set_interlace_handling(png_ptr);
-    png_read_update_info(png_ptr, info_ptr);
-  }
-
-  void row_fn(png_structp png_ptr, png_bytep new_row, png_uint_32 row_num, int pass)
-  {
-    APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
-    png_progressive_combine_row(png_ptr, frame->_rows[row_num], new_row);
-  }
-
-  void APNGAsm::compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
-  {
-    unsigned int  i, j;
-    int u, v, al;
-
-    for (j=0; j<h; j++)
-    {
-      unsigned char * sp = rows_src[j];
-      unsigned char * dp = rows_dst[j+y] + x*4;
-
-      if (bop == 0)
-        memcpy(dp, sp, w*4);
-      else
-      for (i=0; i<w; i++, sp+=4, dp+=4)
-      {
-        if (sp[3] == 255)
-          memcpy(dp, sp, 4);
-        else
-        if (sp[3] != 0)
-        {
-          if (dp[3] != 0)
-          {
-            u = sp[3]*255;
-            v = (255-sp[3])*dp[3];
-            al = 255*255-(255-sp[3])*(255-dp[3]);
-            dp[0] = (sp[0]*u + dp[0]*v)/al;
-            dp[1] = (sp[1]*u + dp[1]*v)/al;
-            dp[2] = (sp[2]*u + dp[2]*v)/al;
-            dp[3] = al/255;
-          }
-          else
-            memcpy(dp, sp, 4);
-        }
-      }
-    }
-  }
-
-  unsigned int APNGAsm::read_chunk(FILE * f, CHUNK * pChunk)
-  {
-    unsigned int len;
-    if (fread(&len, 4, 1, f) == 1)
-    {
-      pChunk->size = swap32(len) + 12;
-      pChunk->p = new unsigned char[pChunk->size];
-      unsigned int * pi = (unsigned int *)pChunk->p;
-      pi[0] = len;
-      if (fread(pChunk->p + 4, pChunk->size - 4, 1, f) == 1)
-        return pi[1];
-    }
-    return 0;
-  }
-
-  void APNGAsm::recalc_crc(unsigned char * p, unsigned int size)
-  {
-    unsigned int crc = crc32(0, Z_NULL, 0);
-    crc = crc32(crc, p + 4, size - 8);
-    crc = swap32(crc);
-    memcpy(p + size - 4, &crc, 4);
-  }
-
-  const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
-  {
-    unsigned int   i, j, id;
-    unsigned int   w, h;
-    unsigned int * pi;
-    unsigned char  header[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-    unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
-    CHUNK chunk_ihdr;
-    CHUNK chunk;
-
-    reset();
-
-    FILE * f;
-    if ((f = fopen(filePath.c_str(), "rb")) != 0)
-    {
-      unsigned char sig[8];
-      unsigned int  w0, h0, x0, y0;
-      unsigned int  delay_num, delay_den, dop, bop, rowbytes, imagesize;
-      unsigned int  flag_actl = 0;
-      unsigned int  flag_fctl = 0;
-      unsigned int  flag_idat = 0;
-      unsigned int  flag_info = 0;
-      unsigned int  num_frames = 1;
-
-      if (fread(sig, 1, 8, f) == 8 && memcmp(sig, header, 8) == 0)
-      {
-        id = read_chunk(f, &chunk_ihdr);
-
-        if (id == id_IHDR && chunk_ihdr.size == 25)
-        {
-          pi = (unsigned int *)chunk_ihdr.p;
-          w0 = w = swap32(pi[2]);
-          h0 = h = swap32(pi[3]);
-          x0 = 0;
-          y0 = 0;
-          delay_num = 1;
-          delay_den = 10;
-          dop = 0;
-          bop = 0;
-          rowbytes = w * 4;
-          imagesize = h * rowbytes;
-
-          APNGFrame frameRaw;
-          APNGFrame frameCur;
-          APNGFrame frameNext;
-
-          frameRaw._pixels = new unsigned char[imagesize];
-          frameRaw._rows = new png_bytep[h * sizeof(png_bytep)];
-          for (j=0; j<h; ++j)
-            frameRaw._rows[j] = frameRaw._pixels + j * rowbytes;
-
-          frameCur._width = w;
-          frameCur._height = h;
-          frameCur._colorType = 6;
-          frameCur._pixels = new unsigned char[imagesize];
-          frameCur._rows = new png_bytep[h * sizeof(png_bytep)];
-          for (j=0; j<h; ++j)
-            frameCur._rows[j] = frameCur._pixels + j * rowbytes;
-
-          png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-          png_infop   info_ptr = png_create_info_struct(png_ptr);
-          setjmp(png_jmpbuf(png_ptr));
-          png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
-          png_process_data(png_ptr, info_ptr, &header[0], 8);
-          png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
-          flag_info = 0;
-
-          while ( !feof(f) )
-          {
-            id = read_chunk(f, &chunk);
-            pi = (unsigned int *)chunk.p;
-
-            if (id == id_acTL)
-            {
-              flag_actl = 1;
-              num_frames = swap32(pi[2]);
-              delete[] chunk.p;
-            }
-            else
-            if (id == id_fcTL)
-            {
-              if (flag_fctl)
-              {
-                png_process_data(png_ptr, info_ptr, &footer[0], 12);
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
-                frameNext._pixels = new unsigned char[imagesize];
-                frameNext._rows = new png_bytep[h * sizeof(png_bytep)];
-                for (j=0; j<h; ++j)
-                  frameNext._rows[j] = frameNext._pixels + j * rowbytes;
-
-                if (dop == 2)
-                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
-
-                compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
-                frameCur._delayNum = delay_num;
-                frameCur._delayDen = delay_den;
-                _frames.push_back(frameCur);
-
-                if (dop != 2)
-                {
-                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
-                  if (dop == 1)
-                    for (j=0; j<h0; j++)
-                      memset(frameNext._rows[y0 + j] + x0*4, 0, w0*4);
-                }
-                frameCur._pixels = frameNext._pixels;
-                frameCur._rows = frameNext._rows;
-
-                memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
-                recalc_crc(chunk_ihdr.p, chunk_ihdr.size);
-
-                png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-                info_ptr = png_create_info_struct(png_ptr);
-                setjmp(png_jmpbuf(png_ptr));
-                png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
-                png_process_data(png_ptr, info_ptr, &header[0], 8);
-                png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
-                flag_info = 0;
-              }
-
-              w0 = swap32(pi[3]);
-              h0 = swap32(pi[4]);
-              x0 = swap32(pi[5]);
-              y0 = swap32(pi[6]);
-              delay_num = chunk.p[28]*256 + chunk.p[29];
-              delay_den = chunk.p[30]*256 + chunk.p[31];
-              dop = chunk.p[32];
-              bop = chunk.p[33];
-              if (!flag_fctl)
-              {
-                bop = 0;
-                if (dop == 2)
-                  dop = 1;
-              }
-              flag_fctl = 1;
-              delete[] chunk.p;
-            }
-            else
-            if (id == id_IDAT)
-            {
-              flag_idat = 1;
-              if (flag_fctl || !flag_actl)
-              {
-                if (!flag_info)
-                {
-                  flag_info = 1;
-                  for (i=0; i<_info_chunks.size(); ++i)
-                    png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
-                }
-                png_process_data(png_ptr, info_ptr, chunk.p, chunk.size);
-              }
-              delete[] chunk.p;
-            }
-            else
-            if (id == id_fdAT)
-            {
-              flag_idat = 1;
-              if (!flag_info)
-              {
-                flag_info = 1;
-                for (i=0; i<_info_chunks.size(); ++i)
-                  png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
-              }
-              pi[1] = swap32(chunk.size - 16);
-              pi[2] = id_IDAT;
-              recalc_crc(chunk.p + 4, chunk.size - 4);
-              png_process_data(png_ptr, info_ptr, chunk.p + 4, chunk.size - 4);
-              delete[] chunk.p;
-            }
-            else
-            if (id == id_IEND)
-            {
-              png_process_data(png_ptr, info_ptr, &footer[0], 12);
-
-              compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
-              frameCur._delayNum = delay_num;
-              frameCur._delayDen = delay_den;
-              _frames.push_back(frameCur);
-              delete[] chunk.p;
-              break;
-            }
-            else
-            if (notabc(chunk.p[4]) || notabc(chunk.p[5]) || notabc(chunk.p[6]) || notabc(chunk.p[7]))
-            {
-              delete[] chunk.p;
-              break;
-            }
-            else
-            {
-              if (!flag_idat)
-                _info_chunks.push_back(chunk);
-              else
-                delete[] chunk.p;
-            }
-          }
-          delete[] frameRaw._rows;
-          delete[] frameRaw._pixels;
-          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-        }
-      }
-      fclose(f);
-
-      for (i=0; i<_info_chunks.size(); ++i)
-        delete[] _info_chunks[i].p;
-
-      _info_chunks.clear();
-
-      delete[] chunk_ihdr.p;
-    }
-    return _frames;
+    return coltype;
   }
 
   int APNGAsm::upconvertToCommonType(unsigned char coltype)
@@ -1280,9 +265,7 @@ namespace apngasm {
     {
       if (coltype == 6 && _frames[n]._colorType != 6)
       {
-        unsigned char * dst = (unsigned char *)malloc(_size*4);
-        if (dst == NULL)
-          return 1;
+        unsigned char * dst = new unsigned char[_size * 4];
 
         if (_frames[n]._colorType == 0)
         {
@@ -1357,15 +340,16 @@ namespace apngasm {
             *dp++ = *sp++;
           }
         }
-        free(_frames[n]._pixels);
+        delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = dst + j * _frames[n]._width * 4;
       }
       else
       if (coltype == 4 && _frames[n]._colorType == 0)
       {
-        unsigned char * dst = (unsigned char *)malloc(_size*2);
-        if (dst == NULL)
-          return 1;
+        unsigned char * dst = new unsigned char[_size * 2];
 
         sp = _frames[n]._pixels;
         dp = dst;
@@ -1374,15 +358,16 @@ namespace apngasm {
           *dp++ = *sp++;
           *dp++ = 255;
         }
-        free(_frames[n]._pixels);
+        delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = dst + j * _frames[n]._width * 2;
       }
       else
       if (coltype == 2 && _frames[n]._colorType == 0)
       {
-        unsigned char * dst = (unsigned char *)malloc(_size*3);
-        if (dst == NULL)
-          return 1;
+        unsigned char * dst = new unsigned char[_size * 3];
 
         sp = _frames[n]._pixels;
         dp = dst;
@@ -1392,8 +377,11 @@ namespace apngasm {
           *dp++ = *sp;
           *dp++ = *sp++;
         }
-        free(_frames[n]._pixels);
+        delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = dst + j * _frames[n]._width * 3;
       }
     }
     return 0;
@@ -2069,5 +1057,1027 @@ namespace apngasm {
     }
     return coltype;
   }
+
+  bool APNGAsm::save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
+  {
+    unsigned int    j, k;
+    unsigned int    has_tcolor = 0;
+    unsigned int    tcolor = 0;
+    unsigned int    i, rowbytes, imagesize;
+    unsigned int    idat_size, zbuf_size, zsize;
+    unsigned char * zbuf;
+    FILE*           f;
+    unsigned char   png_sign[8] = {137,  80,  78,  71,  13,  10,  26,  10};
+    unsigned char   png_Software[27] = { 83, 111, 102, 116, 119, 97, 114, 101, '\0',
+                                         65,  80,  78,  71,  32, 65, 115, 115, 101,
+                                        109,  98, 108, 101, 114, 32,  50,  46,  56};
+
+    unsigned int bpp = 1;
+    if (coltype == 2)
+      bpp = 3;
+    else
+    if (coltype == 4)
+      bpp = 2;
+    else
+    if (coltype == 6)
+      bpp = 4;
+
+    if (coltype == 0)
+    {
+      if (_trnssize)
+      {
+        has_tcolor = 1;
+        tcolor = _trns[1];
+      }
+    }
+    else
+    if (coltype == 2)
+    {
+      if (_trnssize)
+      {
+        has_tcolor = 1;
+        tcolor = (((_trns[5]<<8)+_trns[3])<<8)+_trns[1];
+      }
+    }
+    else
+    if (coltype == 3)
+    {
+      for (i=0; i<_trnssize; i++)
+      if (_trns[i] == 0)
+      {
+        has_tcolor = 1;
+        tcolor = i;
+        break;
+      }
+    }
+    else
+    {
+      has_tcolor = 1;
+      tcolor = 0;
+    }
+
+    rowbytes  = _width * bpp;
+    imagesize = rowbytes * _height;
+
+    unsigned char * temp  = (unsigned char *)malloc(imagesize);
+    unsigned char * over1 = (unsigned char *)malloc(imagesize);
+    unsigned char * over2 = (unsigned char *)malloc(imagesize);
+    unsigned char * over3 = (unsigned char *)malloc(imagesize);
+    unsigned char * rows  = (unsigned char *)malloc((rowbytes + 1) * _height);
+
+    if (!temp || !over1 || !over2 || !over3 || !rows)
+      return false;
+
+    if ((f = fopen(outputPath.c_str(), "wb")) != 0)
+    {
+      struct IHDR
+      {
+        unsigned int    mWidth;
+        unsigned int    mHeight;
+        unsigned char   mDepth;
+        unsigned char   mColorType;
+        unsigned char   mCompression;
+        unsigned char   mFilterMethod;
+        unsigned char   mInterlaceMethod;
+      } ihdr = { swap32(_width), swap32(_height), 8, coltype, 0, 0, 0 };
+
+      struct acTL
+      {
+        unsigned int    mFrameCount;
+        unsigned int    mLoopCount;
+      } actl = { swap32(_frames.size()-first), swap32(loops) };
+
+      struct fcTL
+      {
+        unsigned int    mSeq;
+        unsigned int    mWidth;
+        unsigned int    mHeight;
+        unsigned int    mXOffset;
+        unsigned int    mYOffset;
+        unsigned short  mDelayNum;
+        unsigned short  mDelayDen;
+        unsigned char   mDisposeOp;
+        unsigned char   mBlendOp;
+      } fctl;
+
+      fwrite(png_sign, 1, 8, f);
+
+      write_chunk(f, "IHDR", (unsigned char *)(&ihdr), 13);
+
+      if (_frames.size() > 1)
+        write_chunk(f, "acTL", (unsigned char *)(&actl), 8);
+      else
+        first = 0;
+
+      if (_palsize > 0)
+        write_chunk(f, "PLTE", (unsigned char *)(&_palette), _palsize*3);
+
+      if (_trnssize > 0)
+        write_chunk(f, "tRNS", _trns, _trnssize);
+
+      _op_zstream1.data_type = Z_BINARY;
+      _op_zstream1.zalloc = Z_NULL;
+      _op_zstream1.zfree = Z_NULL;
+      _op_zstream1.opaque = Z_NULL;
+      deflateInit2(&_op_zstream1, Z_BEST_SPEED+1, 8, 15, 8, Z_DEFAULT_STRATEGY);
+
+      _op_zstream2.data_type = Z_BINARY;
+      _op_zstream2.zalloc = Z_NULL;
+      _op_zstream2.zfree = Z_NULL;
+      _op_zstream2.opaque = Z_NULL;
+      deflateInit2(&_op_zstream2, Z_BEST_SPEED+1, 8, 15, 8, Z_FILTERED);
+
+      _fin_zstream.data_type = Z_BINARY;
+      _fin_zstream.zalloc = Z_NULL;
+      _fin_zstream.zfree = Z_NULL;
+      _fin_zstream.opaque = Z_NULL;
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
+
+      idat_size = (rowbytes + 1) * _height;
+      zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
+
+      zbuf = (unsigned char *)malloc(zbuf_size);
+      _op_zbuf1 = (unsigned char *)malloc(zbuf_size);
+      _op_zbuf2 = (unsigned char *)malloc(zbuf_size);
+      _row_buf = (unsigned char *)malloc(rowbytes + 1);
+      _sub_row = (unsigned char *)malloc(rowbytes + 1);
+      _up_row = (unsigned char *)malloc(rowbytes + 1);
+      _avg_row = (unsigned char *)malloc(rowbytes + 1);
+      _paeth_row = (unsigned char *)malloc(rowbytes + 1);
+
+      if (zbuf && _op_zbuf1 && _op_zbuf2 && _row_buf && _sub_row && _up_row && _avg_row && _paeth_row)
+      {
+        _row_buf[0] = 0;
+        _sub_row[0] = 1;
+        _up_row[0] = 2;
+        _avg_row[0] = 3;
+        _paeth_row[0] = 4;
+      }
+      else
+        return false;
+
+      unsigned int x0 = 0;
+      unsigned int y0 = 0;
+      unsigned int w0 = _width;
+      unsigned int h0 = _height;
+      unsigned char bop = 0;
+      unsigned char dop = 0;
+      _next_seq_num = 0;
+
+      for (j=0; j<6; j++)
+        _op[j].valid = 0;
+      deflate_rect_op(_frames[0]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
+      deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
+
+      if (first)
+      {
+        write_IDATs(f, 0, zbuf, zsize, idat_size);
+
+        for (j=0; j<6; j++)
+          _op[j].valid = 0;
+        deflate_rect_op(_frames[1]._pixels, x0, y0, w0, h0, bpp, rowbytes, zbuf_size, 0);
+        deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, 0);
+      }
+
+      for (size_t n = first; n < _frames.size()-1; ++n)
+      {
+        unsigned int op_min;
+        int          op_best;
+
+        for (j=0; j<6; j++)
+          _op[j].valid = 0;
+
+        /* dispose = none */
+        get_rect(_width, _height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
+
+        /* dispose = background */
+        if (has_tcolor)
+        {
+          memcpy(temp, _frames[n]._pixels, imagesize);
+          if (coltype == 2)
+            for (j=0; j<h0; j++)
+              for (k=0; k<w0; k++)
+                memcpy(temp + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
+          else
+            for (j=0; j<h0; j++)
+              memset(temp + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
+
+          get_rect(_width, _height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
+        }
+
+        /* dispose = previous */
+        if (n > first)
+          get_rect(_width, _height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
+
+        op_min = _op[0].size;
+        op_best = 0;
+        for (j=1; j<6; j++)
+        {
+          if (_op[j].size < op_min && _op[j].valid)
+          {
+            op_min = _op[j].size;
+            op_best = j;
+          }
+        }
+
+        dop = op_best >> 1;
+
+        fctl.mSeq       = swap32(_next_seq_num++);
+        fctl.mWidth     = swap32(w0);
+        fctl.mHeight    = swap32(h0);
+        fctl.mXOffset   = swap32(x0);
+        fctl.mYOffset   = swap32(y0);
+        fctl.mDelayNum  = swap16(_frames[n]._delayNum);
+        fctl.mDelayDen  = swap16(_frames[n]._delayDen);
+        fctl.mDisposeOp = dop;
+        fctl.mBlendOp   = bop;
+        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
+
+        write_IDATs(f, n, zbuf, zsize, idat_size);
+
+        /* process apng dispose - begin */
+        if (dop == 1)
+        {
+          if (coltype == 2)
+            for (j=0; j<h0; j++)
+              for (k=0; k<w0; k++)
+                memcpy(_frames[n]._pixels + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
+          else
+            for (j=0; j<h0; j++)
+              memset(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
+        }
+        else
+        if (dop == 2)
+        {
+          for (j=0; j<h0; j++)
+            memcpy(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*_width + x0)*bpp, w0*bpp);
+        }
+        /* process apng dispose - end */
+
+        x0 = _op[op_best].x;
+        y0 = _op[op_best].y;
+        w0 = _op[op_best].w;
+        h0 = _op[op_best].h;
+        bop = op_best & 1;
+
+        deflate_rect_fin(zbuf, &zsize, bpp, rowbytes, rows, zbuf_size, op_best);
+      }
+
+      if (_frames.size() > 1)
+      {
+        fctl.mSeq       = swap32(_next_seq_num++);
+        fctl.mWidth     = swap32(w0);
+        fctl.mHeight    = swap32(h0);
+        fctl.mXOffset   = swap32(x0);
+        fctl.mYOffset   = swap32(y0);
+        fctl.mDelayNum  = swap16(_frames[_frames.size()-1]._delayNum);
+        fctl.mDelayDen  = swap16(_frames[_frames.size()-1]._delayDen);
+        fctl.mDisposeOp = 0;
+        fctl.mBlendOp   = bop;
+        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
+      }
+
+      write_IDATs(f, _frames.size()-1, zbuf, zsize, idat_size);
+
+      write_chunk(f, "tEXt", png_Software, 27);
+      write_chunk(f, "IEND", 0, 0);
+      fclose(f);
+
+      free(zbuf);
+      free(_op_zbuf1);
+      free(_op_zbuf2);
+      free(_row_buf);
+      free(_sub_row);
+      free(_up_row);
+      free(_avg_row);
+      free(_paeth_row);
+    }
+    else
+      return false;
+
+    free(temp);
+    free(over1);
+    free(over2);
+    free(over3);
+    free(rows);
+
+    return true;
+  }
+
+  void APNGAsm::process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows)
+  {
+    int i, j, v;
+    int a, b, c, pa, pb, pc, p;
+    unsigned char * prev = NULL;
+    unsigned char * dp  = rows;
+    unsigned char * out;
+
+    for (j=0; j<h; j++)
+    {
+      unsigned int    sum = 0;
+      unsigned char * best_row = _row_buf;
+      unsigned int    mins = ((unsigned int)(-1)) >> 1;
+
+      out = _row_buf+1;
+      for (i=0; i<rowbytes; i++)
+      {
+        v = out[i] = row[i];
+        sum += (v < 128) ? v : 256 - v;
+      }
+      mins = sum;
+
+      sum = 0;
+      out = _sub_row+1;
+      for (i=0; i<bpp; i++)
+      {
+        v = out[i] = row[i];
+        sum += (v < 128) ? v : 256 - v;
+      }
+      for (i=bpp; i<rowbytes; i++)
+      {
+        v = out[i] = row[i] - row[i-bpp];
+        sum += (v < 128) ? v : 256 - v;
+        if (sum > mins) break;
+      }
+      if (sum < mins)
+      {
+        mins = sum;
+        best_row = _sub_row;
+      }
+
+      if (prev)
+      {
+        sum = 0;
+        out = _up_row+1;
+        for (i=0; i<rowbytes; i++)
+        {
+          v = out[i] = row[i] - prev[i];
+          sum += (v < 128) ? v : 256 - v;
+          if (sum > mins) break;
+        }
+        if (sum < mins)
+        {
+          mins = sum;
+          best_row = _up_row;
+        }
+
+        sum = 0;
+        out = _avg_row+1;
+        for (i=0; i<bpp; i++)
+        {
+          v = out[i] = row[i] - prev[i]/2;
+          sum += (v < 128) ? v : 256 - v;
+        }
+        for (i=bpp; i<rowbytes; i++)
+        {
+          v = out[i] = row[i] - (prev[i] + row[i-bpp])/2;
+          sum += (v < 128) ? v : 256 - v;
+          if (sum > mins) break;
+        }
+        if (sum < mins)
+        {
+          mins = sum;
+          best_row = _avg_row;
+        }
+
+        sum = 0;
+        out = _paeth_row+1;
+        for (i=0; i<bpp; i++)
+        {
+          v = out[i] = row[i] - prev[i];
+          sum += (v < 128) ? v : 256 - v;
+        }
+        for (i=bpp; i<rowbytes; i++)
+        {
+          a = row[i-bpp];
+          b = prev[i];
+          c = prev[i-bpp];
+          p = b - c;
+          pc = a - c;
+          pa = abs(p);
+          pb = abs(pc);
+          pc = abs(p + pc);
+          p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+          v = out[i] = row[i] - p;
+          sum += (v < 128) ? v : 256 - v;
+          if (sum > mins) break;
+        }
+        if (sum < mins)
+        {
+          best_row = _paeth_row;
+        }
+      }
+
+      if (rows == NULL)
+      {
+        // deflate_rect_op()
+        _op_zstream1.next_in = _row_buf;
+        _op_zstream1.avail_in = rowbytes + 1;
+        deflate(&_op_zstream1, Z_NO_FLUSH);
+
+        _op_zstream2.next_in = best_row;
+        _op_zstream2.avail_in = rowbytes + 1;
+        deflate(&_op_zstream2, Z_NO_FLUSH);
+      }
+      else
+      {
+        // deflate_rect_fin()
+        memcpy(dp, best_row, rowbytes+1);
+        dp += rowbytes+1;
+      }
+
+      prev = row;
+      row += stride;
+    }
+  }
+
+  void APNGAsm::deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n)
+  {
+    unsigned char * row  = _op[n].p + _op[n].y*stride + _op[n].x*bpp;
+    int rowbytes = _op[n].w*bpp;
+
+    if (_op[n].filters == 0)
+    {
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
+      unsigned char * dp  = rows;
+      for (int j=0; j<_op[n].h; j++)
+      {
+        *dp++ = 0;
+        memcpy(dp, row, rowbytes);
+        dp += rowbytes;
+        row += stride;
+      }
+    }
+    else
+    {
+      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
+      process_rect(row, rowbytes, bpp, stride, _op[n].h, rows);
+    }
+
+    _fin_zstream.next_out = zbuf;
+    _fin_zstream.avail_out = zbuf_size;
+    _fin_zstream.next_in = rows;
+    _fin_zstream.avail_in = _op[n].h*(rowbytes + 1);
+    deflate(&_fin_zstream, Z_FINISH);
+    *zsize = _fin_zstream.total_out;
+    deflateReset(&_fin_zstream);
+  }
+
+  void APNGAsm::deflate_rect_op(unsigned char *pdata, int x, int y, int w, int h, int bpp, int stride, int zbuf_size, int n)
+  {
+    unsigned char * row  = pdata + y*stride + x*bpp;
+    int rowbytes = w * bpp;
+
+    _op_zstream1.data_type = Z_BINARY;
+    _op_zstream1.next_out = _op_zbuf1;
+    _op_zstream1.avail_out = zbuf_size;
+
+    _op_zstream2.data_type = Z_BINARY;
+    _op_zstream2.next_out = _op_zbuf2;
+    _op_zstream2.avail_out = zbuf_size;
+
+    process_rect(row, rowbytes, bpp, stride, h, NULL);
+
+    deflate(&_op_zstream1, Z_FINISH);
+    deflate(&_op_zstream2, Z_FINISH);
+    _op[n].p = pdata;
+    if (_op_zstream1.total_out < _op_zstream2.total_out)
+    {
+      _op[n].size = _op_zstream1.total_out;
+      _op[n].filters = 0;
+    }
+    else
+    {
+      _op[n].size = _op_zstream2.total_out;
+      _op[n].filters = 1;
+    }
+    _op[n].x = x;
+    _op[n].y = y;
+    _op[n].w = w;
+    _op[n].h = h;
+    _op[n].valid = 1;
+    deflateReset(&_op_zstream1);
+    deflateReset(&_op_zstream2);
+  }
+
+  void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
+  {
+    unsigned int   i, j, x0, y0, w0, h0;
+    unsigned int   x_min = w-1;
+    unsigned int   y_min = h-1;
+    unsigned int   x_max = 0;
+    unsigned int   y_max = 0;
+    unsigned int   diffnum = 0;
+    unsigned int   over_is_possible = 1;
+
+    if (!has_tcolor)
+      over_is_possible = 0;
+
+    if (bpp == 1)
+    {
+      unsigned char *pa = pimage1;
+      unsigned char *pb = pimage2;
+      unsigned char *pc = ptemp;
+
+      for (j=0; j<h; j++)
+      for (i=0; i<w; i++)
+      {
+        unsigned char c = *pb++;
+        if (*pa++ != c)
+        {
+          diffnum++;
+          if (has_tcolor && c == tcolor) over_is_possible = 0;
+          if (i<x_min) x_min = i;
+          if (i>x_max) x_max = i;
+          if (j<y_min) y_min = j;
+          if (j>y_max) y_max = j;
+        }
+        else
+          c = tcolor;
+
+        *pc++ = c;
+      }
+    }
+    else
+    if (bpp == 2)
+    {
+      unsigned short *pa = (unsigned short *)pimage1;
+      unsigned short *pb = (unsigned short *)pimage2;
+      unsigned short *pc = (unsigned short *)ptemp;
+
+      for (j=0; j<h; j++)
+      for (i=0; i<w; i++)
+      {
+        unsigned int c1 = *pa++;
+        unsigned int c2 = *pb++;
+        if ((c1 != c2) && ((c1>>8) || (c2>>8)))
+        {
+          diffnum++;
+          if ((c2 >> 8) != 0xFF) over_is_possible = 0;
+          if (i<x_min) x_min = i;
+          if (i>x_max) x_max = i;
+          if (j<y_min) y_min = j;
+          if (j>y_max) y_max = j;
+        }
+        else
+          c2 = 0;
+
+        *pc++ = c2;
+      }
+    }
+    else
+    if (bpp == 3)
+    {
+      unsigned char *pa = pimage1;
+      unsigned char *pb = pimage2;
+      unsigned char *pc = ptemp;
+
+      for (j=0; j<h; j++)
+      for (i=0; i<w; i++)
+      {
+        unsigned int c1 = (pa[2]<<16) + (pa[1]<<8) + pa[0];
+        unsigned int c2 = (pb[2]<<16) + (pb[1]<<8) + pb[0];
+        if (c1 != c2)
+        {
+          diffnum++;
+          if (has_tcolor && c2 == tcolor) over_is_possible = 0;
+          if (i<x_min) x_min = i;
+          if (i>x_max) x_max = i;
+          if (j<y_min) y_min = j;
+          if (j>y_max) y_max = j;
+        }
+        else
+          c2 = tcolor;
+
+        memcpy(pc, &c2, 3);
+        pa += 3;
+        pb += 3;
+        pc += 3;
+      }
+    }
+    else
+    if (bpp == 4)
+    {
+      unsigned int *pa = (unsigned int *)pimage1;
+      unsigned int *pb = (unsigned int *)pimage2;
+      unsigned int *pc = (unsigned int *)ptemp;
+
+      for (j=0; j<h; j++)
+      for (i=0; i<w; i++)
+      {
+        unsigned int c1 = *pa++;
+        unsigned int c2 = *pb++;
+        if ((c1 != c2) && ((c1>>24) || (c2>>24)))
+        {
+          diffnum++;
+          if ((c2 >> 24) != 0xFF) over_is_possible = 0;
+          if (i<x_min) x_min = i;
+          if (i>x_max) x_max = i;
+          if (j<y_min) y_min = j;
+          if (j>y_max) y_max = j;
+        }
+        else
+          c2 = 0;
+
+        *pc++ = c2;
+      }
+    }
+
+    if (diffnum == 0)
+    {
+      x0 = y0 = 0;
+      w0 = h0 = 1;
+    }
+    else
+    {
+      x0 = x_min;
+      y0 = y_min;
+      w0 = x_max-x_min+1;
+      h0 = y_max-y_min+1;
+    }
+
+    deflate_rect_op(pimage2, x0, y0, w0, h0, bpp, stride, zbuf_size, n*2);
+
+    if (over_is_possible)
+      deflate_rect_op(ptemp, x0, y0, w0, h0, bpp, stride, zbuf_size, n*2+1);
+  }
+
+  void APNGAsm::write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length)
+  {
+    unsigned int crc = crc32(0, Z_NULL, 0);
+    unsigned int len = swap32(length);
+
+    fwrite(&len, 1, 4, f);
+    fwrite(name, 1, 4, f);
+    crc = crc32(crc, (const Bytef *)name, 4);
+
+    if (memcmp(name, "fdAT", 4) == 0)
+    {
+      unsigned int seq = swap32(_next_seq_num++);
+      fwrite(&seq, 1, 4, f);
+      crc = crc32(crc, (const Bytef *)(&seq), 4);
+      length -= 4;
+    }
+
+    if (data != NULL && length > 0)
+    {
+      fwrite(data, 1, length, f);
+      crc = crc32(crc, data, length);
+    }
+
+    crc = swap32(crc);
+    fwrite(&crc, 1, 4, f);
+  }
+
+  void APNGAsm::write_IDATs(FILE * f, int n, unsigned char * data, unsigned int length, unsigned int idat_size)
+  {
+    unsigned int z_cmf = data[0];
+    if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
+    {
+      if (length >= 2)
+      {
+        unsigned int z_cinfo = z_cmf >> 4;
+        unsigned int half_z_window_size = 1 << (z_cinfo + 7);
+        while (idat_size <= half_z_window_size && half_z_window_size >= 256)
+        {
+          z_cinfo--;
+          half_z_window_size >>= 1;
+        }
+        z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
+        if (data[0] != (unsigned char)z_cmf)
+        {
+          data[0] = (unsigned char)z_cmf;
+          data[1] &= 0xe0;
+          data[1] += (unsigned char)(0x1f - ((z_cmf << 8) + data[1]) % 0x1f);
+        }
+      }
+    }
+
+    while (length > 0)
+    {
+      unsigned int ds = length;
+      if (ds > 32768)
+        ds = 32768;
+
+      if (n == 0)
+        write_chunk(f, "IDAT", data, ds);
+      else
+        write_chunk(f, "fdAT", data, ds+4);
+
+      data += ds;
+      length -= ds;
+    }
+  }
+#endif
+
+#ifdef APNG_READ_SUPPORTED
+  void info_fn(png_structp png_ptr, png_infop info_ptr)
+  {
+    png_set_expand(png_ptr);
+    png_set_strip_16(png_ptr);
+    png_set_gray_to_rgb(png_ptr);
+    png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
+    (void)png_set_interlace_handling(png_ptr);
+    png_read_update_info(png_ptr, info_ptr);
+  }
+
+  void row_fn(png_structp png_ptr, png_bytep new_row, png_uint_32 row_num, int pass)
+  {
+    APNGFrame * frame = (APNGFrame *)png_get_progressive_ptr(png_ptr);
+    png_progressive_combine_row(png_ptr, frame->_rows[row_num], new_row);
+  }
+
+  const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
+  {
+    unsigned int   i, j, id;
+    unsigned int   w, h;
+    unsigned int * pi;
+    unsigned char  header[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+    unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
+    CHUNK chunk_ihdr;
+    CHUNK chunk;
+
+    reset();
+
+    FILE * f;
+    if ((f = fopen(filePath.c_str(), "rb")) != 0)
+    {
+      unsigned char sig[8];
+      unsigned int  w0, h0, x0, y0;
+      unsigned int  delay_num, delay_den, dop, bop, rowbytes, imagesize;
+      unsigned int  flag_actl = 0;
+      unsigned int  flag_fctl = 0;
+      unsigned int  flag_idat = 0;
+      unsigned int  flag_info = 0;
+      unsigned int  num_frames = 1;
+
+      if (fread(sig, 1, 8, f) == 8 && memcmp(sig, header, 8) == 0)
+      {
+        id = read_chunk(f, &chunk_ihdr);
+
+        if (id == id_IHDR && chunk_ihdr.size == 25)
+        {
+          pi = (unsigned int *)chunk_ihdr.p;
+          w0 = w = swap32(pi[2]);
+          h0 = h = swap32(pi[3]);
+          x0 = 0;
+          y0 = 0;
+          delay_num = 1;
+          delay_den = 10;
+          dop = 0;
+          bop = 0;
+          rowbytes = w * 4;
+          imagesize = h * rowbytes;
+
+          APNGFrame frameRaw;
+          APNGFrame frameCur;
+          APNGFrame frameNext;
+
+          frameRaw._pixels = new unsigned char[imagesize];
+          frameRaw._rows = new png_bytep[h * sizeof(png_bytep)];
+          for (j=0; j<h; ++j)
+            frameRaw._rows[j] = frameRaw._pixels + j * rowbytes;
+
+          frameCur._width = w;
+          frameCur._height = h;
+          frameCur._colorType = 6;
+          frameCur._pixels = new unsigned char[imagesize];
+          frameCur._rows = new png_bytep[h * sizeof(png_bytep)];
+          for (j=0; j<h; ++j)
+            frameCur._rows[j] = frameCur._pixels + j * rowbytes;
+
+          png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+          png_infop   info_ptr = png_create_info_struct(png_ptr);
+          setjmp(png_jmpbuf(png_ptr));
+          png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
+          png_process_data(png_ptr, info_ptr, &header[0], 8);
+          png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
+          flag_info = 0;
+
+          while ( !feof(f) )
+          {
+            id = read_chunk(f, &chunk);
+            pi = (unsigned int *)chunk.p;
+
+            if (id == id_acTL)
+            {
+              flag_actl = 1;
+              num_frames = swap32(pi[2]);
+              delete[] chunk.p;
+            }
+            else
+            if (id == id_fcTL)
+            {
+              if (flag_fctl)
+              {
+                png_process_data(png_ptr, info_ptr, &footer[0], 12);
+                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+                frameNext._pixels = new unsigned char[imagesize];
+                frameNext._rows = new png_bytep[h * sizeof(png_bytep)];
+                for (j=0; j<h; ++j)
+                  frameNext._rows[j] = frameNext._pixels + j * rowbytes;
+
+                if (dop == 2)
+                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
+
+                compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
+                frameCur._delayNum = delay_num;
+                frameCur._delayDen = delay_den;
+                _frames.push_back(frameCur);
+
+                if (dop != 2)
+                {
+                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
+                  if (dop == 1)
+                    for (j=0; j<h0; j++)
+                      memset(frameNext._rows[y0 + j] + x0*4, 0, w0*4);
+                }
+                frameCur._pixels = frameNext._pixels;
+                frameCur._rows = frameNext._rows;
+
+                memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
+                recalc_crc(chunk_ihdr.p, chunk_ihdr.size);
+
+                png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+                info_ptr = png_create_info_struct(png_ptr);
+                setjmp(png_jmpbuf(png_ptr));
+                png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
+                png_process_data(png_ptr, info_ptr, &header[0], 8);
+                png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
+                flag_info = 0;
+              }
+
+              w0 = swap32(pi[3]);
+              h0 = swap32(pi[4]);
+              x0 = swap32(pi[5]);
+              y0 = swap32(pi[6]);
+              delay_num = chunk.p[28]*256 + chunk.p[29];
+              delay_den = chunk.p[30]*256 + chunk.p[31];
+              dop = chunk.p[32];
+              bop = chunk.p[33];
+              if (!flag_fctl)
+              {
+                bop = 0;
+                if (dop == 2)
+                  dop = 1;
+              }
+              flag_fctl = 1;
+              delete[] chunk.p;
+            }
+            else
+            if (id == id_IDAT)
+            {
+              flag_idat = 1;
+              if (flag_fctl || !flag_actl)
+              {
+                if (!flag_info)
+                {
+                  flag_info = 1;
+                  for (i=0; i<_info_chunks.size(); ++i)
+                    png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
+                }
+                png_process_data(png_ptr, info_ptr, chunk.p, chunk.size);
+              }
+              delete[] chunk.p;
+            }
+            else
+            if (id == id_fdAT)
+            {
+              flag_idat = 1;
+              if (!flag_info)
+              {
+                flag_info = 1;
+                for (i=0; i<_info_chunks.size(); ++i)
+                  png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
+              }
+              pi[1] = swap32(chunk.size - 16);
+              pi[2] = id_IDAT;
+              recalc_crc(chunk.p + 4, chunk.size - 4);
+              png_process_data(png_ptr, info_ptr, chunk.p + 4, chunk.size - 4);
+              delete[] chunk.p;
+            }
+            else
+            if (id == id_IEND)
+            {
+              png_process_data(png_ptr, info_ptr, &footer[0], 12);
+
+              compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
+              frameCur._delayNum = delay_num;
+              frameCur._delayDen = delay_den;
+              _frames.push_back(frameCur);
+              delete[] chunk.p;
+              break;
+            }
+            else
+            if (notabc(chunk.p[4]) || notabc(chunk.p[5]) || notabc(chunk.p[6]) || notabc(chunk.p[7]))
+            {
+              delete[] chunk.p;
+              break;
+            }
+            else
+            {
+              if (!flag_idat)
+                _info_chunks.push_back(chunk);
+              else
+                delete[] chunk.p;
+            }
+          }
+          delete[] frameRaw._rows;
+          delete[] frameRaw._pixels;
+          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        }
+      }
+      fclose(f);
+
+      for (i=0; i<_info_chunks.size(); ++i)
+        delete[] _info_chunks[i].p;
+
+      _info_chunks.clear();
+
+      delete[] chunk_ihdr.p;
+    }
+    return _frames;
+  }
+
+  void APNGAsm::compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+  {
+    unsigned int  i, j;
+    int u, v, al;
+
+    for (j=0; j<h; j++)
+    {
+      unsigned char * sp = rows_src[j];
+      unsigned char * dp = rows_dst[j+y] + x*4;
+
+      if (bop == 0)
+        memcpy(dp, sp, w*4);
+      else
+      for (i=0; i<w; i++, sp+=4, dp+=4)
+      {
+        if (sp[3] == 255)
+          memcpy(dp, sp, 4);
+        else
+        if (sp[3] != 0)
+        {
+          if (dp[3] != 0)
+          {
+            u = sp[3]*255;
+            v = (255-sp[3])*dp[3];
+            al = 255*255-(255-sp[3])*(255-dp[3]);
+            dp[0] = (sp[0]*u + dp[0]*v)/al;
+            dp[1] = (sp[1]*u + dp[1]*v)/al;
+            dp[2] = (sp[2]*u + dp[2]*v)/al;
+            dp[3] = al/255;
+          }
+          else
+            memcpy(dp, sp, 4);
+        }
+      }
+    }
+  }
+
+  unsigned int APNGAsm::read_chunk(FILE * f, CHUNK * pChunk)
+  {
+    unsigned int len;
+    if (fread(&len, 4, 1, f) == 1)
+    {
+      pChunk->size = swap32(len) + 12;
+      pChunk->p = new unsigned char[pChunk->size];
+      unsigned int * pi = (unsigned int *)pChunk->p;
+      pi[0] = len;
+      if (fread(pChunk->p + 4, pChunk->size - 4, 1, f) == 1)
+        return pi[1];
+    }
+    return 0;
+  }
+
+  void APNGAsm::recalc_crc(unsigned char * p, unsigned int size)
+  {
+    unsigned int crc = crc32(0, Z_NULL, 0);
+    crc = crc32(crc, p + 4, size - 8);
+    crc = swap32(crc);
+    memcpy(p + size - 4, &crc, 4);
+  }
+
+  // Save png files.
+  bool APNGAsm::savePNGs(const std::string& outputDir) const
+  {
+    const int count = _frames.size();
+    for(int i = 0;  i < count;  ++i)
+    {
+      const std::string outputPath = _pListener->onCreatePngPath(outputDir, i);
+
+      if( !_pListener->onPreSave(outputPath) )
+        return false;
+
+      if( !_frames[i].save(outputPath) )
+        return false;
+
+      _pListener->onPostSave(outputPath);
+    }
+    return true;
+  }
+#endif
 
 } // namespace apngasm
