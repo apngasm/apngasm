@@ -1,5 +1,6 @@
 #include "apngasm.h"
 #include <iostream>
+#include <cstdlib>
 
 #define RES 100
 
@@ -43,17 +44,19 @@ int main(int argc, char* argv[])
   assembler.addFrame("gold02.png", 15, 100);
   assembler.addFrame("gold03.png", 15, 100);
   assembler.assemble("out/gold_anim.png");
+  assembler.assemble("out/gold_anim2.png");
   std::cout << "frames=" << assembler.frameCount() << std::endl;
-  std::cout << "Test 2 - finish" << std::endl;
+  std::cout << "Test 1 - finish" << std::endl;
 
   assembler.reset();
 
-  std::cout << "Test 1 - start" << std::endl;
+  std::cout << "Test 2 - start" << std::endl;
   assembler.addFrame("clock1.png", 1, 1);
   assembler.addFrame("clock2.png", 1, 1);
   assembler.addFrame("clock3.png", 1, 1);
   assembler.addFrame("clock4.png", 1, 1);
   assembler.assemble("out/clock_anim.png");
+  assembler.assemble("out/clock_anim2.png");
   std::cout << "frames=" << assembler.frameCount() << std::endl;
   std::cout << "Test 2 - finish" << std::endl;
 
@@ -63,6 +66,8 @@ int main(int argc, char* argv[])
   std::vector<apngasm::APNGFrame> frames = assembler.disassemble("penguins.png");
   std::cout << frames.size() << " Frames" << std::endl;
   assembler.savePNGs("out");
+  assembler.saveJson("out/penguins.json", "out");
+  assembler.saveXml("out/penguins.xml", "out");
   std::cout << "Test 3 - finish" << std::endl;
 
   assembler.reset();
@@ -95,6 +100,7 @@ int main(int argc, char* argv[])
     assembler.addFrame(frame4);
 
     assembler.assemble("out/circle_anim.png");
+    assembler.assemble("out/circle_anim2.png");
 
     free(pData);
   }
