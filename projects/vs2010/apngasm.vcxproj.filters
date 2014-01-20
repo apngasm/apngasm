@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\apngasm.cpp" />
+    <ClCompile Include="..\..\src\apngframe.cpp" />
+    <ClCompile Include="..\..\src\listener\apngasmlistener.cpp">
+      <Filter>listener</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\apngasm.h" />
+    <ClInclude Include="..\..\src\apngasm-conf.h" />
+    <ClInclude Include="..\..\src\apngasm-version.h" />
+    <ClInclude Include="..\..\src\apngframe.h" />
+    <ClInclude Include="..\..\src\listener\apngasmlistener.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="listener">
+      <UniqueIdentifier>{74a6bbf6-7578-49bf-b3a6-9453c9f2ba74}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
