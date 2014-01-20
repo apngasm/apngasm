@@ -119,8 +119,8 @@ namespace apngasm {
   {
     if( _pListener->onPreAddFrame(filePath, delayNum, delayDen) )
     {
-    	APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
-    	_frames.push_back(frame);
+      APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
+      _frames.push_back(frame);
       _pListener->onPostAddFrame(filePath, delayNum, delayDen);
     }
     return _frames.size();
@@ -342,6 +342,7 @@ namespace apngasm {
         }
         delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+        _frames[n]._colorType = coltype;
 
         for (j=0; j<_frames[n]._height; ++j)
           _frames[n]._rows[j] = dst + j * _frames[n]._width * 4;
@@ -360,6 +361,7 @@ namespace apngasm {
         }
         delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+        _frames[n]._colorType = coltype;
 
         for (j=0; j<_frames[n]._height; ++j)
           _frames[n]._rows[j] = dst + j * _frames[n]._width * 2;
@@ -379,6 +381,7 @@ namespace apngasm {
         }
         delete[] _frames[n]._pixels;
         _frames[n]._pixels = dst;
+        _frames[n]._colorType = coltype;
 
         for (j=0; j<_frames[n]._height; ++j)
           _frames[n]._rows[j] = dst + j * _frames[n]._width * 3;
@@ -1055,6 +1058,20 @@ namespace apngasm {
         }
       }
     }
+
+    for (size_t n = 0; n < _frames.size(); ++n)
+    {
+      _frames[n]._colorType = coltype;
+      _frames[n]._paletteSize = _palsize;
+      _frames[n]._transparencySize = _trnssize;
+
+      if (_palsize != 0)
+        memcpy(_frames[n]._palette, _palette, _palsize);
+
+      if (_trnssize != 0)
+        memcpy(_frames[n]._transparency, _trns, _trnssize);
+    }
+
     return coltype;
   }
 
