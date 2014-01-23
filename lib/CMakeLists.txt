@@ -1,6 +1,7 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
 # shared library and sources
 ADD_LIBRARY(apngasm SHARED
-#ADD_LIBRARY(apngasm-static STATIC
   ${APNGASM_SOURCE_DIR}/src/apngasm.cpp
   ${APNGASM_SOURCE_DIR}/src/apngframe.cpp
   ${APNGASM_SOURCE_DIR}/src/spec/specreader.cpp
@@ -22,8 +23,6 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS regex filesystem system)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})
 
-SET(CPACK_OUTPUT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake")
-SET(CPACK_DEB_COMPONENT_INSTALL ON)
 INSTALL(TARGETS apngasm
 	LIBRARY DESTINATION lib
 	COMPONENT libraries)
@@ -31,7 +30,6 @@ INSTALL(TARGETS apngasm
 INSTALL(FILES ../src/apngasm.h ../src/apngframe.h ../src/apngasm-version.h
 	DESTINATION include
 	COMPONENT headers)
-
 
 ##CPack definitions for package creation
 INCLUDE(InstallRequiredSystemLibraries)
@@ -44,7 +42,7 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../DESCRIPTION.t
 SET(CPACK_PACKAGE_LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
 SET(CPACK_PACKAGE_CONTACT "zero@genshin.org")
 SET(CPACK_PACKAGE_FILE_NAME "libapngasm_${VERSION}")
-SET(CPACK_COMPONENTS_ALL libraries headers)
+SET(CPACK_COMPONENTS libraries headers)
 
 IF(UNIX)
 	SET(CPACK_GENERATOR "DEB")
