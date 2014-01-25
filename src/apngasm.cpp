@@ -913,8 +913,10 @@ namespace apngasm {
         col[c].r = _frames[0]._palette[c].r;
         col[c].g = _frames[0]._palette[c].g;
         col[c].b = _frames[0]._palette[c].b;
-        col[c].a = _frames[0]._transparency[c];
       }
+
+      for (int c=0; c<_frames[0]._transparencySize; c++)
+        col[c].a = _frames[0]._transparency[c];
 
       for (size_t n = 0; n < _frames.size(); ++n)
       {
@@ -1070,11 +1072,20 @@ namespace apngasm {
       _frames[n]._paletteSize = _palsize;
       _frames[n]._transparencySize = _trnssize;
 
-      if (_palsize != 0)
-        memcpy(_frames[n]._palette, _palette, _palsize);
+      memcpy(_frames[n]._palette, _palette, 256 * 3);
+      memcpy(_frames[n]._transparency, _trns, 256);
 
-      if (_trnssize != 0)
-        memcpy(_frames[n]._transparency, _trns, _trnssize);
+      if (coltype == 0 || coltype == 3)
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = _frames[n]._pixels + j * _frames[n]._width;
+      else
+      if (coltype == 2)
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = _frames[n]._pixels + j * _frames[n]._width * 3;
+      else
+      if (coltype == 4)
+        for (j=0; j<_frames[n]._height; ++j)
+          _frames[n]._rows[j] = _frames[n]._pixels + j * _frames[n]._width * 2;
     }
 
     return coltype;
@@ -1092,7 +1103,7 @@ namespace apngasm {
     unsigned char   png_sign[8] = {137,  80,  78,  71,  13,  10,  26,  10};
     unsigned char   png_Software[27] = { 83, 111, 102, 116, 119, 97, 114, 101, '\0',
                                          65,  80,  78,  71,  32, 65, 115, 115, 101,
-                                        109,  98, 108, 101, 114, 32,  50,  46,  56};
+                                        109,  98, 108, 101, 114, 32,  51,  46,  48};
 
     unsigned int bpp = 1;
     if (coltype == 2)
@@ -1145,6 +1156,7 @@ namespace apngasm {
     unsigned char * over1 = new unsigned char[imagesize];
     unsigned char * over2 = new unsigned char[imagesize];
     unsigned char * over3 = new unsigned char[imagesize];
+    unsigned char * prev  = new unsigned char[imagesize];
     unsigned char * rows  = new unsigned char[(rowbytes + 1) * _height];
 
     if ((f = fopen(outputPath.c_str(), "wb")) != 0)
@@ -1281,7 +1293,7 @@ namespace apngasm {
 
         /* dispose = previous */
         if (n > first)
-          get_rect(_width, _height, _frames[n-1]._pixels, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
+          get_rect(_width, _height, prev, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
 
         op_min = _op[0].size;
         op_best = 0;
@@ -1310,21 +1322,18 @@ namespace apngasm {
         write_IDATs(f, n, zbuf, zsize, idat_size);
 
         /* process apng dispose - begin */
+        if (dop != 2)
+          memcpy(prev, _frames[n]._pixels, imagesize);
+
         if (dop == 1)
         {
           if (coltype == 2)
             for (j=0; j<h0; j++)
               for (k=0; k<w0; k++)
-                memcpy(_frames[n]._pixels + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
+                memcpy(prev + ((j+y0)*_width + (k+x0))*3, &tcolor, 3);
           else
             for (j=0; j<h0; j++)
-              memset(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
-        }
-        else
-        if (dop == 2)
-        {
-          for (j=0; j<h0; j++)
-            memcpy(_frames[n]._pixels + ((j+y0)*_width + x0)*bpp, _frames[n-1]._pixels + ((j+y0)*_width + x0)*bpp, w0*bpp);
+              memset(prev + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
         }
         /* process apng dispose - end */
 
@@ -1373,6 +1382,7 @@ namespace apngasm {
     delete[] over1;
     delete[] over2;
     delete[] over3;
+    delete[] prev;
     delete[] rows;
 
     return true;
