@@ -297,7 +297,33 @@ namespace apngasm {
       {
         png_init_io(png_ptr, f);
         png_set_compression_level(png_ptr, 9);
-        png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, 6, 0, 0, 0);
+        png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, _colorType, 0, 0, 0);
+        if (_paletteSize > 0) 
+        {
+          png_color palette[PNG_MAX_PALETTE_LENGTH];
+          memcpy(palette, _palette, _paletteSize * 3);
+          png_set_PLTE(png_ptr, info_ptr, palette, _paletteSize);
+        }
+        if (_transparencySize > 0)
+        {
+          png_color_16  trans_color;
+          if (_colorType == PNG_COLOR_TYPE_GRAY)
+          {
+            trans_color.gray = _transparency[1];
+            png_set_tRNS(png_ptr, info_ptr, NULL, 0, &trans_color);
+          }
+          else
+          if (_colorType == PNG_COLOR_TYPE_RGB)
+          {
+            trans_color.red = _transparency[1];
+            trans_color.green = _transparency[3];
+            trans_color.blue = _transparency[5];
+            png_set_tRNS(png_ptr, info_ptr, NULL, 0, &trans_color);
+          }
+          else
+          if (_colorType == PNG_COLOR_TYPE_PALETTE)
+            png_set_tRNS(png_ptr, info_ptr, _transparency, _transparencySize, NULL);
+        }
         png_write_info(png_ptr, info_ptr);
         png_write_image(png_ptr, _rows);
         png_write_end(png_ptr, info_ptr);
