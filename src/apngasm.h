@@ -25,6 +25,8 @@ namespace apngasm {
 		//Construct APNGAsm object
 		APNGAsm(const std::vector<APNGFrame> &frames);
 
+		~APNGAsm(void);
+
 		//Adds a frame from a file
 		//Returns the frame number in the frame vector
 		//Uses default delay of 10ms if not specified

@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
   apngasm::APNGAsm assembler;
   std::cout << "Initializing assembler " << assembler.version() << std::endl;
 
+#ifdef APNG_WRITE_SUPPORTED
   std::cout << "Test 1 - start" << std::endl;
   assembler.addFrame("gold01.png", 15, 100);
   assembler.addFrame("gold02.png", 15, 100);
@@ -59,17 +60,23 @@ int main(int argc, char* argv[])
   assembler.assemble("out/clock_anim2.png");
   std::cout << "frames=" << assembler.frameCount() << std::endl;
   std::cout << "Test 2 - finish" << std::endl;
+#endif
 
+#ifdef APNG_READ_SUPPORTED
   assembler.reset();
 
   std::cout << "Test 3 - start" << std::endl;
   std::vector<apngasm::APNGFrame> frames = assembler.disassemble("penguins.png");
   std::cout << frames.size() << " Frames" << std::endl;
   assembler.savePNGs("out");
+#ifdef APNG_SPECS_SUPPORTED
   assembler.saveJson("out/penguins.json", "out");
   assembler.saveXml("out/penguins.xml", "out");
+#endif
   std::cout << "Test 3 - finish" << std::endl;
+#endif
 
+#ifdef APNG_WRITE_SUPPORTED
   assembler.reset();
 
   std::cout << "Test 4 - start" << std::endl;
@@ -105,6 +112,7 @@ int main(int argc, char* argv[])
     free(pData);
   }
   std::cout << "Test 4 - finish" << std::endl;
+#endif
 
   return 0;
 }
