@@ -322,7 +322,7 @@ namespace apngasm {
           }
           else
           if (_colorType == PNG_COLOR_TYPE_PALETTE)
-            png_set_tRNS(png_ptr, info_ptr, _transparency, _transparencySize, NULL);
+            png_set_tRNS(png_ptr, info_ptr, const_cast<unsigned char*>(_transparency), _transparencySize, NULL);
         }
         png_write_info(png_ptr, info_ptr);
         png_write_image(png_ptr, _rows);
