@@ -1,6 +1,9 @@
-assemble APNG animation from PNG image sequences
-Command line tool and libraries to create APNG files from
-individual PNG files or RGB[A] bitmap data with per-frame delay.
+C++ Library to assemble APNG animations from PNG image sequences
+or RGB+A data. apngasm can also be used to read and disassemble 
+PNG/APNG images.
+
+The apngasmasm library can be used alone or in conjuction with many
+popular image processing libraries.
   
 The Animated Portable Network Graphics (APNG) file format is an
 extension to the Portable Network Graphics (PNG) specification. It
