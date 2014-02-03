@@ -4,7 +4,7 @@
 cd `dirname $0`
 
 # Set variable.
-EXEC="../bin/apngasm"
+EXEC="../build/cli/apngasm"
 SPEC_FILE="../resources/images/test.json"
 OUT="./json_test.png"
 

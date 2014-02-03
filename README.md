@@ -15,19 +15,29 @@ Building on (Ubuntu/Debian) Linux:
 sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev
 ```
 
-2. Generate makefiles with cmake  
+2. Create temporary directory
 ```
-cmake ./
+mkdir build
 ```
 
-3. Make  
+3. Move current directory
+```
+cd build
+```
+
+4. Generate makefiles with cmake  
+```
+cmake ../
+```
+
+5. Make  
 ```
 make
 ```
 
-4. [optional] Build packages
+6. [optional] Build packages
 ```
-make package
+make package-apngasm-all
 ```
 
 Building on OS-X (with homebrew):  
@@ -37,12 +47,22 @@ Building on OS-X (with homebrew):
 brew install cmake boost libpng lzlib
 ```
 
-2. Generate makefiles with cmake  
+2. Create temporary directory
 ```
-cmake ./
+mkdir build
 ```
 
-3. Make  
+3. Move current directory
+```
+cd build
+```
+
+4. Generate makefiles with cmake  
+```
+cmake ../
+```
+
+5. Make  
 ```
 make
 ```
