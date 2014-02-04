@@ -9,7 +9,7 @@ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/cli)
 
 # Create package command
 ADD_CUSTOM_TARGET(
-  package-apngasm-all
-  DEPENDS package-apngasm-lib package-apngasm-cli
+  package
+  DEPENDS package-lib package-cli
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )

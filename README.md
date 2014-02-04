@@ -37,7 +37,7 @@ make
 
 6. [optional] Build packages
 ```
-make package-apngasm-all
+make package
 ```
 
 Building on OS-X (with homebrew):  
