@@ -10,6 +10,8 @@ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/cli)
 # Create package command
 ADD_CUSTOM_TARGET(
   package
-  DEPENDS package-lib package-cli
+  COMMAND ${CMAKE_MAKE_PROGRAM}
+  COMMAND ${CMAKE_MAKE_PROGRAM} package-lib
+  COMMAND ${CMAKE_MAKE_PROGRAM} package-cli
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )
