@@ -1,15 +1,33 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+PROJECT(APNGASM_LIB)
+
+
+# Generate version header
+SET(APNGASM_LIB_VERSION_MAJOR 3)
+SET(APNGASM_LIB_VERSION_MINOR 0)
+SET(APNGASM_LIB_VERSION_PATCH 0)
+SET(APNGASM_LIB_VERSION "${APNGASM_LIB_VERSION_MAJOR}.${APNGASM_LIB_VERSION_MINOR}.${APNGASM_LIB_VERSION_PATCH}")
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/apngasm-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-version.h @ONLY)
+INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/manifest.txt.in ${PROJECT_BINARY_DIR}/manifest.txt @ONLY)
+
+
 # shared library and sources
 ADD_LIBRARY(apngasm SHARED
-#ADD_LIBRARY(apngasm-static STATIC
-	${APNGASM_SOURCE_DIR}/src/apngasm.cpp
-	${APNGASM_SOURCE_DIR}/src/apngframe.cpp
-  ${APNGASM_SOURCE_DIR}/src/spec/specreader.cpp
-  ${APNGASM_SOURCE_DIR}/src/spec/specwriter.cpp
-  ${APNGASM_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
-  ${APNGASM_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
-  ${APNGASM_SOURCE_DIR}/src/listener/apngasmlistener.cpp
+  ${PROJECT_SOURCE_DIR}/src/apngasm.cpp
+  ${PROJECT_SOURCE_DIR}/src/apngframe.cpp
+  ${PROJECT_SOURCE_DIR}/src/spec/specreader.cpp
+  ${PROJECT_SOURCE_DIR}/src/spec/specwriter.cpp
+  ${PROJECT_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
+  ${PROJECT_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
+  ${PROJECT_SOURCE_DIR}/src/listener/apngasmlistener.cpp
 )
 
+
+# Link libraries
 FIND_PACKAGE(PNG REQUIRED)
 INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR})
 TARGET_LINK_LIBRARIES(apngasm ${PNG_LIBRARY})
@@ -22,10 +40,17 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS regex filesystem system)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})
 
-INSTALL(TARGETS apngasm
-	LIBRARY DESTINATION lib
-	COMPONENT libraries)
 
-INSTALL(FILES ../src/apngasm.h ../src/apngframe.h ../src/apngasm-version.h
-	DESTINATION include
-	COMPONENT headers)
+# Create package command
+SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
+SET(INSTALL_HEADERS "${PROJECT_SOURCE_DIR}/src/apngasm.h ${PROJECT_SOURCE_DIR}/src/apngframe.h ${PROJECT_BINARY_DIR}/src/apngasm-version.h")
+GET_PROPERTY(INSTALL_LIBS TARGET apngasm PROPERTY LOCATION)
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
+
+ADD_CUSTOM_TARGET(
+  package-lib
+  COMMAND ${CMAKE_COMMAND} .
+  COMMAND ${CMAKE_MAKE_PROGRAM} package
+  WORKING_DIRECTORY ${PACKAGE_DIR}
+)

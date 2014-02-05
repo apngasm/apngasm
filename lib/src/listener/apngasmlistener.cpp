@@ -1,6 +1,5 @@
 #include "apngasmlistener.h"
 #include <sstream>
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
   namespace listener {
@@ -50,7 +49,7 @@ namespace apngasm {
     {
       std::ostringstream result;
       result  << outputDir
-              << ( (outputDir.empty() || boost::algorithm::iends_with(outputDir, "/")) ? "" : "/" )
+              << ( (outputDir.empty() || *outputDir.rbegin() == '/') ? "" : "/" )
               << index
               << ".png"
               ;

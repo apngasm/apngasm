@@ -151,7 +151,7 @@ namespace apngasm_cli {
 
 	void Options::putVersionTo(std::basic_ostream<char> &out) const
 	{
-		out << "APNG Assembler v" << APNGASM_VERSION
+		out << "APNG Assembler v" << apngasm::APNGASM_VERSION
 			<< " (frontend v" << CLI::VERSION << ")" << std::endl;
 	}
 

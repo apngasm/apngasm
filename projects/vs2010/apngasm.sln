@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "apngasm", "apngasm.vcxproj", "{F4EA44DE-B001-48E8-A2A3-6E8E042EF709}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "apngtest", "apngtest.vcxproj", "{4A9C618A-3937-4029-BB10-B0DA348A823C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4EA44DE-B001-48E8-A2A3-6E8E042EF709}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F4EA44DE-B001-48E8-A2A3-6E8E042EF709}.Debug|Win32.Build.0 = Debug|Win32
+		{F4EA44DE-B001-48E8-A2A3-6E8E042EF709}.Release|Win32.ActiveCfg = Release|Win32
+		{F4EA44DE-B001-48E8-A2A3-6E8E042EF709}.Release|Win32.Build.0 = Release|Win32
+		{4A9C618A-3937-4029-BB10-B0DA348A823C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A9C618A-3937-4029-BB10-B0DA348A823C}.Debug|Win32.Build.0 = Debug|Win32
+		{4A9C618A-3937-4029-BB10-B0DA348A823C}.Release|Win32.ActiveCfg = Release|Win32
+		{4A9C618A-3937-4029-BB10-B0DA348A823C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
