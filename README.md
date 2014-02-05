@@ -14,7 +14,7 @@ Building on (Ubuntu/Debian) Linux:
     ```
     sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev   libboost-filesystem-dev
     ```
-2. Generate makefiles with cmake  
+2. Generate Makefiles with CMake  
     ```
     mkdir build;
     cd build;
@@ -25,14 +25,14 @@ Building on (Ubuntu/Debian) Linux:
     make
     ```
 4. [optional] Build packages  
-  [recommended] Build separte lib and cli packages:
-    ```
-    make package-apngasm-all
-    ```
-  
-  [NOT recommended] Build an all-in-one package:
     ```
     make package
+    ```
+
+    Then install them:
+    ```
+    sudo dpkg -i ./lib/package/libapngasm*.deb
+    sudo dpkg -i ./cli/package/apngasm*.deb
     ```
 
 Building on OS-X (with homebrew):  
