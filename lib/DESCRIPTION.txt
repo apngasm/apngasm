@@ -1,0 +1,12 @@
+C++ Library to assemble APNG animations from PNG image sequences
+or RGB+A data. apngasm can also be used to read and disassemble 
+PNG/APNG images.
+
+The apngasmasm library can be used alone or in conjuction with many
+popular image processing libraries.
+  
+The Animated Portable Network Graphics (APNG) file format is an
+extension to the Portable Network Graphics (PNG) specification. It
+allows for animated PNG files that work similarly to animated GIF
+files, while retaining backward compatibility with non-animated PNG
+files and adding support for 8-bit transparency and 24-bit images.

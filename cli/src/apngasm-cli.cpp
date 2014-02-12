@@ -1,4 +1,4 @@
-#include "cli/cli.h"
+#include "cli.h"
 
 static void warn(const boost::program_options::error &e)
 {

@@ -99,6 +99,15 @@ namespace apngasm {
   }
 
   APNGFrame::APNGFrame(const std::string &filePath, unsigned delayNum, unsigned delayDen)
+    : _pixels(NULL)
+    , _width(0)
+    , _height(0)
+    , _colorType(0)
+    , _paletteSize(0)
+    , _transparencySize(0)
+    , _delayNum(delayNum)
+    , _delayDen(delayDen)
+    , _rows(NULL)
   {
   	//TODO save extracted info to self
     FILE * f;
@@ -114,15 +123,11 @@ namespace apngasm {
         info_ptr = png_create_info_struct(png_ptr);
         if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
         {
-          _delayNum = delayNum;
-          _delayDen = delayDen;
-
           png_byte       depth;
           png_uint_32    rowbytes, i;
           png_colorp     palette;
           png_color_16p  trans_color;
           png_bytep      trans_alpha;
-          png_bytepp     row_ptr = NULL;
 
           png_init_io(png_ptr, f);
           png_set_sig_bytes(png_ptr, 8);
@@ -187,19 +192,15 @@ namespace apngasm {
           else
             _transparencySize = 0;
 
-          _pixels = (unsigned char *)malloc(_height * rowbytes);
-          row_ptr  = (png_bytepp)malloc(_height * sizeof(png_bytep));
+          _pixels = new unsigned char[_height * rowbytes];
+          _rows = new png_bytep[_height * sizeof(png_bytep)];
 
-          if (_pixels != NULL && row_ptr != NULL)
-          {
-            for (i=0; i<_height; i++)
-              row_ptr[i] = _pixels + i*rowbytes;
-
-            png_read_image(png_ptr, row_ptr);
-            free(row_ptr);
-            png_read_end(png_ptr, NULL);
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-          }
+          for (i=0; i<_height; ++i)
+            _rows[i] = _pixels + i * rowbytes;
+          
+          png_read_image(png_ptr, _rows);
+          png_read_end(png_ptr, NULL);
+          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         }
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       }
@@ -207,14 +208,79 @@ namespace apngasm {
     }
   }
 
-  APNGFrame::APNGFrame(rgb *pixels, unsigned char tr[], unsigned delayNum, unsigned delayDen)
+  APNGFrame::APNGFrame(rgb *pixels, unsigned int width, unsigned int height, rgb *trns_color, unsigned delayNum, unsigned delayDen)
+    : _pixels(NULL)
+    , _width(0)
+    , _height(0)
+    , _colorType(0)
+    , _paletteSize(0)
+    , _transparencySize(0)
+    , _delayNum(delayNum)
+    , _delayDen(delayDen)
+    , _rows(NULL)
   {
-  	//TODO
+    memset(_palette, 0, sizeof(_palette));
+    memset(_transparency, 0, sizeof(_transparency));
+
+    if (pixels != NULL)
+    {
+      png_uint_32 rowbytes = width * 3;
+
+      _width = width;
+      _height = height;
+      _colorType = 2;
+
+      _pixels = new unsigned char[_height * rowbytes];
+      _rows = new png_bytep[_height * sizeof(png_bytep)];
+
+      memcpy(_pixels, pixels, _height * rowbytes);
+
+      for (unsigned int i=0; i<_height; ++i)
+        _rows[i] = _pixels + i * rowbytes;
+
+      if (trns_color != NULL)
+      {
+        _transparency[0] = 0;
+        _transparency[1] = trns_color->r;
+        _transparency[2] = 0;
+        _transparency[3] = trns_color->g;
+        _transparency[4] = 0;
+        _transparency[5] = trns_color->b;
+        _transparencySize = 6;
+      }
+    }
   }
 
-  APNGFrame::APNGFrame(rgba *pixels, unsigned delay_num, unsigned delay_den)
+  APNGFrame::APNGFrame(rgba *pixels, unsigned int width, unsigned int height, unsigned delayNum, unsigned delayDen)
+    : _pixels(NULL)
+    , _width(0)
+    , _height(0)
+    , _colorType(0)
+    , _paletteSize(0)
+    , _transparencySize(0)
+    , _delayNum(delayNum)
+    , _delayDen(delayDen)
+    , _rows(NULL)
   {
-  	//TODO
+    memset(_palette, 0, sizeof(_palette));
+    memset(_transparency, 0, sizeof(_transparency));
+
+    if (pixels != NULL)
+    {
+      png_uint_32 rowbytes = width * 4;
+
+      _width = width;
+      _height = height;
+      _colorType = 6;
+
+      _pixels = new unsigned char[_height * rowbytes];
+      _rows = new png_bytep[_height * sizeof(png_bytep)];
+
+      memcpy(_pixels, pixels, _height * rowbytes);
+
+      for (unsigned int i=0; i<_height; ++i)
+        _rows[i] = _pixels + i * rowbytes;
+    }
   }
 
   // Save frame to a PNG image file.
@@ -231,7 +297,33 @@ namespace apngasm {
       {
         png_init_io(png_ptr, f);
         png_set_compression_level(png_ptr, 9);
-        png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, 6, 0, 0, 0);
+        png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, _colorType, 0, 0, 0);
+        if (_paletteSize > 0) 
+        {
+          png_color palette[PNG_MAX_PALETTE_LENGTH];
+          memcpy(palette, _palette, _paletteSize * 3);
+          png_set_PLTE(png_ptr, info_ptr, palette, _paletteSize);
+        }
+        if (_transparencySize > 0)
+        {
+          png_color_16  trans_color;
+          if (_colorType == PNG_COLOR_TYPE_GRAY)
+          {
+            trans_color.gray = _transparency[1];
+            png_set_tRNS(png_ptr, info_ptr, NULL, 0, &trans_color);
+          }
+          else
+          if (_colorType == PNG_COLOR_TYPE_RGB)
+          {
+            trans_color.red = _transparency[1];
+            trans_color.green = _transparency[3];
+            trans_color.blue = _transparency[5];
+            png_set_tRNS(png_ptr, info_ptr, NULL, 0, &trans_color);
+          }
+          else
+          if (_colorType == PNG_COLOR_TYPE_PALETTE)
+            png_set_tRNS(png_ptr, info_ptr, const_cast<unsigned char*>(_transparency), _transparencySize, NULL);
+        }
         png_write_info(png_ptr, info_ptr);
         png_write_image(png_ptr, _rows);
         png_write_end(png_ptr, info_ptr);

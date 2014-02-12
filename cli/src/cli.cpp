@@ -1,4 +1,5 @@
 #include "cli.h"
+#include "apngasm-cli-version.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
@@ -114,7 +115,7 @@ private:
 };	// class CustomAPNGAsmListener
 
 namespace apngasm_cli {
-	const std::string CLI::VERSION = "0.1.1";
+	const std::string CLI::VERSION = APNGASM_CLI_VERSION;
 
 	CLI::CLI(int argc, char **argv)
 		: options(argc, argv), assembler()
