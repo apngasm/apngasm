@@ -85,16 +85,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\apngasm.cpp" />
-    <ClCompile Include="..\..\src\apngframe.cpp" />
-    <ClCompile Include="..\..\src\listener\apngasmlistener.cpp" />
+    <ClCompile Include="..\..\lib\src\apngasm.cpp" />
+    <ClCompile Include="..\..\lib\src\apngframe.cpp" />
+    <ClCompile Include="..\..\lib\src\listener\apngasmlistener.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\apngasm-conf.h" />
-    <ClInclude Include="..\..\src\apngasm-version.h" />
-    <ClInclude Include="..\..\src\apngasm.h" />
-    <ClInclude Include="..\..\src\apngframe.h" />
-    <ClInclude Include="..\..\src\listener\apngasmlistener.h" />
+    <ClInclude Include="..\..\lib\src\apngasm-conf.h" />
+    <ClInclude Include="..\..\lib\src\apngasm-version.h" />
+    <ClInclude Include="..\..\lib\src\apngasm.h" />
+    <ClInclude Include="..\..\lib\src\apngframe.h" />
+    <ClInclude Include="..\..\lib\src\listener\apngasmlistener.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
