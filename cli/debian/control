@@ -5,10 +5,16 @@ Maintainer: Rei Kagetsuki <zero@genshin.org>
 Build-Depends: cmake, build-essential, libpng-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-filesystem-dev
 Homepage: https://github.com/apngasm/apngasm
 
-Package: apngasm
+Package: libapngasm
 Architecture: any
 Depends: libc6 (>= 2.14), libpng12-0 (>= 1.2.13-4), zlib1g (>= 1:1.1.4)
-Description: apngasm APNG Assembler library, headers and standalone CLI
- This package includes the apngasm assembler and dis-assembler, complete with
- library, headers and standalone command for assembling, disassembling and
+Description: apngasm APNG Assembler library and headers.
+ apngasm can be used to assemble, dis-assemble, or edit APNG files.
+
+Package: apngasm
+Architecture: any
+Depends: libapngasm (>= 3.0)
+Description: apngasm APNG Assembler command line tool
+ This package includes the apngasm assembler and dis-assembler
+ standalone command for assembling, disassembling and
  editing Animated PNG files.
