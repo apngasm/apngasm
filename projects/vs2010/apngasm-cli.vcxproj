@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4A9C618A-3937-4029-BB10-B0DA348A823C}</ProjectGuid>
+    <ProjectGuid>{EC4EAFB5-64CB-427C-9F0C-8E1CE892BCB9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>apngtest</RootNamespace>
+    <RootNamespace>apngasmcli</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -50,9 +50,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lib/src/;../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -62,6 +63,9 @@
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>echo #ifndef _APNGASM_CLI_VERSION_H_ &gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo #define _APNGASM_CLI_VERSION_H_ &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo namespace apngasm_cli { &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo   static const char* APNGASM_CLI_VERSION = "3.0.0"; &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo } // namespace apngasm_cli &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo #endif  // _APNGASM_CLI_VERSION_H_ &gt;&gt;..\..\cli\src\apngasm-cli-version.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -72,8 +76,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../lib/src/;../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,9 +90,18 @@
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>echo #ifndef _APNGASM_CLI_VERSION_H_ &gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo #define _APNGASM_CLI_VERSION_H_ &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo namespace apngasm_cli { &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo   static const char* APNGASM_CLI_VERSION = "3.0.0"; &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo } // namespace apngasm_cli &gt;&gt;..\..\cli\src\apngasm-cli-version.h &amp;&amp; echo #endif  // _APNGASM_CLI_VERSION_H_ &gt;&gt;..\..\cli\src\apngasm-cli-version.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib\src\apngtest.cpp" />
+    <ClCompile Include="..\..\cli\src\apngasm-cli.cpp" />
+    <ClCompile Include="..\..\cli\src\cli.cpp" />
+    <ClCompile Include="..\..\cli\src\options.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\cli\src\cli.h" />
+    <ClInclude Include="..\..\cli\src\options.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
