@@ -43,7 +43,7 @@ TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})
 
 # Create package command
 SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
-SET(INSTALL_HEADERS "${PROJECT_SOURCE_DIR}/src/apngasm.h ${PROJECT_SOURCE_DIR}/src/apngframe.h ${PROJECT_BINARY_DIR}/src/apngasm-version.h")
+SET(INSTALL_HEADERS "${PROJECT_SOURCE_DIR}/src/apngasm.h ${PROJECT_SOURCE_DIR}/src/apngframe.h ${PROJECT_SOURCE_DIR}/src/apngasm-conf.h ${PROJECT_BINARY_DIR}/src/apngasm-version.h")
 GET_PROPERTY(INSTALL_LIBS TARGET apngasm PROPERTY LOCATION)
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
