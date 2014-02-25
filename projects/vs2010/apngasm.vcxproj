@@ -45,7 +45,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../lpng168;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -57,8 +57,11 @@
       <AdditionalDependencies>libpng16.lib;zlib.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>../../../lpng168/projects/vstudio/Debug Library/;../../../boost_1_55_0/stage/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lpng169/projects/vstudio/Debug Library/;../../../boost_1_55_0/stage/lib</AdditionalLibraryDirectories>
     </Lib>
+    <PreBuildEvent>
+      <Command>echo #ifndef _APNGASM_VERSION_H_ &gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo #define _APNGASM_VERSION_H_ &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo namespace apngasm { &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo   static const char* APNGASM_VERSION = "3.0.0"; &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo } // namespace apngasm &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo #endif  // _APNGASM_VERSION_H_ &gt;&gt;..\..\lib\src\apngasm-version.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -69,7 +72,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../lpng168;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../lpng169;../../../zlib-1.2.5;../../../boost_1_55_0</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -80,21 +83,31 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>../../../lpng168/projects/vstudio/Release Library/;../../../boost_1_55_0/stage/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lpng169/projects/vstudio/Release Library/;../../../boost_1_55_0/stage/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>libpng16.lib;zlib.lib</AdditionalDependencies>
     </Lib>
+    <PreBuildEvent>
+      <Command>echo #ifndef _APNGASM_VERSION_H_ &gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo #define _APNGASM_VERSION_H_ &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo namespace apngasm { &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo   static const char* APNGASM_VERSION = "3.0.0"; &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo } // namespace apngasm &gt;&gt;..\..\lib\src\apngasm-version.h &amp;&amp; echo #endif  // _APNGASM_VERSION_H_ &gt;&gt;..\..\lib\src\apngasm-version.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\lib\src\apngasm.cpp" />
     <ClCompile Include="..\..\lib\src\apngframe.cpp" />
     <ClCompile Include="..\..\lib\src\listener\apngasmlistener.cpp" />
+    <ClCompile Include="..\..\lib\src\spec\priv\specreaderimpl.cpp" />
+    <ClCompile Include="..\..\lib\src\spec\priv\specwriterimpl.cpp" />
+    <ClCompile Include="..\..\lib\src\spec\specreader.cpp" />
+    <ClCompile Include="..\..\lib\src\spec\specwriter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\lib\src\apngasm-conf.h" />
-    <ClInclude Include="..\..\lib\src\apngasm-version.h" />
     <ClInclude Include="..\..\lib\src\apngasm.h" />
     <ClInclude Include="..\..\lib\src\apngframe.h" />
     <ClInclude Include="..\..\lib\src\listener\apngasmlistener.h" />
+    <ClInclude Include="..\..\lib\src\spec\priv\specreaderimpl.h" />
+    <ClInclude Include="..\..\lib\src\spec\priv\specwriterimpl.h" />
+    <ClInclude Include="..\..\lib\src\spec\specreader.h" />
+    <ClInclude Include="..\..\lib\src\spec\specwriter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
