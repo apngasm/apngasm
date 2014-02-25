@@ -10,6 +10,9 @@ namespace apngasm {
     class IAPNGAsmListener
     {
     public:
+      // Destructor.
+      virtual ~IAPNGAsmListener(){ /* nop */ }
+
       // Called before add frame.
       // Return true if can add.
       virtual bool onPreAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const = 0;

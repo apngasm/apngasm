@@ -23,6 +23,9 @@ namespace apngasm {
       class ISpecReaderImpl
       {
       public:
+        // Destructor.
+        virtual ~ISpecReaderImpl(){ /* nop */ }
+
         // Read parameter from spec file.
         // Return true if read succeeded.
         virtual bool read(const std::string& filePath) = 0;
