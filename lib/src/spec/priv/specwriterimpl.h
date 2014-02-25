@@ -15,6 +15,9 @@ namespace apngasm {
       class ISpecWriterImpl
       {
       public:
+        // Destructor.
+        virtual ~ISpecWriterImpl(){ /* nop */ }
+
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         virtual bool write(const std::string& filePath, const std::string& currentDir="") const = 0;
