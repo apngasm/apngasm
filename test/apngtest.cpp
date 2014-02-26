@@ -41,9 +41,9 @@ int main(int argc, char* argv[])
 
 #ifdef APNG_WRITE_SUPPORTED
   std::cout << "Test 1 - start" << std::endl;
-  assembler.addFrame("gold01.png", 15, 100);
-  assembler.addFrame("gold02.png", 15, 100);
-  assembler.addFrame("gold03.png", 15, 100);
+  assembler.addFrame("samples/gold01.png", 15, 100);
+  assembler.addFrame("samples/gold02.png", 15, 100);
+  assembler.addFrame("samples/gold03.png", 15, 100);
   assembler.assemble("out/gold_anim.png");
   assembler.assemble("out/gold_anim2.png");
   std::cout << "frames=" << assembler.frameCount() << std::endl;
@@ -52,10 +52,10 @@ int main(int argc, char* argv[])
   assembler.reset();
 
   std::cout << "Test 2 - start" << std::endl;
-  assembler.addFrame("clock1.png", 1, 1);
-  assembler.addFrame("clock2.png", 1, 1);
-  assembler.addFrame("clock3.png", 1, 1);
-  assembler.addFrame("clock4.png", 1, 1);
+  assembler.addFrame("samples/clock1.png", 1, 1);
+  assembler.addFrame("samples/clock2.png", 1, 1);
+  assembler.addFrame("samples/clock3.png", 1, 1);
+  assembler.addFrame("samples/clock4.png", 1, 1);
   assembler.assemble("out/clock_anim.png");
   assembler.assemble("out/clock_anim2.png");
   std::cout << "frames=" << assembler.frameCount() << std::endl;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   assembler.reset();
 
   std::cout << "Test 3 - start" << std::endl;
-  std::vector<apngasm::APNGFrame> frames = assembler.disassemble("penguins.png");
+  std::vector<apngasm::APNGFrame> frames = assembler.disassemble("samples/penguins.png");
   std::cout << frames.size() << " Frames" << std::endl;
   assembler.savePNGs("out");
 #ifdef APNG_SPECS_SUPPORTED

@@ -4,8 +4,10 @@ PROJECT(APNGASM_TEST)
 
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
+ENABLE_TESTING()
 # Generate executable file
 ADD_EXECUTABLE(apngasm-test
+	EXCLUDE_FROM_ALL
     ${PROJECT_SOURCE_DIR}/apngtest.cpp
 )
 
@@ -18,3 +20,11 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_BINARY_DIR}/../lib/src
 )
 TARGET_LINK_LIBRARIES(apngasm-test apngasm)
+
+ADD_TEST(
+	NAME apngasm-test
+	COMMAND apngasm-test
+)
+
+FILE(COPY ${PROJECT_SOURCE_DIR}/samples DESTINATION ./)
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/out)
