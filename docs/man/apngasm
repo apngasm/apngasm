@@ -1,0 +1,41 @@
+.\" Manpage for apngasm.
+.\" Go to https://www.github.com/apngasm/apngasm for patches/corrections.
+.TH man 8 "27 February 2014" "3.0" "apngasm man page"
+.SH NAME
+apngasm \- APNG Assembler
+.SH SYNOPSIS
+apngasm frame01.png frame02.png [-o outfile.png]
+.SH DESCRIPTION
+apngasm can assemble or dis-assemble Animated PNG files.
+.SH OPTIONS
+.B Information Options:
+  -v [ --version ]      Display the version.
+  -h [ --help ]         View detailed help.
+
+.B Main Options:
+  -d [ --delay ] arg (=100)             Default frame delay [in miliseconds or 
+                                        fractions of a second], default is 100.
+  -l [ --loops ] arg (=0)               Number of loops. Use 0 [the default] 
+                                        for infinite loops.
+  -f [ --file ] arg                     Loads an XML or JSON animation 
+                                        directive file.
+  -s [ --skip ]                         Skip the first frame. When animation is
+                                        not supported the first frame is shown.
+  -D [ --disassemble ] arg              Specifies Disassemble file (Then, can 
+                                        NOT specify other files)
+  -o [ --output ] arg                   Specifies Output File (Then, 1st 
+                                        argument is NOT output-file)
+  -j [ --json ] [=arg(=animation.json)] Specifies output json file.
+  -x [ --xml ] [=arg(=animation.xml)]   Specifies output xml file.
+
+.B Overwrite Options:
+  -n [ --nooverwrite ]  exit when overwrite.
+  -i [ --interactive ]  prompt before overwrite. (default)
+  -F [ --force ]        always overwrites existing file.
+.SH SEE ALSO
+
+.SH BUGS
+To report bugs please go to http://www.github.com/apngasm/apngasm/issues .
+.SH AUTHOR
+Max Stepin and Genshin Souzou K.K. (info@genshin.org)
+
