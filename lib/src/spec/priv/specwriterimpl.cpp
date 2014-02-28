@@ -47,7 +47,7 @@ namespace apngasm {
               delay << frames[i].delayNum() << "/" << frames[i].delayDen();
 
               boost::property_tree::ptree frame;
-              frame.push_back(std::make_pair(file, delay.str()));
+              frame.push_back(std::make_pair( file, boost::property_tree::ptree(delay.str()) ));
 
               child.push_back(std::make_pair("", frame));
             }
