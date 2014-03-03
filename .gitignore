@@ -1,7 +1,7 @@
 *.swp
 *.swo
-spec/*.png
-spec/*/
+test/*.png
+test/test/
 .DS_Store
 install_manifest_ApplicationData.txt
 install_manifest_Libraries.txt
