@@ -1,5 +1,6 @@
 #include "cli.h"
 #include "apngasm-cli-version.h"
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
