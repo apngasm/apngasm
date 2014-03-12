@@ -124,8 +124,12 @@ namespace apngasm {
   {
     if( _pListener->onPreAddFrame(filePath, delayNum, delayDen) )
     {
+#ifdef APNG_READ_SUPPORTED
+      fileToFrames(filePath, delayNum, delayDen);
+#else
       APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
       _frames.push_back(frame);
+#endif
       _pListener->onPostAddFrame(filePath, delayNum, delayDen);
     }
     return _frames.size();
@@ -216,6 +220,10 @@ namespace apngasm {
     _width  = _frames[0]._width;
     _height = _frames[0]._height;
     _size   = _width * _height;
+
+    for (size_t n = 1; n < _frames.size(); ++n)
+      if (_width != _frames[n]._width || _height != _frames[n]._height)
+        return false;
 
     unsigned char coltype = findCommonType();
 
@@ -1813,6 +1821,12 @@ namespace apngasm {
 
   const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
   {
+    reset();
+    return fileToFrames(filePath, DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR);
+  }
+
+  const std::vector<APNGFrame>& APNGAsm::fileToFrames(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
+  {
     unsigned int   i, j, id;
     unsigned int   w, h;
     unsigned int * pi;
@@ -1820,8 +1834,6 @@ namespace apngasm {
     unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
     CHUNK chunk_ihdr;
     CHUNK chunk;
-
-    reset();
 
     FILE * f;
     if ((f = fopen(filePath.c_str(), "rb")) != 0)
@@ -1846,8 +1858,8 @@ namespace apngasm {
           h0 = h = swap32(pi[3]);
           x0 = 0;
           y0 = 0;
-          delay_num = 1;
-          delay_den = 10;
+          delay_num = delayNum;
+          delay_den = delayDen;
           dop = 0;
           bop = 0;
           rowbytes = w * 4;
