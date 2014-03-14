@@ -17,7 +17,7 @@ namespace apngasm {
 
     struct CHUNK { unsigned int size; unsigned char * p; };
 
-    class APNGAsm {
+    class APNGASM_DECLSPEC APNGAsm {
     public:
 		//Construct APNGAsm object
 		APNGAsm(void);

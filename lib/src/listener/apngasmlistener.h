@@ -2,12 +2,13 @@
 #define _APNGASMLISTENER_H_
 
 #include <string>
+#include "../apngasm-conf.h"
 #include "../apngframe.h"
 
 namespace apngasm {
   namespace listener {
 
-    class IAPNGAsmListener
+    class APNGASM_DECLSPEC IAPNGAsmListener
     {
     public:
       // Destructor.
@@ -40,7 +41,7 @@ namespace apngasm {
 
     };  // class IAPNGAsmListener
 
-    class APNGAsmListener : public IAPNGAsmListener
+    class APNGASM_DECLSPEC APNGAsmListener : public IAPNGAsmListener
     {
     public:
       // Called before add frame.

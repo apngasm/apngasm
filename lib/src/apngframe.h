@@ -2,6 +2,7 @@
 #define _APNGFRAME_H_
 
 #include <string>
+#include "apngasm-conf.h"
 
 namespace apngasm {
 
@@ -12,7 +13,7 @@ namespace apngasm {
   typedef struct { unsigned char r, g, b, a; } rgba;
 
   //Individual APNG frame
-  class APNGFrame
+  class APNGASM_DECLSPEC APNGFrame
   {
   public:
     // Raw pixel data
