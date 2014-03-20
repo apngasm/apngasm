@@ -24,10 +24,10 @@ IF(WIN32)
     package
     COMMAND cd lib/package
     COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj
+    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj /p:Configuration=$(Configuration)
     COMMAND cd ../../cli/package
     COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj
+    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj /p:Configuration=$(Configuration)
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
   )
 ENDIF(WIN32)
