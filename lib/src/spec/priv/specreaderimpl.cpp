@@ -1,13 +1,10 @@
 #include "specreaderimpl.h"
 #include "../../apngframe.h"  // DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/regex.hpp>
-#include <boost/range/algorithm.hpp>
 
 namespace apngasm {
   namespace spec {
@@ -61,67 +58,6 @@ namespace apngasm {
           }
 
           return true;
-        }
-
-        // Get file path vector.
-        const std::vector<std::string>& getFiles(const std::string& filepath)
-        {
-          static std::vector<std::string> files;
-
-          boost::filesystem::path absPath( boost::filesystem::absolute(filepath) );
-
-          // Clear temporary vector.
-          files.clear();
-
-          // File is unique.
-          if( absPath.string().find('*', 0) == std::string::npos )
-          {
-            // Add extension
-            if( !boost::algorithm::iends_with(absPath.string(), ".png") )
-              absPath = absPath.string() + ".png";
-            
-            if( boost::filesystem::exists(absPath) )
-              files.push_back(absPath.string());
-          }
-
-          // File path has wildcard.
-          else
-          {
-            // Convert filepath.
-            static const boost::regex escape("[\\^\\.\\$\\|\\(\\)\\[\\]\\+\\?\\\\]");
-            static const boost::regex wildcard("\\*");
-
-            absPath = boost::regex_replace(absPath.string(), escape, "\\\\$0");
-            absPath = boost::regex_replace(absPath.string(), wildcard, ".+");
-
-            // Skip if directory is not found.
-            if( !boost::filesystem::exists(absPath.parent_path()) )
-              return files;
-
-            // Search files.
-            const boost::regex filter(absPath.string());
-            const boost::filesystem::directory_iterator itEnd;
-            for(boost::filesystem::directory_iterator itCur(absPath.parent_path());  itCur != itEnd;  ++itCur)
-            {
-              // Skip if not a file.
-              if( !boost::filesystem::is_regular_file(itCur->status()) )
-                continue;
-
-              // Skip if no match.
-              const std::string& curFilePath = itCur->path().string();
-              if( !boost::regex_match(curFilePath, filter) )
-                continue;
-
-              // Add filepath if extension is png.
-              if( boost::algorithm::iends_with(curFilePath, ".png") )
-                files.push_back(curFilePath);
-            }
-
-            // Sort vector.
-            boost::sort(files);
-          }
-
-          return files;
         }
       } // unnamed namespace
 
@@ -243,13 +179,8 @@ namespace apngasm {
             }
 
             // Add frame informations.
-            const std::vector<std::string>& files = getFiles(file);
-            const int count = files.size();
-            for(int i = 0;  i < count;  ++i)
-            {
-              const FrameInfo frameInfo = { files[i], delay };
-              _frameInfos.push_back(frameInfo);
-            }
+            const FrameInfo frameInfo = { boost::filesystem::absolute(file).string(), delay };
+            _frameInfos.push_back(frameInfo);
 
             ++delayIndex;
           }
@@ -332,13 +263,8 @@ namespace apngasm {
             }
 
             // Add frame informations.
-            const std::vector<std::string>& files = getFiles(file);
-            const int count = files.size();
-            for(int i = 0;  i < count;  ++i)
-            {
-              const FrameInfo frameInfo = { files[i], delay };
-              _frameInfos.push_back(frameInfo);
-            }
+            const FrameInfo frameInfo = { boost::filesystem::absolute(file).string(), delay };
+            _frameInfos.push_back(frameInfo);
           }
         }
 
