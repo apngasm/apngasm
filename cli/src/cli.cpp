@@ -1,5 +1,6 @@
 #include "cli.h"
 #include "apngasm-cli-version.h"
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
@@ -167,6 +168,7 @@ namespace apngasm_cli {
 		const FrameDelay DEFAULT_DELAY = options.getDefaultDelay();
 
 		std::string lastFile;
+    std::string errorFile;
 		Options::INPUTS::const_iterator arg = options.inputFilesBegin();
 		for(; arg != options.inputFilesEnd(); ++arg) {
 			if(regex_match(*arg, DELAY_RE)) {
@@ -178,18 +180,30 @@ namespace apngasm_cli {
 					continue;
 				}
 			}
-			else if(regex_match(*arg, PNG_RE)) {
+			else if(regex_match(*arg, PNG_RE) || arg->find("*", 0)) {
 				if(!lastFile.empty())
 				{
 					const FrameDelay delay = DEFAULT_DELAY;
-					assembler.addFrame(lastFile, delay.num, delay.den);
+          if( assembler.frameCount() < assembler.addFrame(lastFile, delay.num, delay.den) )
+          {
+            lastFile = *arg;
+            continue;
+          }
+          errorFile = lastFile;
 				}
-				lastFile = *arg;
-				continue;
+        else
+        {
+          lastFile = *arg;
+          continue;
+        }
 			}
+      else
+      {
+        errorFile = *arg;
+      }
 
 			// Error.
-			cout << "argument `" << (*arg)
+			cout << "argument `" << errorFile
 				<< "' is invalid." << std::endl;
 			return ERRCODE_INVALIDARGUMENT;
 		}

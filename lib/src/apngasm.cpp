@@ -2,6 +2,10 @@
 #include <cstdlib>
 #include <png.h>
 #include <zlib.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/regex.hpp>
+#include <boost/range/algorithm.hpp>
 #ifdef APNG_SPECS_SUPPORTED
 #include "spec/specreader.h"
 #include "spec/specwriter.h"
@@ -66,6 +70,74 @@ namespace {
 
 namespace apngasm {
 
+  namespace
+  {
+
+    // Get file path vector.
+    const std::vector<std::string>& getFiles(const std::string& filepath)
+    {
+      static std::vector<std::string> files;
+
+      boost::filesystem::path nativePath(filepath);
+      nativePath.make_preferred();
+
+      // Clear temporary vector.
+      files.clear();
+
+      // File is unique.
+      if (nativePath.string().find('*', 0) == std::string::npos)
+      {
+        // Add extension
+        if (!boost::algorithm::iends_with(nativePath.string(), ".png"))
+          nativePath = nativePath.string() + ".png";
+
+        if (boost::filesystem::exists(nativePath))
+          files.push_back(nativePath.string());
+      }
+
+      // File path has wildcard.
+      else
+      {
+        const boost::filesystem::path &parentPath = nativePath.parent_path();
+
+        // Convert filepath.
+        static const boost::regex escape("[\\^\\.\\$\\|\\(\\)\\[\\]\\+\\?\\\\]");
+        static const boost::regex wildcard("\\*");
+
+        nativePath = boost::regex_replace(nativePath.string(), escape, "\\\\$0");
+        nativePath = boost::regex_replace(nativePath.string(), wildcard, ".*");
+
+        // Skip if directory is not found.
+        if (!boost::filesystem::exists(parentPath))
+          return files;
+
+        // Search files.
+        const boost::regex filter(nativePath.string());
+        const boost::filesystem::directory_iterator itEnd;
+        for (boost::filesystem::directory_iterator itCur(parentPath); itCur != itEnd; ++itCur)
+        {
+          // Skip if not a file.
+          if (!boost::filesystem::is_regular_file(itCur->status()))
+            continue;
+
+          // Skip if no match.
+          const std::string& curFilePath = itCur->path().string();
+          if (!boost::regex_match(curFilePath, filter))
+            continue;
+
+          // Add filepath if extension is png.
+          if (boost::algorithm::iends_with(curFilePath, ".png"))
+            files.push_back(curFilePath);
+        }
+
+        // Sort vector.
+        boost::sort(files);
+      }
+
+      return files;
+    }
+  } // unnamed namespace
+
   //Construct APNGAsm object
   APNGAsm::APNGAsm(void)
     : _pListener(&defaultListener)
@@ -122,12 +194,24 @@ namespace apngasm {
   //Uses default delay of 10ms if not specified
   size_t APNGAsm::addFrame(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
   {
-    if( _pListener->onPreAddFrame(filePath, delayNum, delayDen) )
+    const std::vector<std::string>& files = getFiles(filePath);
+    const int count = files.size();
+
+    for(int i = 0;  i < count;  ++i)
     {
-      APNGFrame frame = APNGFrame(filePath, delayNum, delayDen);
-      _frames.push_back(frame);
-      _pListener->onPostAddFrame(filePath, delayNum, delayDen);
+      const std::string &currentFile = files[i];
+      if( _pListener->onPreAddFrame(currentFile, delayNum, delayDen) )
+      {
+#ifdef APNG_READ_SUPPORTED
+        fileToFrames(currentFile, delayNum, delayDen);
+#else
+        APNGFrame frame = APNGFrame(currentFile, delayNum, delayDen);
+        _frames.push_back(frame);
+#endif
+        _pListener->onPostAddFrame(currentFile, delayNum, delayDen);
+      }
     }
+
     return _frames.size();
   }
 
@@ -216,6 +300,10 @@ namespace apngasm {
     _width  = _frames[0]._width;
     _height = _frames[0]._height;
     _size   = _width * _height;
+
+    for (size_t n = 1; n < _frames.size(); ++n)
+      if (_width != _frames[n]._width || _height != _frames[n]._height)
+        return false;
 
     unsigned char coltype = findCommonType();
 
@@ -1813,6 +1901,12 @@ namespace apngasm {
 
   const std::vector<APNGFrame>& APNGAsm::disassemble(const std::string &filePath)
   {
+    reset();
+    return fileToFrames(filePath, DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR);
+  }
+
+  const std::vector<APNGFrame>& APNGAsm::fileToFrames(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
+  {
     unsigned int   i, j, id;
     unsigned int   w, h;
     unsigned int * pi;
@@ -1820,8 +1914,6 @@ namespace apngasm {
     unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
     CHUNK chunk_ihdr;
     CHUNK chunk;
-
-    reset();
 
     FILE * f;
     if ((f = fopen(filePath.c_str(), "rb")) != 0)
@@ -1846,8 +1938,8 @@ namespace apngasm {
           h0 = h = swap32(pi[3]);
           x0 = 0;
           y0 = 0;
-          delay_num = 1;
-          delay_den = 10;
+          delay_num = delayNum;
+          delay_den = delayDen;
           dop = 0;
           bop = 0;
           rowbytes = w * 4;

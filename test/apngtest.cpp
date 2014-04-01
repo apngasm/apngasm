@@ -114,5 +114,20 @@ int main(int argc, char* argv[])
   std::cout << "Test 4 - finish" << std::endl;
 #endif
 
+  assembler.reset();
+
+  std::cout << "Test 5 - start" << std::endl;
+  {
+    apngasm::APNGFrame frame1 = apngasm::APNGFrame("samples/gold01.png", 15, 100);
+    apngasm::APNGFrame frame2 = apngasm::APNGFrame("samples/gold02.png", 15, 100);
+    std::vector<apngasm::APNGFrame> frames;
+    frames.push_back(frame1);
+    frames.push_back(frame2);
+    apngasm::APNGAsm test5Assembler(frames);
+    std::cout << "frames=" << test5Assembler.frameCount() << std::endl;
+    test5Assembler.assemble("out/test5_anim.png");
+  }
+  std::cout << "Test 5 - finish" << std::endl;
+
   return 0;
 }

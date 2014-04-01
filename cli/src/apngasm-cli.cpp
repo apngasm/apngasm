@@ -1,4 +1,5 @@
 #include "cli.h"
+#include <iostream>
 
 static void warn(const boost::program_options::error &e)
 {

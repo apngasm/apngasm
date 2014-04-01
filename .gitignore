@@ -1,8 +1,12 @@
 *.swp
 *.swo
-spec/*.png
-spec/*/
+test/*.png
+test/test/
 .DS_Store
 install_manifest_ApplicationData.txt
 install_manifest_Libraries.txt
 build/
+projects/vs2010/*/
+projects/vs2010/*.suo
+projects/vs2010/*.sdf
+projects/vs2010/*.opensdf

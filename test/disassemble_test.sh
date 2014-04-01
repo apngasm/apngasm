@@ -8,7 +8,7 @@ EXEC="../build/cli/apngasm"
 SRC="../resources/images/apngasm.png"
 OUT="./test"
 OUT_JSON="-j"
-OUT_XML="-x ../../spec/test/xml/animation.xml"
+OUT_XML="-x ../../test/test/xml/animation.xml"
 
 # Run.
 RUN="${EXEC} -o ${OUT} -D ${SRC} ${OUT_JSON} ${OUT_XML}"
