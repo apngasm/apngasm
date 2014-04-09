@@ -2,15 +2,13 @@
 #include "priv/specwriterimpl.h"
 #include "../apngasm.h"
 #include <boost/filesystem/operations.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
   namespace spec {
 
     namespace {
-      bool isSeparator(const char c)
-      {
-        return c == '/' || c == '\\';
-      }
+      const char separator = boost::filesystem::path::preferred_separator;
 
       const boost::filesystem::path createAbsolutePath(const std::string& path)
       {
@@ -23,15 +21,25 @@ namespace apngasm {
       }
       const std::string createRelativeDir(const std::string& from, const std::string& to)
       {
-        const boost::filesystem::path fromPath = createAbsolutePath(from);
-        const boost::filesystem::path toPath = createAbsolutePath(to);
+        boost::filesystem::path fromPath = createAbsolutePath(from);
+        boost::filesystem::path toPath = createAbsolutePath(to);
+        const std::string separatorStr = std::string(1, separator);
+
+        // Convert path to native.
+        fromPath.make_preferred();
+        toPath.make_preferred();
+        if( !boost::algorithm::iends_with(fromPath.string(), separatorStr) )
+          fromPath /= separatorStr;
+        if( !boost::algorithm::iends_with(toPath.string(), separatorStr) )
+          toPath /= separatorStr;
 
         // Other drive.
         if(fromPath.root_name() != toPath.root_name())
-          return fromPath.string() + "/";
+          return fromPath.string();
 
-        std::string fromDir = fromPath.string() + "/";
-        std::string toDir = toPath.string() + "/";
+        // Same drive.
+        std::string fromDir = fromPath.string();
+        std::string toDir = toPath.string();
 
         {
           const int count = std::min(fromDir.length(), toDir.length());
@@ -43,7 +51,7 @@ namespace apngasm {
 
             if(fromChar == toChar)
             {
-              if( isSeparator(fromChar) )
+              if( fromChar == separator )
                 find = i;
             }
             else
@@ -60,15 +68,16 @@ namespace apngasm {
         if(!fromDir.empty())
         {
           const int count = fromDir.length();
+          const std::string parentDir = ".." + separatorStr;
           bool beforeIsSeparator = true;
           for(int i = 0;  i < count;  ++i)
           {
             const char currentChar = fromDir.at(i);
-            if( isSeparator(currentChar) )
+            if( currentChar == separator )
             {
               if( !beforeIsSeparator )
               {
-                result += "../";
+                result += parentDir;
                 beforeIsSeparator = true;
               }
             }
@@ -100,7 +109,7 @@ namespace apngasm {
         return false;
 
       priv::JsonSpecWriterImpl impl(_pApngasm, _pListener);
-      return impl.write(filePath, createRelativeDir(filePath, imageDir + "/"));
+      return impl.write(filePath, createRelativeDir(filePath, imageDir + separator));
     }
 
     // Write APNGAsm object to xml file.
@@ -111,7 +120,7 @@ namespace apngasm {
         return false;
 
       priv::XmlSpecWriterImpl impl(_pApngasm, _pListener);
-      return impl.write(filePath, createRelativeDir(filePath, imageDir + "/"));
+      return impl.write(filePath, createRelativeDir(filePath, imageDir + separator));
     }
 
   } // namespace spec
