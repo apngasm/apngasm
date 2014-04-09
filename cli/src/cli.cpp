@@ -190,7 +190,8 @@ namespace apngasm_cli {
 				if(!lastFile.empty())
 				{
 					const FrameDelay delay = DEFAULT_DELAY;
-          if( assembler.frameCount() < assembler.addFrame(lastFile, delay.num, delay.den) )
+          const int frameCount = assembler.frameCount();
+          if( frameCount < assembler.addFrame(lastFile, delay.num, delay.den) )
           {
             lastFile = *arg;
             continue;
@@ -211,7 +212,8 @@ namespace apngasm_cli {
 		if(!lastFile.empty())
 		{
 			const FrameDelay delay = DEFAULT_DELAY;
-			if( assembler.frameCount() >= assembler.addFrame(lastFile, delay.num, delay.den) )
+      const int frameCount = assembler.frameCount();
+			if( frameCount >= assembler.addFrame(lastFile, delay.num, delay.den) )
         errorFile = lastFile;
 		}
 
