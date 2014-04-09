@@ -2,7 +2,6 @@
 #include "priv/specwriterimpl.h"
 #include "../apngasm.h"
 #include <boost/filesystem/operations.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace apngasm {
   namespace spec {
@@ -28,9 +27,9 @@ namespace apngasm {
         // Convert path to native.
         fromPath.make_preferred();
         toPath.make_preferred();
-        if( !boost::algorithm::iends_with(fromPath.string(), separatorStr) )
+        if( *fromPath.string().rbegin() != separator )
           fromPath /= separatorStr;
-        if( !boost::algorithm::iends_with(toPath.string(), separatorStr) )
+        if( *toPath.string().rbegin() != separator )
           toPath /= separatorStr;
 
         // Other drive.

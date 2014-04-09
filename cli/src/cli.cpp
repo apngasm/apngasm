@@ -6,6 +6,11 @@
 #include <boost/filesystem.hpp>
 #include "listener/apngasmlistener.h"
 
+
+namespace {
+  const char separator = boost::filesystem::path::preferred_separator;
+} // unnamed namespace
+
 static bool isNumber(const std::string s)
 {
 	std::string::const_iterator it = s.begin();
@@ -252,7 +257,7 @@ namespace apngasm_cli {
 		{
 			boost::filesystem::path path = outSpecFile;
 			if(path.is_relative())
-				outSpecFile = outdir + "/" + outSpecFile;
+				outSpecFile = outdir + separator + outSpecFile;
 
 			assembler.saveJson(outSpecFile, outdir);
 		}
@@ -262,7 +267,7 @@ namespace apngasm_cli {
 		{
 			boost::filesystem::path path = outSpecFile;
 			if(path.is_relative())
-				outSpecFile = outdir + "/" + outSpecFile;
+				outSpecFile = outdir + separator + outSpecFile;
 
 			assembler.saveXml(outSpecFile, outdir);
 		}
