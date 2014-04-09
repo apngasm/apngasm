@@ -68,7 +68,7 @@ namespace apngasm {
             {
               if( !beforeIsSeparator )
               {
-                result += "./";
+                result += "../";
                 beforeIsSeparator = true;
               }
             }
