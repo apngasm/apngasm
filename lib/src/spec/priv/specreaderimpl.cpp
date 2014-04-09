@@ -105,7 +105,9 @@ namespace apngasm {
 
         // Set current directory.
         const boost::filesystem::path oldPath = boost::filesystem::current_path();
-        boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
+        const boost::filesystem::path currentPath = boost::filesystem::path(filePath);
+        if(currentPath.has_parent_path())
+          boost::filesystem::current_path(currentPath.parent_path());
 
         // Read fields.
         // name
@@ -202,7 +204,9 @@ namespace apngasm {
 
         // Set current directory.
         const boost::filesystem::path oldPath = boost::filesystem::current_path();
-        boost::filesystem::current_path( boost::filesystem::path(filePath).parent_path() );
+        const boost::filesystem::path currentPath = boost::filesystem::path(filePath);
+        if(currentPath.has_parent_path())
+          boost::filesystem::current_path(currentPath.parent_path());
 
         // Read fields.
         // name
