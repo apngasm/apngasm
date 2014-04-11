@@ -1,5 +1,6 @@
 #include "apngasmlistener.h"
 #include <sstream>
+#include <boost/filesystem/operations.hpp>
 
 namespace apngasm {
   namespace listener {
@@ -47,9 +48,11 @@ namespace apngasm {
     // Return output path.
     const std::string APNGAsmListener::onCreatePngPath(const std::string& outputDir, int index) const
     {
+      const char separator = boost::filesystem::path::preferred_separator;
+      const std::string separatorStr = (outputDir.empty() || *outputDir.rbegin() == separator) ? "" : std::string(1, separator);
       std::ostringstream result;
       result  << outputDir
-              << ( (outputDir.empty() || *outputDir.rbegin() == '/') ? "" : "/" )
+              << separatorStr
               << index
               << ".png"
               ;

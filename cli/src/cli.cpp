@@ -6,114 +6,120 @@
 #include <boost/filesystem.hpp>
 #include "listener/apngasmlistener.h"
 
-static bool isNumber(const std::string s)
-{
-	std::string::const_iterator it = s.begin();
-	while (it != s.end() && std::isdigit(*it)) ++it;
-	return !s.empty() && it == s.end();
-}
 
-class FrameDelay {
-public:
-	int num, den;
-	FrameDelay(void) : num(100), den(1000) {}
-	FrameDelay(int num) : num(num), den(1000) {}
-	FrameDelay(int num, int den) : num(num), den(den) {}
-	FrameDelay(const std::string &src_str)
-		: den(1000)
-	{
-		using namespace std;
+namespace {
+  const char separator = boost::filesystem::path::preferred_separator;
 
-		if(isNumber(src_str)) {
-			num = atoi(src_str.c_str());
-		} else { // Delay is in fractions of a second or invalid
-			using boost::algorithm::split;
-
-			vector<string> portions;
-			split(portions, src_str, boost::is_any_of(":"));
-			if(portions.size() != 2
-			|| !isNumber(portions[0]) || !isNumber(portions[1])) {
-				throw std::runtime_error("parse delay error");
-			}
-			num = atoi(portions[0].c_str());
-			den = atoi(portions[1].c_str());
-		}
-	}
-};
-
-class CustomAPNGAsmListener : public apngasm::listener::APNGAsmListener
-{
-public:
-	// Initialize CustomAPNGAsmListener object.
-	CustomAPNGAsmListener(int overwriteMode)
-		: _overwriteMode(overwriteMode)
-	{
-		// nop
-	}
-
-  // Called after add frame.
-  void onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const
+  bool isNumber(const std::string s)
   {
-  	std::cout << filePath << " => Delay=(" << delayNum << "/" << delayDen << ") sec" << std::endl;
+	  std::string::const_iterator it = s.begin();
+	  while (it != s.end() && std::isdigit(*it)) ++it;
+	  return !s.empty() && it == s.end();
   }
 
-  // Called after add frame.
-  void onPostAddFrame(const apngasm::APNGFrame& frame) const
+  class FrameDelay {
+  public:
+	  int num, den;
+	  FrameDelay(void) : num(100), den(1000) {}
+	  FrameDelay(int num) : num(num), den(1000) {}
+	  FrameDelay(int num, int den) : num(num), den(den) {}
+	  FrameDelay(const std::string &src_str)
+		  : den(1000)
+	  {
+		  using namespace std;
+
+		  if(isNumber(src_str)) {
+			  num = atoi(src_str.c_str());
+		  } else { // Delay is in fractions of a second or invalid
+			  using boost::algorithm::split;
+
+			  vector<string> portions;
+			  split(portions, src_str, boost::is_any_of(":"));
+			  if(portions.size() != 2
+			  || !isNumber(portions[0]) || !isNumber(portions[1])) {
+				  throw std::runtime_error("parse delay error");
+			  }
+			  num = atoi(portions[0].c_str());
+			  den = atoi(portions[1].c_str());
+		  }
+	  }
+  };
+
+  class CustomAPNGAsmListener : public apngasm::listener::APNGAsmListener
   {
-  	apngasm::APNGFrame& tmp = const_cast<apngasm::APNGFrame&>(frame);
-  	std::cout << "New Frame => Delay=(" << tmp.delayNum() << "/" << tmp.delayDen() << ") sec" << std::endl;
-  }
+  public:
+	  // Initialize CustomAPNGAsmListener object.
+	  CustomAPNGAsmListener(int overwriteMode)
+		  : _overwriteMode(overwriteMode)
+	  {
+		  // nop
+	  }
 
-  // Called before save.
-  // Return true if can save.
-  bool onPreSave(const std::string& filePath) const
-  {
-		using namespace std;
-		using namespace boost;
+    // Called after add frame.
+    void onPostAddFrame(const std::string& filePath, unsigned int delayNum, unsigned int delayDen) const
+    {
+  	  std::cout << filePath << " => Delay=(" << delayNum << "/" << delayDen << ") sec" << std::endl;
+    }
 
-		if(_overwriteMode == apngasm_cli::Options::OVERWRITE_FORCE) {
-			createParentDirs(filePath);
-			return true;
-		}
-		if(!filesystem::exists(filesystem::path(filePath))) {
-			createParentDirs(filePath);
-			return true;
-		}
-		cout << "The file '" << filePath << "' already exists.";
-		if(_overwriteMode == apngasm_cli::Options::OVERWRITE_INTERACTIVE) {
-			cout << " Overwrite? [y/N]: ";
-			string reply;
-			getline(cin, reply);
-			static const regex RE("\\Ay(es)?\\z", regex::icase);
-			if(regex_match(reply, RE)) {
-				return true;
-			}
-		} else {
-			cout << "\nuse `--interactive' or `--force' to overwrite." << endl;
-		}
-		return false;
-  }
+    // Called after add frame.
+    void onPostAddFrame(const apngasm::APNGFrame& frame) const
+    {
+  	  apngasm::APNGFrame& tmp = const_cast<apngasm::APNGFrame&>(frame);
+  	  std::cout << "New Frame => Delay=(" << tmp.delayNum() << "/" << tmp.delayDen() << ") sec" << std::endl;
+    }
 
-  // Called after save.
-  void onPostSave(const std::string& filePath) const
-  {
-  	std::cout << filePath << std::endl;
-  }
+    // Called before save.
+    // Return true if can save.
+    bool onPreSave(const std::string& filePath) const
+    {
+		  using namespace std;
+		  using namespace boost;
 
-private:
-	const int _overwriteMode;
+		  if(_overwriteMode == apngasm_cli::Options::OVERWRITE_FORCE) {
+			  createParentDirs(filePath);
+			  return true;
+		  }
+		  if(!filesystem::exists(filesystem::path(filePath))) {
+			  createParentDirs(filePath);
+			  return true;
+		  }
+		  cout << "The file '" << filePath << "' already exists.";
+		  if(_overwriteMode == apngasm_cli::Options::OVERWRITE_INTERACTIVE) {
+			  cout << " Overwrite? [y/N]: ";
+			  string reply;
+			  getline(cin, reply);
+			  static const regex RE("\\Ay(es)?\\z", regex::icase);
+			  if(regex_match(reply, RE)) {
+				  return true;
+			  }
+		  } else {
+			  cout << "\nuse `--interactive' or `--force' to overwrite." << endl;
+		  }
+		  return false;
+    }
 
-	// Return true if create succeeded.
-	bool createParentDirs(const std::string& filePath) const
-	{
-		boost::filesystem::path path = filePath;
-		boost::filesystem::path parent = path.parent_path();
-		if(parent == "") {
-			return true;
-		}
-		return boost::filesystem::create_directories(parent);
-	}
-};	// class CustomAPNGAsmListener
+    // Called after save.
+    void onPostSave(const std::string& filePath) const
+    {
+  	  std::cout << filePath << std::endl;
+    }
+
+  private:
+	  const int _overwriteMode;
+
+	  // Return true if create succeeded.
+	  bool createParentDirs(const std::string& filePath) const
+	  {
+		  boost::filesystem::path path = filePath;
+		  boost::filesystem::path parent = path.parent_path();
+		  if(parent == "") {
+			  return true;
+		  }
+		  return boost::filesystem::create_directories(parent);
+	  }
+  };	// class CustomAPNGAsmListener
+
+} // unnamed namespace
 
 namespace apngasm_cli {
 	const std::string CLI::VERSION = APNGASM_CLI_VERSION;
@@ -184,7 +190,8 @@ namespace apngasm_cli {
 				if(!lastFile.empty())
 				{
 					const FrameDelay delay = DEFAULT_DELAY;
-          if( assembler.frameCount() < assembler.addFrame(lastFile, delay.num, delay.den) )
+          const int frameCount = assembler.frameCount();
+          if( frameCount < assembler.addFrame(lastFile, delay.num, delay.den) )
           {
             lastFile = *arg;
             continue;
@@ -201,17 +208,22 @@ namespace apngasm_cli {
       {
         errorFile = *arg;
       }
-
-			// Error.
-			cout << "argument `" << errorFile
-				<< "' is invalid." << std::endl;
-			return ERRCODE_INVALIDARGUMENT;
 		}
 		if(!lastFile.empty())
 		{
 			const FrameDelay delay = DEFAULT_DELAY;
-			assembler.addFrame(lastFile, delay.num, delay.den);
+      const int frameCount = assembler.frameCount();
+			if( frameCount >= assembler.addFrame(lastFile, delay.num, delay.den) )
+        errorFile = lastFile;
 		}
+
+    if( !errorFile.empty() )
+    {
+			// Error.
+			cout << "argument `" << errorFile
+				<< "' is invalid." << std::endl;
+			return ERRCODE_INVALIDARGUMENT;
+    }
 		
 		if (assembler.frameCount() == 0)
 			cout << "apngasm " << assembler.version() << "\nNo source frames were specified. Use --help for usage information." << std::endl;
@@ -252,7 +264,7 @@ namespace apngasm_cli {
 		{
 			boost::filesystem::path path = outSpecFile;
 			if(path.is_relative())
-				outSpecFile = outdir + "/" + outSpecFile;
+				outSpecFile = outdir + separator + outSpecFile;
 
 			assembler.saveJson(outSpecFile, outdir);
 		}
@@ -262,7 +274,7 @@ namespace apngasm_cli {
 		{
 			boost::filesystem::path path = outSpecFile;
 			if(path.is_relative())
-				outSpecFile = outdir + "/" + outSpecFile;
+				outSpecFile = outdir + separator + outSpecFile;
 
 			assembler.saveXml(outSpecFile, outdir);
 		}
