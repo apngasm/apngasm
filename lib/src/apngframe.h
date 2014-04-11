@@ -6,8 +6,8 @@
 
 namespace apngasm {
 
-  const unsigned DEFAULT_FRAME_NUMERATOR = 100;
-  const unsigned DEFAULT_FRAME_DENOMINATOR = 1000;
+  const unsigned DEFAULT_FRAME_NUMERATOR = 100; //!< @brief [TODO: Description of DEFAULT_FRAME_NUMERATOR]
+  const unsigned DEFAULT_FRAME_DENOMINATOR = 1000;  //!< @brief [TODO: Description of DEFAULT_FRAME_DENOMINATOR]
 
   typedef struct { unsigned char r, g, b; } rgb;
   typedef struct { unsigned char r, g, b, a; } rgba;
