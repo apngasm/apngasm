@@ -129,5 +129,23 @@ int main(int argc, char* argv[])
   }
   std::cout << "Test 5 - finish" << std::endl;
 
+  std::cout << "Test 6 - start" << std::endl;
+  {
+    apngasm::APNGFrame frame1 = apngasm::APNGFrame("samples/gold01.png", 15, 100);
+    apngasm::APNGFrame frame2 = apngasm::APNGFrame("samples/gold02.png", 15, 100);
+    assembler.addFrame(frame1);
+    assembler.addFrame(frame2);
+    assembler.assemble("out/test6_anim1.png");
+    assembler.reset();
+    std::cout << "First assemble. Assembler reset." << std::endl;
+    assembler.addFrame(frame1);
+    assembler.addFrame(frame2);
+    assembler.assemble("out/test6_anim2.png");
+    std::cout << "Second assemble. Please check 'out/test6_anim2.png' file. " << std::endl;
+  }
+  std::cout << "Test 6 - finish" << std::endl;
+
+  assembler.reset();
+
   return 0;
 }
