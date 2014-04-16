@@ -36,34 +36,34 @@ Build boost
 
 Copy Libraries/Headers and Add to System Path
 =============================================
-You can copy all your header files and lib files into a common directory to save time.
-We recommend a *nix like structure with a lib and an include directory.
-The files you need in include are:
-"(libpng directory)/png.h"
-"(libpng directory)/pngconf.h"
-"(libpng directory)/pnglibconf.h"
-"(zlib directory)/zlib.h"
-"(zlib directory)/zconf.h"
-"(boost directory)/boost/"
-And the files you need in lib are:
-"(libpng directory)/projects/vstudio/Release Library/libpng16.lib"
-"(libpng directory)/projects/vstudio/Release Library/zlib.lib"
-"(boost directory)/stage/lib/libboost_filesystem-vc120-mt-1_55.lib"
-"(boost directory)/stage/lib/libboost_filesystem-vc120-mt-gd-1_55.lib"
-"(boost directory)/stage/lib/libboost_program_options-vc120-mt-1_55.lib"
-"(boost directory)/stage/lib/libboost_program_options-vc120-mt-gd-1_55.lib"
-"(boost directory)/stage/lib/libboost_regex-vc120-mt-1_55.lib"
-"(boost directory)/stage/lib/libboost_regex-vc120-mt-gd-1_55.lib"
-"(boost directory)/stage/lib/libboost_system-vc120-mt-1_55.lib"
-"(boost directory)/stage/lib/libboost_system-vc120-mt-gd-1_55.lib"
-*Your versions may be different. These were just versions we got from our build.
-
-Then add the include and lib directories to your system path. Either set it permanently by going to:
-1. Control Panel->System->Details
-2. Environment Variables
-3. Add paths to the "Path" variable
-
-Or temporarily by entering the following line in your terminal:
+You can copy all your header files and lib files into a common directory to save time.  
+We recommend a *nix like structure with a lib and an include directory.  
+The files you need in include are:  
+"(libpng directory)/png.h"  
+"(libpng directory)/pngconf.h"  
+"(libpng directory)/pnglibconf.h"  
+"(zlib directory)/zlib.h"  
+"(zlib directory)/zconf.h"  
+"(boost directory)/boost/"  
+And the files you need in lib are:  
+"(libpng directory)/projects/vstudio/Release Library/libpng16.lib"  
+"(libpng directory)/projects/vstudio/Release Library/zlib.lib"  
+"(boost directory)/stage/lib/libboost_filesystem-vc120-mt-1_55.lib"  
+"(boost directory)/stage/lib/libboost_filesystem-vc120-mt-gd-1_55.lib"  
+"(boost directory)/stage/lib/libboost_program_options-vc120-mt-1_55.lib"  
+"(boost directory)/stage/lib/libboost_program_options-vc120-mt-gd-1_55.lib"  
+"(boost directory)/stage/lib/libboost_regex-vc120-mt-1_55.lib"  
+"(boost directory)/stage/lib/libboost_regex-vc120-mt-gd-1_55.lib"  
+"(boost directory)/stage/lib/libboost_system-vc120-mt-1_55.lib"  
+"(boost directory)/stage/lib/libboost_system-vc120-mt-gd-1_55.lib"  
+*Your versions may be different. These were just versions we got from our build.  
+  
+Then add the include and lib directories to your system path. Either set it permanently by going to:  
+1. Control Panel->System->Details  
+2. Environment Variables  
+3. Add paths to the "Path" variable  
+  
+Or temporarily by entering the following line in your terminal:  
 ```set path=%path%;c:\usr\lib;c:\usr\include``` <-replacing with your lib and include directories, or individual entries for libpng, zlib and boost separately if you chose not to copy files to common locations.
 
 Get apngasm Source
@@ -72,12 +72,12 @@ Clone apngasm with something like this: ```git clone http://github.com/apngasm/a
 
 Build apngasm Project
 =====================
-In a command line:
-1. cd apngasm
-2. mkdir build
-3. cd build
-4. cmake ..
-5. Open the APNGASM project file
-6. Change build configuration to Release
-7. Build->Build Solution
+In a command line:  
+1. cd apngasm  
+2. mkdir build  
+3. cd build  
+4. cmake ..  
+5. Open the APNGASM project file  
+6. Change build configuration to Release  
+7. Build->Build Solution  
 8. An installer for the command line tool, libraries and headers can be found in cli/package under the build directory. Individual libraries can be found in lib, the command line executable can be found in cli.
