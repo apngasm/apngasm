@@ -62,16 +62,7 @@ brew install cmake boost libpng lzlib
   
 Building on Windows (with Visual Studio):  
 ----------------------------------------------
-Windows is the most difficult build platform to set up as it totally lacks any sort of standard packaging and many of the tools require manual configuration though a GUI. If anyone has a more full description of how to build please fork/edit this description on github and make a pull request.  
-1. Install CMake for windows from [here](http://www.cmake.org/cmake/resources/software.html)  
-2. Install or build libpng and zlib and put them (and their headers) somewhere in that path that CMake can find them.  
-3. Generate VS project files with the CMake GUI.  
-3. Open VS project files in Visual Studio  
-4. Hit build  
-    Libraries will be found in the lib directory.  
-    The apngasm command line tool can be found in the bin directory.  
-5. [optional] Generate Installer  
-    ??? we're still working on this one.  
+Please see detailed instructions [here](https://github.com/apngasm/apngasm/blob/assemble_test/docs/building/win/instructions.md)
 
 License
 -------
