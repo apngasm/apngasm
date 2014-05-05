@@ -6,8 +6,8 @@
 
 namespace apngasm {
 
-  const unsigned DEFAULT_FRAME_NUMERATOR = 100; //!< @brief [The default numerator for the frame delay fraction. ]
-  const unsigned DEFAULT_FRAME_DENOMINATOR = 1000;  //!< @brief [The default denominator for the frame delay fraction.]
+  const unsigned DEFAULT_FRAME_NUMERATOR = 100; //!< @brief The default numerator for the frame delay fraction.
+  const unsigned DEFAULT_FRAME_DENOMINATOR = 1000;  //!< @brief The default denominator for the frame delay fraction.
 
   typedef struct { unsigned char r, g, b; } rgb;
   typedef struct { unsigned char r, g, b, a; } rgba;
@@ -55,17 +55,55 @@ namespace apngasm {
     unsigned char** rows(unsigned char** setRows = NULL);
     unsigned char ** _rows;
 
-    // Init empty frame for filling in manually
+	/**
+	 * @brief Creates an empty APNGFrame.
+	 */
     APNGFrame();
-    // Init frame from a PNG image file
-    APNGFrame(const std::string &filePath, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
-    // Init frame 
-    APNGFrame(rgb *pixels, unsigned int width, unsigned int height, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
-    APNGFrame(rgb *pixels, unsigned int width, unsigned int height, rgb *trns_color = NULL, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
-    APNGFrame(rgba *pixels, unsigned int width, unsigned int height, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
 
-    // Save frame to a PNG image file.
-    // Return true if save succeeded.
+	/**
+	 * @brief Creates an APNGFrame from a PNG file.
+	 * @param filePath The relative or absolute path to an image file.
+	 * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+	 * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+	 */
+    APNGFrame(const std::string &filePath, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+	/**
+	 * @brief Creates an APNGFrame from a bitmapped array of RBG pixel data.
+	 * @param pixels The RGB pixel data.
+	 * @param width The width of the pixel data.
+	 * @param height The height of the pixel data.
+	 * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+	 * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+	 */
+    APNGFrame(rgb *pixels, unsigned int width, unsigned int height, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+	/**
+	 * @brief Creates an APNGFrame from a bitmapped array of RBG pixel data.
+	 * @param pixels The RGB pixel data.
+	 * @param width The width of the pixel data.
+	 * @param height The height of the pixel data.
+	 * @param trns_color An array of transparency data.
+	 * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+	 * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+	 */
+	APNGFrame(rgb *pixels, unsigned int width, unsigned int height, rgb *trns_color = NULL, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+	/**
+	 * @brief Creates an APNGFrame from a bitmapped array of RBGA pixel data.
+	 * @param pixels The RGBA pixel data.
+	 * @param width The width of the pixel data.
+	 * @param height The height of the pixel data.
+	 * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+	 * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+	 */
+	APNGFrame(rgba *pixels, unsigned int width, unsigned int height, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+	/**
+	 * @brief Saves this frame as a single PNG file.
+	 * @param outPath The relative or absolute path to save the image file to.
+	 * @return Returns true if save was successful.
+	 */
     bool save(const std::string& outPath) const;
 
   private:
