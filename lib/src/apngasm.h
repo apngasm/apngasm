@@ -53,7 +53,7 @@ namespace apngasm {
 		~APNGAsm(void);
 
         /**
-         * @brief Adds a frame from an image file.
+         * @brief Adds a frame from a PNG file or frames from a APNG file to the frame vector.
          * @param filePath The relative or absolute path to an image file.
          * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
          * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
@@ -113,50 +113,48 @@ namespace apngasm {
         
         /**
          * @brief Saves a JSON animation spec file.
-         * @param filePath [TODO: Description of filePath]
-         * @param imageDir [TODO: Description of imageDir]
-         * @return [TODO: Description of return value]
+         * @param filePath Path to save the file to.
+         * @param imageDir Directory where frame files are to be saved if not the same path as the animation spec.
+         * @return Returns true if save was successful.
          */
 		bool saveJSON(const std::string& outputPath, const std::string& imageDir="") const;
         
         /**
          * @brief Saves an XML animation spec file.
-         * @param filePath [TODO: Description of filePath]
-         * @param imageDir [TODO: Description of imageDir]
-         * @return [TODO: Description of return value]
+         * @param filePath Path to save the file to.
+         * @param imageDir Directory where frame files are to be saved if not the same path as the animation spec.
+         * @return Returns true if save was successful.
          */
 		bool saveXML(const std::string& outputPath, const std::string& imageDir="") const;
 #endif
 
         /**
-         * @brief
-		 *   Set APNGAsmListener.<br>
-		 *   If argument is NULL, set default APNGAsmListener.
-         * @param pListener [TODO: Description of pListener]
+         * @brief Sets a listener.
+         * @param listener A pointer to the listener object. If the argument is NULL a default APNGAsmListener will be created and assigned.
          */
-		void setAPNGAsmListener(listener::IAPNGAsmListener* pListener=NULL);
+		void setAPNGAsmListener(listener::IAPNGAsmListener* listener=NULL);
 
         /**
-         * @brief Returns the vector of frames.
-         * @return [TODO: Description of return value]
+         * @brief Returns the frame vector.
+         * @return Returns the frame vector.
          */
 		const std::vector<APNGFrame>& getFrames() const;
 
         /**
          * @brief Returns the number of frames.
-         * @return [TODO: Description of return value]
+         * @return Returns the number of frames.
          */
 		size_t frameCount();
 
         /**
-         * @brief Throw away all frames, start over.
-         * @return [TODO: Description of return value]
+         * @brief Destroy all frames in memory/dispose of the frame vector. Leaves the apngasm object in a clean state.
+         * @return Retruns number of frames disposed of.
          */
 		size_t reset();
 
         /**
          * @brief Returns the version of APNGAsm.
-         * @return [TODO: Description of return value]
+         * @return Version string.
          */
 		const char* version(void) const;
 
@@ -165,7 +163,7 @@ namespace apngasm {
     std::vector<APNGFrame> _frames;
 
     // APNGAsm event listener.
-    listener::IAPNGAsmListener* _pListener;
+    listener::IAPNGAsmListener* _listener;
 
 #ifdef APNG_WRITE_SUPPORTED
     unsigned char findCommonType(void);

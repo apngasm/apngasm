@@ -140,14 +140,14 @@ namespace apngasm {
 
   //Construct APNGAsm object
   APNGAsm::APNGAsm(void)
-    : _pListener(&defaultListener)
+    : _listener(&defaultListener)
   {
     // nop
   }
 
   //Construct APNGAsm object
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
-    : _pListener(&defaultListener)
+    : _listener(&defaultListener)
   {
     _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
@@ -200,7 +200,7 @@ namespace apngasm {
     for(int i = 0;  i < count;  ++i)
     {
       const std::string &currentFile = files[i];
-      if( _pListener->onPreAddFrame(currentFile, delayNum, delayDen) )
+      if( _listener->onPreAddFrame(currentFile, delayNum, delayDen) )
       {
 #ifdef APNG_READ_SUPPORTED
         fileToFrames(currentFile, delayNum, delayDen);
@@ -208,7 +208,7 @@ namespace apngasm {
         APNGFrame frame = APNGFrame(currentFile, delayNum, delayDen);
         _frames.push_back(frame);
 #endif
-        _pListener->onPostAddFrame(currentFile, delayNum, delayDen);
+        _listener->onPostAddFrame(currentFile, delayNum, delayDen);
       }
     }
 
@@ -219,10 +219,10 @@ namespace apngasm {
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(const APNGFrame &frame)
   {
-    if( _pListener->onPreAddFrame(frame) )
+    if( _listener->onPreAddFrame(frame) )
     {
       _frames.push_back(frame);
-      _pListener->onPostAddFrame(frame);
+      _listener->onPostAddFrame(frame);
     }
     return _frames.size();
   }
@@ -255,11 +255,11 @@ namespace apngasm {
   bool APNGAsm::saveJSON(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
-    if( _pListener->onPreSave(outputPath) )
+    if( _listener->onPreSave(outputPath) )
     {
-      spec::SpecWriter writer(this, _pListener);
+      spec::SpecWriter writer(this, _listener);
       if( (result = writer.writeJSON(outputPath, imageDir)) )
-        _pListener->onPostSave(outputPath);
+        _listener->onPostSave(outputPath);
     }
     return result;
   }
@@ -268,11 +268,11 @@ namespace apngasm {
   bool APNGAsm::saveXML(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
-    if( _pListener->onPreSave(outputPath) )
+    if( _listener->onPreSave(outputPath) )
     {
-      spec::SpecWriter writer(this, _pListener);
+      spec::SpecWriter writer(this, _listener);
       if( (result = writer.writeXML(outputPath, imageDir)) )
-        _pListener->onPostSave(outputPath);
+        _listener->onPostSave(outputPath);
     }
     return result;
   }
@@ -280,9 +280,9 @@ namespace apngasm {
 
   // Set APNGAsmListener.
   // If argument is NULL, set default APNGAsmListener.
-  void APNGAsm::setAPNGAsmListener(listener::IAPNGAsmListener* pListener)
+  void APNGAsm::setAPNGAsmListener(listener::IAPNGAsmListener* listener)
   {
-    _pListener = (pListener==NULL) ? &defaultListener : pListener;
+    _listener = (listener==NULL) ? &defaultListener : listener;
   }
 
 #ifdef APNG_WRITE_SUPPORTED
@@ -294,7 +294,7 @@ namespace apngasm {
     if (_frames.empty())
       return false;
 
-    if( !_pListener->onPreSave(outputPath) )
+    if( !_listener->onPreSave(outputPath) )
       return false;
 
     _width  = _frames[0]._width;
@@ -317,7 +317,7 @@ namespace apngasm {
     if( !save(outputPath, coltype, 0, 0) )
       return false;
 
-    _pListener->onPostSave(outputPath);
+    _listener->onPostSave(outputPath);
     return true;
   }
 
@@ -2182,15 +2182,15 @@ namespace apngasm {
     const int count = _frames.size();
     for(int i = 0;  i < count;  ++i)
     {
-      const std::string outputPath = _pListener->onCreatePngPath(outputDir, i);
+      const std::string outputPath = _listener->onCreatePngPath(outputDir, i);
 
-      if( !_pListener->onPreSave(outputPath) )
+      if( !_listener->onPreSave(outputPath) )
         return false;
 
       if( !_frames[i].save(outputPath) )
         return false;
 
-      _pListener->onPostSave(outputPath);
+      _listener->onPostSave(outputPath);
     }
     return true;
   }

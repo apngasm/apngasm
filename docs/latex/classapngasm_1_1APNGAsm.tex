@@ -3,7 +3,7 @@
 }
 
 
-\mbox{[}The \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} core class is all you need to assemble and disassemble Animated P\-N\-G.\mbox{]}  
+The \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} core class is all you need to assemble and disassemble Animated P\-N\-G.  
 
 
 
@@ -15,53 +15,44 @@
 \item 
 \hypertarget{classapngasm_1_1APNGAsm_a8e20443aff7eab2a51b9140d97168da2}{\hyperlink{classapngasm_1_1APNGAsm_a8e20443aff7eab2a51b9140d97168da2}{A\-P\-N\-G\-Asm} (void)}\label{classapngasm_1_1APNGAsm_a8e20443aff7eab2a51b9140d97168da2}
 
-\begin{DoxyCompactList}\small\item\em Construct \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} object. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Construct an empty \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} object. \end{DoxyCompactList}\item 
 \hyperlink{classapngasm_1_1APNGAsm_a4f8cc13561379ed9fdf7cbe132e1e496}{A\-P\-N\-G\-Asm} (const std\-::vector$<$ \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} $>$ \&frames)
 \begin{DoxyCompactList}\small\item\em Construct \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} object from an existing vector of apngasm frames. \end{DoxyCompactList}\item 
 \hypertarget{classapngasm_1_1APNGAsm_a63670f5cc79de98738c28c303cc74f37}{\hyperlink{classapngasm_1_1APNGAsm_a63670f5cc79de98738c28c303cc74f37}{$\sim$\-A\-P\-N\-G\-Asm} (void)}\label{classapngasm_1_1APNGAsm_a63670f5cc79de98738c28c303cc74f37}
 
 \begin{DoxyCompactList}\small\item\em \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} destructor. !reset() is called here and will destroy the memory for all frames! \end{DoxyCompactList}\item 
 size\-\_\-t \hyperlink{classapngasm_1_1APNGAsm_a937cbf8260ee5ce8ae1a589fb07e357f}{add\-Frame} (const std\-::string \&file\-Path, unsigned delay\-Num=\hyperlink{namespaceapngasm_a5b334b6957e14291ff8f76cab562f60f}{D\-E\-F\-A\-U\-L\-T\-\_\-\-F\-R\-A\-M\-E\-\_\-\-N\-U\-M\-E\-R\-A\-T\-O\-R}, unsigned delay\-Den=\hyperlink{namespaceapngasm_a867b3acbcc2624faf6b3e82732110594}{D\-E\-F\-A\-U\-L\-T\-\_\-\-F\-R\-A\-M\-E\-\_\-\-D\-E\-N\-O\-M\-I\-N\-A\-T\-O\-R})
-\begin{DoxyCompactList}\small\item\em Adds a frame from a file.\par
- Returns the frame number in the frame vector.\par
- Uses default delay of 10ms if not specified. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Adds a frame from a P\-N\-G file or frames from a A\-P\-N\-G file to the frame vector. \end{DoxyCompactList}\item 
 size\-\_\-t \hyperlink{classapngasm_1_1APNGAsm_ab90be230c206a50f9b2cb9ff64f932bc}{add\-Frame} (const \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} \&frame)
-\begin{DoxyCompactList}\small\item\em Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the frame vector.\par
- Returns the frame number in the frame vector. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the frame vector. \end{DoxyCompactList}\item 
 \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} \& \hyperlink{classapngasm_1_1APNGAsm_ad3c3260ad6a8b004ccb955c9425d5053}{operator$<$$<$} (const \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} \&frame)
 \begin{DoxyCompactList}\small\item\em Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the frame vector. \end{DoxyCompactList}\item 
 bool \hyperlink{classapngasm_1_1APNGAsm_ae2d72070a6f76248e717c027c2c19bbd}{assemble} (const std\-::string \&output\-Path)
-\begin{DoxyCompactList}\small\item\em Assembles and outputs an A\-P\-N\-G file.\par
- Returns the assembled file object.\par
- If no output path is specified only the file object is returned. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Assembles and outputs an A\-P\-N\-G file. \end{DoxyCompactList}\item 
 const std\-::vector$<$ \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} $>$ \& \hyperlink{classapngasm_1_1APNGAsm_ab905012a98e04946623252b5561453aa}{disassemble} (const std\-::string \&file\-Path)
-\begin{DoxyCompactList}\small\item\em Disassembles an A\-P\-N\-G file.\par
- Returns the frame vector. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Disassembles an A\-P\-N\-G file. \end{DoxyCompactList}\item 
 bool \hyperlink{classapngasm_1_1APNGAsm_a59ebac9f6db6973bc8e5b5d05e72586f}{save\-P\-N\-Gs} (const std\-::string \&output\-Dir) const 
-\begin{DoxyCompactList}\small\item\em Save png files. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Saves individual P\-N\-G files of the frames in the frame vector. \end{DoxyCompactList}\item 
 const std\-::vector$<$ \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} $>$ \& \hyperlink{classapngasm_1_1APNGAsm_acf09916f78025c714a205142cdae1349}{load\-Animation\-Spec} (const std\-::string \&file\-Path)
-\begin{DoxyCompactList}\small\item\em Loads an animation spec from J\-S\-O\-N or X\-M\-L.\par
- Returns a frame vector with the loaded frames.\par
- Loaded frames are added to the end of the frame vector. \end{DoxyCompactList}\item 
-bool \hyperlink{classapngasm_1_1APNGAsm_ae85225d19784fe0681ab88b9220901ab}{save\-Json} (const std\-::string \&output\-Path, const std\-::string \&image\-Dir=\char`\"{}\char`\"{}) const 
-\begin{DoxyCompactList}\small\item\em Save json file. \end{DoxyCompactList}\item 
-bool \hyperlink{classapngasm_1_1APNGAsm_ae92bb6d35d573b8609cd06b80c92cc34}{save\-Xml} (const std\-::string \&output\-Path, const std\-::string \&image\-Dir=\char`\"{}\char`\"{}) const 
-\begin{DoxyCompactList}\small\item\em Save xml file. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Loads an animation spec from J\-S\-O\-N or X\-M\-L. Loaded frames are added to the end of the frame vector. For more details on animation specs see\-: \href{https://github.com/Genshin/PhantomStandards}{\tt https\-://github.\-com/\-Genshin/\-Phantom\-Standards}. \end{DoxyCompactList}\item 
+bool \hyperlink{classapngasm_1_1APNGAsm_abdb6681c9013cf41a026a4dd48331557}{save\-J\-S\-O\-N} (const std\-::string \&output\-Path, const std\-::string \&image\-Dir=\char`\"{}\char`\"{}) const 
+\begin{DoxyCompactList}\small\item\em Saves a J\-S\-O\-N animation spec file. \end{DoxyCompactList}\item 
+bool \hyperlink{classapngasm_1_1APNGAsm_a978d3036659830a811e6b6572c84ee10}{save\-X\-M\-L} (const std\-::string \&output\-Path, const std\-::string \&image\-Dir=\char`\"{}\char`\"{}) const 
+\begin{DoxyCompactList}\small\item\em Saves an X\-M\-L animation spec file. \end{DoxyCompactList}\item 
 void \hyperlink{classapngasm_1_1APNGAsm_a9077ec06f0f271d1719e868b93a3a703}{set\-A\-P\-N\-G\-Asm\-Listener} (listener\-::\-I\-A\-P\-N\-G\-Asm\-Listener $\ast$p\-Listener=N\-U\-L\-L)
-\begin{DoxyCompactList}\small\item\em Set A\-P\-N\-G\-Asm\-Listener.\par
- If argument is N\-U\-L\-L, set default A\-P\-N\-G\-Asm\-Listener. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Sets a listener. \end{DoxyCompactList}\item 
 const std\-::vector$<$ \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} $>$ \& \hyperlink{classapngasm_1_1APNGAsm_a7533862bb9fae0c1fe9c16d3887eb5a2}{get\-Frames} () const 
-\begin{DoxyCompactList}\small\item\em Returns the vector of frames. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns the frame vector. \end{DoxyCompactList}\item 
 size\-\_\-t \hyperlink{classapngasm_1_1APNGAsm_aa8386d242540399c9c48cef6841feae3}{frame\-Count} ()
 \begin{DoxyCompactList}\small\item\em Returns the number of frames. \end{DoxyCompactList}\item 
 size\-\_\-t \hyperlink{classapngasm_1_1APNGAsm_a01763c8cd76b6ed61309b50cf1060e03}{reset} ()
-\begin{DoxyCompactList}\small\item\em Throw away all frames, start over. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Destroy all frames in memory/dispose of the frame vector. Leaves the apngasm object in a clean state. \end{DoxyCompactList}\item 
 const char $\ast$ \hyperlink{classapngasm_1_1APNGAsm_ac021e490af5e73353d1efbc5c1216637}{version} (void) const 
 \begin{DoxyCompactList}\small\item\em Returns the version of \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm}. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-\mbox{[}The \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} core class is all you need to assemble and disassemble Animated P\-N\-G.\mbox{]} 
+The \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} core class is all you need to assemble and disassemble Animated P\-N\-G. 
 
 \subsection{Constructor \& Destructor Documentation}
 \hypertarget{classapngasm_1_1APNGAsm_a4f8cc13561379ed9fdf7cbe132e1e496}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!A\-P\-N\-G\-Asm@{A\-P\-N\-G\-Asm}}
@@ -77,7 +68,7 @@ Construct \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} object from an ex
 
 
 \begin{DoxyParams}{Parameters}
-{\em frames} & \mbox{[}T\-O\-D\-O\-: Description of frames\mbox{]} \\
+{\em a} & std\-::vector of \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} objects. \\
 \hline
 \end{DoxyParams}
 
@@ -94,21 +85,19 @@ Construct \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm} object from an ex
 )}}\label{classapngasm_1_1APNGAsm_a937cbf8260ee5ce8ae1a589fb07e357f}
 
 
-Adds a frame from a file.\par
- Returns the frame number in the frame vector.\par
- Uses default delay of 10ms if not specified. 
+Adds a frame from a P\-N\-G file or frames from a A\-P\-N\-G file to the frame vector. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Path} & \mbox{[}T\-O\-D\-O\-: Description of file\-Path\mbox{]} \\
+{\em file\-Path} & The relative or absolute path to an image file. \\
 \hline
-{\em delay\-Num} & \mbox{[}T\-O\-D\-O\-: Description of delay\-Num\mbox{]} \\
+{\em delay\-Num} & The delay numerator for this frame (defaults to D\-E\-F\-A\-U\-L\-T\-\_\-\-F\-R\-A\-M\-E\-\_\-\-N\-U\-M\-E\-R\-A\-T\-O\-R). \\
 \hline
-{\em delay\-Den} & \mbox{[}T\-O\-D\-O\-: Description of delay\-Den\mbox{]} \\
+{\em delay\-Den} & The delay denominator for this frame (defaults to D\-E\-F\-A\-U\-L\-T\-\_\-\-F\-R\-A\-M\-E\-\_\-\-D\-E\-N\-M\-I\-N\-A\-T\-O\-R). \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+The \mbox{[}new\mbox{]} number of frames/the number of this frame on the frame vector. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_ab90be230c206a50f9b2cb9ff64f932bc}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!add\-Frame@{add\-Frame}}
 \index{add\-Frame@{add\-Frame}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -119,16 +108,15 @@ Adds a frame from a file.\par
 )}}\label{classapngasm_1_1APNGAsm_ab90be230c206a50f9b2cb9ff64f932bc}
 
 
-Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the frame vector.\par
- Returns the frame number in the frame vector. 
+Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the frame vector. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em frame} & \mbox{[}T\-O\-D\-O\-: Description of frame\mbox{]} \\
+{\em frame} & the \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to be added \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+The \mbox{[}new\mbox{]} number of frames/the number of this frame on the frame vector. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_ae2d72070a6f76248e717c027c2c19bbd}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!assemble@{assemble}}
 \index{assemble@{assemble}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -139,17 +127,15 @@ Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the f
 )}}\label{classapngasm_1_1APNGAsm_ae2d72070a6f76248e717c027c2c19bbd}
 
 
-Assembles and outputs an A\-P\-N\-G file.\par
- Returns the assembled file object.\par
- If no output path is specified only the file object is returned. 
+Assembles and outputs an A\-P\-N\-G file. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em output\-Path} & \mbox{[}T\-O\-D\-O\-: Description of output\-Path\mbox{]} \\
+{\em output\-Path} & The output file path. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns true if assemble completed succesfully. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_ab905012a98e04946623252b5561453aa}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!disassemble@{disassemble}}
 \index{disassemble@{disassemble}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -160,16 +146,15 @@ Assembles and outputs an A\-P\-N\-G file.\par
 )}}\label{classapngasm_1_1APNGAsm_ab905012a98e04946623252b5561453aa}
 
 
-Disassembles an A\-P\-N\-G file.\par
- Returns the frame vector. 
+Disassembles an A\-P\-N\-G file. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Path} & \mbox{[}T\-O\-D\-O\-: Description of file\-Path\mbox{]} \\
+{\em file\-Path} & The file path to the P\-N\-G image to be disassembled. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+A vector containing the frames of the disassembled P\-N\-G. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_aa8386d242540399c9c48cef6841feae3}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!frame\-Count@{frame\-Count}}
 \index{frame\-Count@{frame\-Count}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -183,7 +168,7 @@ Disassembles an A\-P\-N\-G file.\par
 Returns the number of frames. 
 
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns the number of frames. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_a7533862bb9fae0c1fe9c16d3887eb5a2}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!get\-Frames@{get\-Frames}}
 \index{get\-Frames@{get\-Frames}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -194,10 +179,10 @@ Returns the number of frames.
 ) const}}\label{classapngasm_1_1APNGAsm_a7533862bb9fae0c1fe9c16d3887eb5a2}
 
 
-Returns the vector of frames. 
+Returns the frame vector. 
 
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns the frame vector. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_acf09916f78025c714a205142cdae1349}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!load\-Animation\-Spec@{load\-Animation\-Spec}}
 \index{load\-Animation\-Spec@{load\-Animation\-Spec}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -208,17 +193,15 @@ Returns the vector of frames.
 )}}\label{classapngasm_1_1APNGAsm_acf09916f78025c714a205142cdae1349}
 
 
-Loads an animation spec from J\-S\-O\-N or X\-M\-L.\par
- Returns a frame vector with the loaded frames.\par
- Loaded frames are added to the end of the frame vector. 
+Loads an animation spec from J\-S\-O\-N or X\-M\-L. Loaded frames are added to the end of the frame vector. For more details on animation specs see\-: \href{https://github.com/Genshin/PhantomStandards}{\tt https\-://github.\-com/\-Genshin/\-Phantom\-Standards}. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Path} & \mbox{[}T\-O\-D\-O\-: Description of file\-Path\mbox{]} \\
+{\em file\-Path} & The path to the spec .xml or .json file. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+A frame vector with the loaded frames. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_ad3c3260ad6a8b004ccb955c9425d5053}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -233,11 +216,11 @@ Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the f
 
 
 \begin{DoxyParams}{Parameters}
-{\em frame} & \mbox{[}T\-O\-D\-O\-: Description of frame\mbox{]} \\
+{\em frame} & An \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+The \mbox{[}new\mbox{]} number of frames/the number of this frame on the frame vector. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_a01763c8cd76b6ed61309b50cf1060e03}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!reset@{reset}}
 \index{reset@{reset}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -248,32 +231,32 @@ Adds an \hyperlink{classapngasm_1_1APNGFrame}{A\-P\-N\-G\-Frame} object to the f
 )}}\label{classapngasm_1_1APNGAsm_a01763c8cd76b6ed61309b50cf1060e03}
 
 
-Throw away all frames, start over. 
+Destroy all frames in memory/dispose of the frame vector. Leaves the apngasm object in a clean state. 
 
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Retruns number of frames disposed of. 
 \end{DoxyReturn}
-\hypertarget{classapngasm_1_1APNGAsm_ae85225d19784fe0681ab88b9220901ab}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!save\-Json@{save\-Json}}
-\index{save\-Json@{save\-Json}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
-\subsubsection[{save\-Json}]{\setlength{\rightskip}{0pt plus 5cm}bool apngasm\-::\-A\-P\-N\-G\-Asm\-::save\-Json (
+\hypertarget{classapngasm_1_1APNGAsm_abdb6681c9013cf41a026a4dd48331557}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!save\-J\-S\-O\-N@{save\-J\-S\-O\-N}}
+\index{save\-J\-S\-O\-N@{save\-J\-S\-O\-N}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
+\subsubsection[{save\-J\-S\-O\-N}]{\setlength{\rightskip}{0pt plus 5cm}bool apngasm\-::\-A\-P\-N\-G\-Asm\-::save\-J\-S\-O\-N (
 \begin{DoxyParamCaption}
 \item[{const std\-::string \&}]{output\-Path, }
 \item[{const std\-::string \&}]{image\-Dir = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
-) const}}\label{classapngasm_1_1APNGAsm_ae85225d19784fe0681ab88b9220901ab}
+) const}}\label{classapngasm_1_1APNGAsm_abdb6681c9013cf41a026a4dd48331557}
 
 
-Save json file. 
+Saves a J\-S\-O\-N animation spec file. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Path} & \mbox{[}T\-O\-D\-O\-: Description of file\-Path\mbox{]} \\
+{\em file\-Path} & Path to save the file to. \\
 \hline
-{\em image\-Dir} & \mbox{[}T\-O\-D\-O\-: Description of image\-Dir\mbox{]} \\
+{\em image\-Dir} & Directory where frame files are to be saved if not the same path as the animation spec. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns true if save was successful. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_a59ebac9f6db6973bc8e5b5d05e72586f}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!save\-P\-N\-Gs@{save\-P\-N\-Gs}}
 \index{save\-P\-N\-Gs@{save\-P\-N\-Gs}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -284,37 +267,37 @@ Save json file.
 ) const}}\label{classapngasm_1_1APNGAsm_a59ebac9f6db6973bc8e5b5d05e72586f}
 
 
-Save png files. 
+Saves individual P\-N\-G files of the frames in the frame vector. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Dir} & \mbox{[}T\-O\-D\-O\-: Description of file\-Dir\mbox{]} \\
+{\em file\-Dir} & The directory where the P\-N\-G fils will be saved. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns true if all files were saved successfully. 
 \end{DoxyReturn}
-\hypertarget{classapngasm_1_1APNGAsm_ae92bb6d35d573b8609cd06b80c92cc34}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!save\-Xml@{save\-Xml}}
-\index{save\-Xml@{save\-Xml}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
-\subsubsection[{save\-Xml}]{\setlength{\rightskip}{0pt plus 5cm}bool apngasm\-::\-A\-P\-N\-G\-Asm\-::save\-Xml (
+\hypertarget{classapngasm_1_1APNGAsm_a978d3036659830a811e6b6572c84ee10}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!save\-X\-M\-L@{save\-X\-M\-L}}
+\index{save\-X\-M\-L@{save\-X\-M\-L}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
+\subsubsection[{save\-X\-M\-L}]{\setlength{\rightskip}{0pt plus 5cm}bool apngasm\-::\-A\-P\-N\-G\-Asm\-::save\-X\-M\-L (
 \begin{DoxyParamCaption}
 \item[{const std\-::string \&}]{output\-Path, }
 \item[{const std\-::string \&}]{image\-Dir = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
-) const}}\label{classapngasm_1_1APNGAsm_ae92bb6d35d573b8609cd06b80c92cc34}
+) const}}\label{classapngasm_1_1APNGAsm_a978d3036659830a811e6b6572c84ee10}
 
 
-Save xml file. 
+Saves an X\-M\-L animation spec file. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em file\-Path} & \mbox{[}T\-O\-D\-O\-: Description of file\-Path\mbox{]} \\
+{\em file\-Path} & Path to save the file to. \\
 \hline
-{\em image\-Dir} & \mbox{[}T\-O\-D\-O\-: Description of image\-Dir\mbox{]} \\
+{\em image\-Dir} & Directory where frame files are to be saved if not the same path as the animation spec. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Returns true if save was successful. 
 \end{DoxyReturn}
 \hypertarget{classapngasm_1_1APNGAsm_a9077ec06f0f271d1719e868b93a3a703}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!set\-A\-P\-N\-G\-Asm\-Listener@{set\-A\-P\-N\-G\-Asm\-Listener}}
 \index{set\-A\-P\-N\-G\-Asm\-Listener@{set\-A\-P\-N\-G\-Asm\-Listener}!apngasm::APNGAsm@{apngasm\-::\-A\-P\-N\-G\-Asm}}
@@ -325,12 +308,11 @@ Save xml file.
 )}}\label{classapngasm_1_1APNGAsm_a9077ec06f0f271d1719e868b93a3a703}
 
 
-Set A\-P\-N\-G\-Asm\-Listener.\par
- If argument is N\-U\-L\-L, set default A\-P\-N\-G\-Asm\-Listener. 
+Sets a listener. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em p\-Listener} & \mbox{[}T\-O\-D\-O\-: Description of p\-Listener\mbox{]} \\
+{\em p\-Listener} & A pointer to the listener object. If the argument is N\-U\-L\-L a default A\-P\-N\-G\-Asm\-Listener will be created and assigned. \\
 \hline
 \end{DoxyParams}
 \hypertarget{classapngasm_1_1APNGAsm_ac021e490af5e73353d1efbc5c1216637}{\index{apngasm\-::\-A\-P\-N\-G\-Asm@{apngasm\-::\-A\-P\-N\-G\-Asm}!version@{version}}
@@ -345,5 +327,5 @@ Set A\-P\-N\-G\-Asm\-Listener.\par
 Returns the version of \hyperlink{classapngasm_1_1APNGAsm}{A\-P\-N\-G\-Asm}. 
 
 \begin{DoxyReturn}{Returns}
-\mbox{[}T\-O\-D\-O\-: Description of return value\mbox{]} 
+Version string. 
 \end{DoxyReturn}
