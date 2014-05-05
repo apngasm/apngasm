@@ -38,30 +38,30 @@ namespace apngasm {
       };  // class AbstractSpecWriterImpl
 
       // for JSON.
-      class JsonSpecWriterImpl : public AbstractSpecWriterImpl
+      class JSONSpecWriterImpl : public AbstractSpecWriterImpl
       {
       public:
-        // Initialize JsonSpecWriterImpl object.
-        JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
+        // Initialize JSONSpecWriterImpl object.
+        JSONSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         bool write(const std::string& filePath, const std::string& imagePathPrefix="") const;
         
-      };  // class JsonSpecWriterImpl
+      };  // class JSONSpecWriterImpl
 
       // for XML.
-      class XmlSpecWriterImpl : public AbstractSpecWriterImpl
+      class XMLSpecWriterImpl : public AbstractSpecWriterImpl
       {
       public:
-        // Initialize XmlSpecWriterImpl object.
-        XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
+        // Initialize XMLSpecWriterImpl object.
+        XMLSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener);
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
         bool write(const std::string& filePath, const std::string& imagePathPrefix="") const;
         
-      };  // class XmlSpecWriterImpl
+      };  // class XMLSpecWriterImpl
 
 
     } // namespace priv

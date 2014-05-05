@@ -33,8 +33,8 @@ namespace apngasm_cli {
 		bool outputFile(std::string &out) const;
 		bool disassembleFile(std::string &out) const;
 		bool specFile(std::string &out) const;
-		bool outputJsonFile(std::string &out) const;
-		bool outputXmlFile(std::string &out) const;
+		bool outputJSONFile(std::string &out) const;
+		bool outputXMLFile(std::string &out) const;
 		const INPUTS::const_iterator inputFilesBegin(void) const;
 		const INPUTS::const_iterator inputFilesEnd(void) const;
 	};

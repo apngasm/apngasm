@@ -102,23 +102,23 @@ namespace apngasm {
 
     // Write APNGAsm object to json file.
     // Return true if write succeeded.
-    bool SpecWriter::writeJson(const std::string& filePath, const std::string& imageDir) const
+    bool SpecWriter::writeJSON(const std::string& filePath, const std::string& imageDir) const
     {
       if( !_pApngasm )
         return false;
 
-      priv::JsonSpecWriterImpl impl(_pApngasm, _pListener);
+      priv::JSONSpecWriterImpl impl(_pApngasm, _pListener);
       return impl.write(filePath, createRelativeDir(filePath, imageDir + separator));
     }
 
     // Write APNGAsm object to xml file.
     // Return true if write succeeded.
-    bool SpecWriter::writeXml(const std::string& filePath, const std::string& imageDir) const
+    bool SpecWriter::writeXML(const std::string& filePath, const std::string& imageDir) const
     {
       if( !_pApngasm )
         return false;
 
-      priv::XmlSpecWriterImpl impl(_pApngasm, _pListener);
+      priv::XMLSpecWriterImpl impl(_pApngasm, _pListener);
       return impl.write(filePath, createRelativeDir(filePath, imageDir + separator));
     }
 

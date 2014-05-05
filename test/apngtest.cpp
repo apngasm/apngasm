@@ -70,8 +70,8 @@ int main(int argc, char* argv[])
   std::cout << frames.size() << " Frames" << std::endl;
   assembler.savePNGs("out");
 #ifdef APNG_SPECS_SUPPORTED
-  assembler.saveJson("out/penguins.json", "out");
-  assembler.saveXml("out/penguins.xml", "out");
+  assembler.saveJSON("out/penguins.json", "out");
+  assembler.saveXML("out/penguins.xml", "out");
 #endif
   std::cout << "Test 3 - finish" << std::endl;
 #endif

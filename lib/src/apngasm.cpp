@@ -252,26 +252,26 @@ namespace apngasm {
   }
 
   // Save json file.
-  bool APNGAsm::saveJson(const std::string& outputPath, const std::string& imageDir) const
+  bool APNGAsm::saveJSON(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
     if( _pListener->onPreSave(outputPath) )
     {
       spec::SpecWriter writer(this, _pListener);
-      if( (result = writer.writeJson(outputPath, imageDir)) )
+      if( (result = writer.writeJSON(outputPath, imageDir)) )
         _pListener->onPostSave(outputPath);
     }
     return result;
   }
 
   // Save xml file.
-  bool APNGAsm::saveXml(const std::string& outputPath, const std::string& imageDir) const
+  bool APNGAsm::saveXML(const std::string& outputPath, const std::string& imageDir) const
   {
     bool result = false;
     if( _pListener->onPreSave(outputPath) )
     {
       spec::SpecWriter writer(this, _pListener);
-      if( (result = writer.writeXml(outputPath, imageDir)) )
+      if( (result = writer.writeXML(outputPath, imageDir)) )
         _pListener->onPostSave(outputPath);
     }
     return result;
