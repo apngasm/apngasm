@@ -9,13 +9,13 @@ namespace apngasm {
 
     namespace {
       // Return true if file is json.
-      bool isJson(const std::string& filePath)
+      bool isJSON(const std::string& filePath)
       {
         return boost::algorithm::iends_with(filePath, ".json");
       }
 
       // Return true if file is xml.
-      bool isXml(const std::string& filePath)
+      bool isXML(const std::string& filePath)
       {
         return boost::algorithm::iends_with(filePath, ".xml");
       }
@@ -38,14 +38,14 @@ namespace apngasm {
       boost::scoped_ptr<priv::ISpecReaderImpl> pImpl;
 
       // json file.
-      if( isJson(filePath) )
+      if( isJSON(filePath) )
       {
-        pImpl.reset(new priv::JsonSpecReaderImpl());
+        pImpl.reset(new priv::JSONSpecReaderImpl());
       }
       // xml file.
-      else if( isXml(filePath) )
+      else if( isXML(filePath) )
       {
-        pImpl.reset(new priv::XmlSpecReaderImpl());
+        pImpl.reset(new priv::XMLSpecReaderImpl());
       }
       // unknown file.
       else

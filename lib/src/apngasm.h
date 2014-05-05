@@ -1,7 +1,7 @@
 /**
  * @file apngasm.h
- * @brief [TODO: Description of this file]
- * @author [TODO: Author of this file]
+ * @brief apngasm core. All apngasm functionality can is accessable from here.
+ * @author Max Stepin, Naoki Iwakawa (GSSZ)
  */
 
 #ifndef _APNGASM_H_
@@ -16,161 +16,145 @@
 
 /**
  * @namespace apngasm
- * @brief [TODO: Description of apngasm namespace]
+ * @brief The apngasm namespace contains all functionality of apngasm.
  */
 namespace apngasm {
 
     namespace listener { class IAPNGAsmListener; }
 
-    /**
-     * @struct OP
-     * @brief [TODO: Description of OP]
-     */
     typedef struct { unsigned char *p; unsigned int size; int x, y, w, h, valid, filters; } OP;
 
     /**
      * @struct CHUNK
-     * @brief [TODO: Description of CHUNK]
+     * @brief A chunk of image data.
      */
     struct CHUNK { unsigned int size; unsigned char * p; };
 
     /**
      * @class APNGAsm
-     * @brief [TODO: Description of APNGAsm class]
+     * @brief The APNGAsm core class is all you need to assemble and disassemble Animated PNG.
      */
     class APNGASM_DECLSPEC APNGAsm {
     public:
         /**
-         * @brief Construct APNGAsm object.
+         * @brief Construct an empty APNGAsm object.
          */
 		APNGAsm(void);
 		
         /**
-         * @brief Construct APNGAsm object.
-         * @param frames [TODO: Description of frames]
+         * @brief Construct APNGAsm object from an existing vector of apngasm frames.
+         * @param a std::vector of APNGFrame objects.
          */
 		APNGAsm(const std::vector<APNGFrame> &frames);
 
         /**
-         * @brief Destruct APNGAsm object.
+         * @brief APNGAsm destructor. !reset() is called here and will destroy the memory for all frames!
          */
 		~APNGAsm(void);
 
         /**
-         * @brief
-         *   Adds a frame from a file.<br>
-         *   Returns the frame number in the frame vector.<br>
-         *   Uses default delay of 10ms if not specified.
-         * @param filePath [TODO: Description of filePath]
-         * @param delayNum [TODO: Description of delayNum]
-         * @param delayDen [TODO: Description of delayDen]
-         * @return [TODO: Description of return value]
+         * @brief Adds a frame from a PNG file or frames from a APNG file to the frame vector.
+         * @param filePath The relative or absolute path to an image file.
+         * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+         * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+         * @return The [new] number of frames/the number of this frame on the frame vector.
          */
 		size_t addFrame(const std::string &filePath, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
 
         /**
-		 * @brief
-         *   Adds an APNGFrame object to the frame vector.<br>
-		 *   Returns the frame number in the frame vector.
-         * @param frame [TODO: Description of frame]
-         * @return [TODO: Description of return value]
+		 * @brief Adds an APNGFrame object to the frame vector.
+         * @param frame the APNGFrame object to be added
+         * @return The [new] number of frames/the number of this frame on the frame vector.
          */
 		size_t addFrame(const APNGFrame &frame);
 		
         /**
 		 * @brief Adds an APNGFrame object to the frame vector.
-         * @param frame [TODO: Description of frame]
-         * @return [TODO: Description of return value]
+         * @param frame An APNGFrame object.
+         * @return The [new] number of frames/the number of this frame on the frame vector.
          */
 		APNGAsm& operator << (const APNGFrame &frame);
 
 #ifdef APNG_WRITE_SUPPORTED
         /**
-         * @brief
-		 *   Assembles and outputs an APNG file.<br>
-		 *   Returns the assembled file object.<br>
-		 *   If no output path is specified only the file object is returned.
-         * @param outputPath [TODO: Description of outputPath]
-         * @return [TODO: Description of return value]
+         * @brief Assembles and outputs an APNG file.
+         * @param outputPath The output file path.
+         * @return Returns true if assemble completed succesfully.
          */
 		bool assemble(const std::string &outputPath);
 #endif
 
 #ifdef APNG_READ_SUPPORTED
         /**
-         * @brief
-		 *   Disassembles an APNG file.<br>
-		 *   Returns the frame vector.
-         * @param filePath [TODO: Description of filePath]
-         * @return [TODO: Description of return value]
+         * @brief Disassembles an APNG file.
+         * @param filePath The file path to the PNG image to be disassembled.
+         * @return A vector containing the frames of the disassembled PNG.
          */
 		const std::vector<APNGFrame>& disassemble(const std::string &filePath);
         
         /**
-         * @brief Save png files.
-         * @param fileDir [TODO: Description of fileDir]
-         * @return [TODO: Description of return value]
+         * @brief Saves individual PNG files of the frames in the frame vector.
+         * @param fileDir The directory where the PNG fils will be saved.
+         * @return Returns true if all files were saved successfully.
          */
 		bool savePNGs(const std::string& outputDir) const;
 #endif
 
 #ifdef APNG_SPECS_SUPPORTED
         /**
-         * @brief
-		 *   Loads an animation spec from JSON or XML.<br>
-		 *   Returns a frame vector with the loaded frames.<br>
-		 *   Loaded frames are added to the end of the frame vector.
-         * @param filePath [TODO: Description of filePath]
-         * @return [TODO: Description of return value]
+         * @brief Loads an animation spec from JSON or XML.
+		 *		Loaded frames are added to the end of the frame vector.
+		 *		For more details on animation specs see:
+		 *			https://github.com/Genshin/PhantomStandards
+         * @param filePath The path to the spec .xml or .json file.
+         * @return A frame vector with the loaded frames.
          */
 		const std::vector<APNGFrame>& loadAnimationSpec(const std::string &filePath);
         
         /**
-         * @brief Save json file.
-         * @param filePath [TODO: Description of filePath]
-         * @param imageDir [TODO: Description of imageDir]
-         * @return [TODO: Description of return value]
+         * @brief Saves a JSON animation spec file.
+         * @param filePath Path to save the file to.
+         * @param imageDir Directory where frame files are to be saved if not the same path as the animation spec.
+         * @return Returns true if save was successful.
          */
-		bool saveJson(const std::string& outputPath, const std::string& imageDir="") const;
+		bool saveJSON(const std::string& outputPath, const std::string& imageDir="") const;
         
         /**
-         * @brief Save xml file.
-         * @param filePath [TODO: Description of filePath]
-         * @param imageDir [TODO: Description of imageDir]
-         * @return [TODO: Description of return value]
+         * @brief Saves an XML animation spec file.
+         * @param filePath Path to save the file to.
+         * @param imageDir Directory where frame files are to be saved if not the same path as the animation spec.
+         * @return Returns true if save was successful.
          */
-		bool saveXml(const std::string& outputPath, const std::string& imageDir="") const;
+		bool saveXML(const std::string& outputPath, const std::string& imageDir="") const;
 #endif
 
         /**
-         * @brief
-		 *   Set APNGAsmListener.<br>
-		 *   If argument is NULL, set default APNGAsmListener.
-         * @param pListener [TODO: Description of pListener]
+         * @brief Sets a listener.
+         * @param listener A pointer to the listener object. If the argument is NULL a default APNGAsmListener will be created and assigned.
          */
-		void setAPNGAsmListener(listener::IAPNGAsmListener* pListener=NULL);
+		void setAPNGAsmListener(listener::IAPNGAsmListener* listener=NULL);
 
         /**
-         * @brief Returns the vector of frames.
-         * @return [TODO: Description of return value]
+         * @brief Returns the frame vector.
+         * @return Returns the frame vector.
          */
 		const std::vector<APNGFrame>& getFrames() const;
 
         /**
          * @brief Returns the number of frames.
-         * @return [TODO: Description of return value]
+         * @return Returns the number of frames.
          */
 		size_t frameCount();
 
         /**
-         * @brief Throw away all frames, start over.
-         * @return [TODO: Description of return value]
+         * @brief Destroy all frames in memory/dispose of the frame vector. Leaves the apngasm object in a clean state.
+         * @return Retruns number of frames disposed of.
          */
 		size_t reset();
 
         /**
          * @brief Returns the version of APNGAsm.
-         * @return [TODO: Description of return value]
+         * @return Version string.
          */
 		const char* version(void) const;
 
@@ -179,7 +163,7 @@ namespace apngasm {
     std::vector<APNGFrame> _frames;
 
     // APNGAsm event listener.
-    listener::IAPNGAsmListener* _pListener;
+    listener::IAPNGAsmListener* _listener;
 
 #ifdef APNG_WRITE_SUPPORTED
     unsigned char findCommonType(void);

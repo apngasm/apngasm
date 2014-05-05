@@ -17,8 +17,8 @@ namespace apngasm {
           // nop
         }
 
-        // Initialize JsonSpecWriterImpl object.
-        JsonSpecWriterImpl::JsonSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+        // Initialize JSONSpecWriterImpl object.
+        JSONSpecWriterImpl::JSONSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
           : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
@@ -26,7 +26,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool JsonSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
+        bool JSONSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
         {
           boost::property_tree::ptree root;
 
@@ -58,8 +58,8 @@ namespace apngasm {
           return true;
         }
 
-        // Initialize XmlSpecWriterImpl object.
-        XmlSpecWriterImpl::XmlSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
+        // Initialize XMLSpecWriterImpl object.
+        XMLSpecWriterImpl::XMLSpecWriterImpl(const APNGAsm* pApngasm, const listener::IAPNGAsmListener* pListener)
           : AbstractSpecWriterImpl(pApngasm, pListener)
         {
           // nop
@@ -67,7 +67,7 @@ namespace apngasm {
 
         // Write APNGAsm object to spec file.
         // Return true if write succeeded.
-        bool XmlSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
+        bool XMLSpecWriterImpl::write(const std::string& filePath, const std::string& imagePathPrefix) const
         {
           boost::property_tree::ptree root;
 

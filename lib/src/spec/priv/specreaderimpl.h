@@ -75,25 +75,25 @@ namespace apngasm {
 
 
       // for JSON.
-      class JsonSpecReaderImpl : public AbstractSpecReaderImpl
+      class JSONSpecReaderImpl : public AbstractSpecReaderImpl
       {
       public:
         // Read parameter from spec file.
         // Return true if read succeeded.
         bool read(const std::string& filePath);
 
-      };  // class JsonSpecReaderImpl
+      };  // class JSONSpecReaderImpl
 
 
       // for XML.
-      class XmlSpecReaderImpl : public AbstractSpecReaderImpl
+      class XMLSpecReaderImpl : public AbstractSpecReaderImpl
       {
       public:
         // Read parameter from spec file.
         // Return true if read succeeded.
         bool read(const std::string& filePath);
 
-      };  // class XmlSpecReaderImpl
+      };  // class XMLSpecReaderImpl
 
     } // namespace priv
   } // namespace spec

@@ -97,7 +97,7 @@ namespace apngasm {
       
       // Read parameter from spec file.
       // Return true if read succeeded.
-      bool JsonSpecReaderImpl::read(const std::string& filePath)
+      bool JSONSpecReaderImpl::read(const std::string& filePath)
       {
         // Read JSON file.
         boost::property_tree::ptree root;
@@ -196,7 +196,7 @@ namespace apngasm {
       
       // Read parameter from spec file.
       // Return true if read succeeded.
-      bool XmlSpecReaderImpl::read(const std::string& filePath)
+      bool XMLSpecReaderImpl::read(const std::string& filePath)
       {
         // Read XML file.
         boost::property_tree::ptree root;

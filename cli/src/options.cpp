@@ -249,7 +249,7 @@ namespace apngasm_cli {
 		return true;
 	}
 
-	bool Options::outputJsonFile(std::string &out) const
+	bool Options::outputJSONFile(std::string &out) const
 	{
 		if(!vm.count("json")) {
 			return false;
@@ -258,7 +258,7 @@ namespace apngasm_cli {
 		return true;
 	}
 
-	bool Options::outputXmlFile(std::string &out) const
+	bool Options::outputXMLFile(std::string &out) const
 	{
 		if(!vm.count("xml")) {
 			return false;
