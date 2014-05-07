@@ -1,24 +1,7 @@
 #!/usr/bin/make -f
 
-BUILDDIR = build
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
 
-# secondly called by launchpad
-build:
-	mkdir $(BUILDDIR);
-	cd $(BUILDDIR); cmake ..
-	make -C $(BUILDDIR)
-
-# thirdly called by launchpad
-binary: binary-indep binary-arch
-
-binary-indep:
-	# nothing to be done
-
-binary-arch:
-	cd $(BUILDDIR);	make package
-
-# firstly called by launchpad
-clean:
-	rm -rf build
-
-.PHONY: binary binary-arch binary-indep clean
+%:
+    dh --buildsystem=cmake $@
