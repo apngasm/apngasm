@@ -1,4 +1,4 @@
-Source: libapngasm
+Source: apngasm
 Section: devel
 Priority: optional
 Maintainer: Rei Kagetsuki <zero@genshin.org>
@@ -14,7 +14,7 @@ Description: apngasm Animated PNG Assembler CLI tool
   Assemble APNG animations from PNG image sequences.
   This is the command line tool to create APNG files from
   individual PNG files.
-  _
+  .
   The Animated Portable Network Graphics (APNG) file format is an
   extension to the Portable Network Graphics (PNG) specification. It
   allows for animated PNG files that work similarly to animated GIF
@@ -28,10 +28,10 @@ Description: apngasm [the APNG Assembler] library
   C++ Library to assemble APNG animations from PNG image sequences
   or RGB+A data. apngasm can also be used to read and disassemble 
   PNG/APNG images.
-  _
+  .
   The apngasmasm library can be used alone or in conjuction with many
   popular image processing libraries.
-  _
+  .
   The Animated Portable Network Graphics (APNG) file format is an
   extension to the Portable Network Graphics (PNG) specification. It
   allows for animated PNG files that work similarly to animated GIF
