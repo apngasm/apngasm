@@ -2,7 +2,7 @@ Source: apngasm
 Section: devel
 Priority: optional
 Maintainer: Rei Kagetsuki <zero@genshin.org>
-Build-Depends: cmake, build-essential, libpng-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-filesystem-dev
+Build-Depends: cmake, build-essential, cdbs, libpng-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-filesystem-dev
 Homepage: https://github.com/apngasm/apngasm
 Vcs-Browser: https://github.com/apngasm/apngasm
 Vcs-Git: git@github.com:apngasm/apngasm.git
