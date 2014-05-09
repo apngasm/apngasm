@@ -81,6 +81,13 @@ namespace apngasm {
       boost::filesystem::path nativePath(filepath);
       nativePath.make_preferred();
 
+      // filepath is current directory.
+      if( !nativePath.has_parent_path() )
+      {
+        const std::string currentDirPath = "." + std::string(1, boost::filesystem::path::preferred_separator);
+        nativePath = currentDirPath + nativePath.string();
+      }
+
       // Clear temporary vector.
       files.clear();
 
