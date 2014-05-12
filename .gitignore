@@ -10,3 +10,14 @@ projects/vs2010/*/
 projects/vs2010/*.suo
 projects/vs2010/*.sdf
 projects/vs2010/*.opensdf
+debian/apngasm.debhelper.log
+debian/apngasm.substvars
+debian/apngasm/
+debian/compat
+debian/libapngasm.debhelper.log
+debian/libapngasm.substvars
+debian/rules-orig
+debian/stamp-makefile-build
+debian/stamp-makefile-install
+debian/tmp/
+obj-x86_64-linux-gnu/
