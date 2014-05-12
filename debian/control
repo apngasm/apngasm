@@ -23,7 +23,7 @@ Description: apngasm Animated PNG Assembler CLI tool
 
 Package: libapngasm
 Architecture: any
-Depends: libpng
+Depends: libpng12-0
 Description: apngasm [the APNG Assembler] library
   C++ Library to assemble APNG animations from PNG image sequences
   or RGB+A data. apngasm can also be used to read and disassemble 

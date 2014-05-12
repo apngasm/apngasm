@@ -58,6 +58,9 @@ INCLUDE(${PROJECT_BINARY_DIR}/../lib/manifest.txt)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
 
 IF(UNIX OR APPLE)
+  INSTALL(FILES 
+	"${PROJECT_SOURCE_DIR}/../docs/man/apngasm.1"
+	DESTINATION "${CMAKE_INSTALL_MANDIR}/man1" COMPONENT doc)
   ADD_CUSTOM_TARGET(
     package-cli
     COMMAND ${CMAKE_COMMAND} .
