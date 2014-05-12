@@ -65,7 +65,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CM
 
 IF(UNIX OR APPLE)
   ADD_CUSTOM_TARGET(
-    package-libapngasm
+    package-lib
     COMMAND ${CMAKE_COMMAND} .
     COMMAND ${CMAKE_MAKE_PROGRAM} package
     WORKING_DIRECTORY ${PACKAGE_DIR}
