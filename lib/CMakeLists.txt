@@ -43,6 +43,14 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS regex filesystem system)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(apngasm ${Boost_LIBRARIES})
 
+# Installation
+INSTALL(FILES 
+	${PROJECT_SOURCE_DIR}/src/apngasm.h
+	${PROJECT_SOURCE_DIR}/src/apngframe.h
+	${PROJECT_SOURCE_DIR}/src/apngasm-conf.h
+	${PROJECT_BINARY_DIR}/src/apngasm-version.h
+	DESTINATION "include")
+INSTALL(TARGETS apngasm DESTINATION "lib")
 
 # Create package command
 SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
@@ -57,7 +65,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CM
 
 IF(UNIX OR APPLE)
   ADD_CUSTOM_TARGET(
-    package-lib
+    package-libapngasm
     COMMAND ${CMAKE_COMMAND} .
     COMMAND ${CMAKE_MAKE_PROGRAM} package
     WORKING_DIRECTORY ${PACKAGE_DIR}

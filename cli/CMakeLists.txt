@@ -12,8 +12,6 @@ SET(APNGASM_CLI_VERSION "${APNGASM_CLI_VERSION_MAJOR}.${APNGASM_CLI_VERSION_MINO
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/apngasm-cli-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-cli-version.h @ONLY)
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
-
-
 # Generate executable file
 ADD_EXECUTABLE(apngasm-cli
     ${PROJECT_SOURCE_DIR}/src/apngasm-cli.cpp
@@ -22,7 +20,6 @@ ADD_EXECUTABLE(apngasm-cli
 )
 SET_TARGET_PROPERTIES(apngasm-cli
 	PROPERTIES OUTPUT_NAME apngasm)
-
 
 # Link libraries
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/../lib)
@@ -43,6 +40,8 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options regex filesystem system)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}) 
 TARGET_LINK_LIBRARIES(apngasm-cli ${Boost_LIBRARIES})
 
+# Installation
+INSTALL(TARGETS apngasm-cli DESTINATION "bin")
 
 # Create package command
 SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)

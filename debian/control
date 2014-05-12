@@ -1,0 +1,39 @@
+Source: apngasm
+Section: devel
+Priority: optional
+Maintainer: Rei Kagetsuki <zero@genshin.org>
+Build-Depends: cmake, build-essential, cdbs, libpng-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-filesystem-dev
+Homepage: https://github.com/apngasm/apngasm
+Vcs-Browser: https://github.com/apngasm/apngasm
+Vcs-Git: git@github.com:apngasm/apngasm.git
+
+Package: apngasm
+Architecture: any
+Depends: libapngasm
+Description: apngasm Animated PNG Assembler CLI tool
+  Assemble APNG animations from PNG image sequences.
+  This is the command line tool to create APNG files from
+  individual PNG files.
+  .
+  The Animated Portable Network Graphics (APNG) file format is an
+  extension to the Portable Network Graphics (PNG) specification. It
+  allows for animated PNG files that work similarly to animated GIF
+  files, while retaining backward compatibility with non-animated PNG
+  files and adding support for 8-bit transparency and 24-bit images.
+
+Package: libapngasm
+Architecture: any
+Depends: libpng
+Description: apngasm [the APNG Assembler] library
+  C++ Library to assemble APNG animations from PNG image sequences
+  or RGB+A data. apngasm can also be used to read and disassemble 
+  PNG/APNG images.
+  .
+  The apngasmasm library can be used alone or in conjuction with many
+  popular image processing libraries.
+  .
+  The Animated Portable Network Graphics (APNG) file format is an
+  extension to the Portable Network Graphics (PNG) specification. It
+  allows for animated PNG files that work similarly to animated GIF
+  files, while retaining backward compatibility with non-animated PNG
+  files and adding support for 8-bit transparency and 24-bit images.

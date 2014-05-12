@@ -1,7 +1,7 @@
-assemble APNG animation from PNG image sequences
-Command line tool and libraries to create APNG files from
-individual PNG files or RGB[A] bitmap data with per-frame delay.
-  
+Assemble APNG animations from PNG image sequences.
+This is the command line tool to create APNG files from
+individual PNG files.
+
 The Animated Portable Network Graphics (APNG) file format is an
 extension to the Portable Network Graphics (PNG) specification. It
 allows for animated PNG files that work similarly to animated GIF
