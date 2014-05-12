@@ -13,7 +13,6 @@ projects/vs2010/*.opensdf
 debian/apngasm.debhelper.log
 debian/apngasm.substvars
 debian/apngasm/
-debian/compat
 debian/libapngasm.debhelper.log
 debian/libapngasm.substvars
 debian/rules-orig
