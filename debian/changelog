@@ -4,6 +4,12 @@ apngasm (3.1-0ppa1) trusty; urgency=low
 
  -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Mon, 12 May 2014 20:29:00 +0900
 
+libapngasm (3.1-0ppa1) trusty; urgency=low
+
+  * debuild adjustment, PPA rebuild
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Mon, 12 May 2014 20:29:00 +0900
+
 apngasm (3.1-0ppa0) trusty; urgency=low
 
   * Update to 3.1
