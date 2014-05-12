@@ -2,16 +2,16 @@ apngasm (3.0-0ppa0) saucy; urgency=low
 
   * Version 3.0.0 "stable" release.
 
- -- Rei Kagetsuki <zero@genshin.org> Tue, 07 Jan 2014 01:03:26 +0900
+ -- Rei Kagetsuki (zero-tsuki) <zero@genshin.org> Tue, 07 Jan 2014 01:03:26 +0900
 
 apngasm (3.1-0ppa0) trusty; urgency=low
 
   * Update to 3.1
 
- -- Rei Kagetsuki <zero@genshin.org>  Tue, 06 May 2014 23:24:57 +0900
+ -- Rei Kagetsuki (zero-tsuki) <zero@genshin.org>  Tue, 06 May 2014 23:24:57 +0900
 
 apngasm (3.1-0ppa1) trusty; urgency=low
 
   * debuild adjustment, PPA rebuild
 
- -- Rei Kagetsuki <zero@genshin.org>  Mon, 12 May 2014 20:29:00 +0900
+ -- Rei Kagetsuki (zero-tsuki) <zero@genshin.org>  Mon, 12 May 2014 20:29:00 +0900
