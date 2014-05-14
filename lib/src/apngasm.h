@@ -67,6 +67,29 @@ namespace apngasm {
          * @return The [new] number of frames/the number of this frame on the frame vector.
          */
 		size_t addFrame(const APNGFrame &frame);
+
+        /**
+         * @brief Adds an APNGFrame object to the vector.
+         * @param pixels The RGB pixel data.
+         * @param width The width of the pixel data.
+         * @param height The height of the pixel data.
+         * @param trns_color An array of transparency data.
+         * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+         * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+         * @return The [new] number of frames/the number of this frame on the frame vector.
+         */
+        size_t addFrame(rgb *pixels, unsigned int width, unsigned int height, rgb *trns_color = NULL, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
+
+        /**
+         * @brief Adds an APNGFrame object to the vector.
+         * @param pixels The RGBA pixel data.
+         * @param width The width of the pixel data.
+         * @param height The height of the pixel data.
+         * @param delayNum The delay numerator for this frame (defaults to DEFAULT_FRAME_NUMERATOR).
+         * @param delayDen The delay denominator for this frame (defaults to DEFAULT_FRAME_DENMINATOR).
+         * @return The [new] number of frames/the number of this frame on the frame vector.
+         */
+        size_t addFrame(rgba *pixels, unsigned int width, unsigned int height, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
 		
         /**
 		 * @brief Adds an APNGFrame object to the frame vector.
