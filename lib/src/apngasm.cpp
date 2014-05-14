@@ -238,20 +238,14 @@ namespace apngasm {
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(rgb *pixels, unsigned int width, unsigned int height, rgb *trns_color, unsigned delayNum, unsigned delayDen)
   {
-    _frames.push_back(
-      APNGFrame(pixels, width, height, trns_color, delayNum, delayDen)
-    );
-    return _frames.size();
+    return addFrame(APNGFrame(pixels, width, height, trns_color, delayNum, delayDen));
   }
 
   //Adds an APNGFrame object to the frame vector
   //Returns the frame number in the frame vector
   size_t APNGAsm::addFrame(rgba *pixels, unsigned int width, unsigned int height, unsigned delayNum, unsigned delayDen)
   {
-    _frames.push_back(
-      APNGFrame(pixels, width, height, delayNum, delayDen)
-    );
-    return _frames.size();
+    return addFrame(APNGFrame(pixels, width, height, delayNum, delayDen));
   }
 
   //Adds an APNGFrame object to the frame vector
