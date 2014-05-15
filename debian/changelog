@@ -1,3 +1,9 @@
+apngasm (3.1-1ppa1) trusty; urgency=low
+
+  * re-adjusted debian/rules for compatibility
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Thu, 15 May 2014 10:33:03 +0900
+
 apngasm (3.1-1ppa0) trusty; urgency=low
 
   * add RGB/ARGB frame addtion in APNGAsm class
