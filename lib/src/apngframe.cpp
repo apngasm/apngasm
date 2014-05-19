@@ -1,6 +1,7 @@
 #include "apngframe.h"
 #include <png.h>
 #include <cstdlib>
+#include <cstring>
 #include <algorithm>
 
 namespace apngasm {
