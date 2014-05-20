@@ -62,7 +62,7 @@ brew install cmake boost libpng lzlib
   
 Building on Windows (with Visual Studio):  
 ----------------------------------------------
-Please see detailed instructions [here](https://github.com/apngasm/apngasm/blob/assemble_test/docs/building/win/instructions.md)
+Please see detailed instructions [here](https://github.com/apngasm/apngasm/blob/master/docs/building/win/instructions.md)
 
 License
 -------
