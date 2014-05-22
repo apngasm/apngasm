@@ -1,5 +1,13 @@
 apngasm (3.1-1ppa1) trusty; urgency=low
 
+  * fixed hooks and listener for loops and frame skip
+  * fixed JSON and XML parser for loops and frame skip
+  * fixed loop and frame skip functionality from CLI
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Thu, 22 May 2014 10:45:16 +0900
+
+apngasm (3.1-1ppa1) trusty; urgency=low
+
   * re-adjusted debian/rules for compatibility
 
  -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Thu, 15 May 2014 10:33:03 +0900
