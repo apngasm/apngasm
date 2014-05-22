@@ -32,8 +32,8 @@ namespace apngasm {
 
           // Write apngasm fields.
           // root.put("name", _pApngasm->name());
-          // root.put("loops", _pApngasm->loops());
-          // root.put("skip_first", _pApngasm->skipFirst());
+          root.put("loops", _pApngasm->getLoops());
+          root.put("skip_frame", _pApngasm->getSkipFrameCount());
 
           {
             boost::property_tree::ptree child;
@@ -73,8 +73,8 @@ namespace apngasm {
 
           // Write apngasm fields.
           // root.put("animation.<xmlattr>.name", _pApngasm->name());
-          // root.put("animation.<xmlattr>.loops", _pApngasm->loops());
-          // root.put("animation.<xmlattr>.skip_first", _pApngasm->skipFirst());
+          root.put("animation.<xmlattr>.loops", _pApngasm->getLoops());
+          root.put("animation.<xmlattr>.skip_frame", _pApngasm->getSkipFrameCount());
 
           {
             boost::property_tree::ptree child;

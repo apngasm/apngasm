@@ -158,10 +158,34 @@ namespace apngasm {
 		void setAPNGAsmListener(listener::IAPNGAsmListener* listener=NULL);
 
         /**
+         * @brief Set loop count of animation.
+         * @param loops Loop count of animation. If the argument is 0 a loop count is infinity.
+         */
+        void setLoops(unsigned int loops=0);
+
+        /**
+         * @brief Set skip frame count.
+         * @param skipFrameCount Skip frame count.
+         */
+        void setSkipFrameCount(unsigned int skipFrameCount);
+
+        /**
          * @brief Returns the frame vector.
          * @return Returns the frame vector.
          */
 		const std::vector<APNGFrame>& getFrames() const;
+
+        /**
+         * @brief Returns the loop count.
+         * @return Returns the loop count.
+         */
+        unsigned int getLoops() const;
+
+        /**
+         * @brief Returns the skip frame count.
+         * @return Returns the skip frame count.
+         */
+        unsigned int getSkipFrameCount() const;
 
         /**
          * @brief Returns the number of frames.
@@ -184,6 +208,12 @@ namespace apngasm {
     private:
     //apng frame vector
     std::vector<APNGFrame> _frames;
+
+    // Animation loop count.
+    unsigned int _loops;
+
+    // Skip frame count.
+    unsigned int _skipFrameCount;
 
     // APNGAsm event listener.
     listener::IAPNGAsmListener* _listener;

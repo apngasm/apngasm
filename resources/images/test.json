@@ -1,7 +1,7 @@
 {
   "name": "myanimation",
   "loops": 0,
-  "skip_first": false,
+  "skip_frame": 0,
   "default_delay": "800/1000",
   "delays": [
     100,

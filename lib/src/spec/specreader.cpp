@@ -64,6 +64,10 @@ namespace apngasm {
         _pApngasm->addFrame(current.filePath, current.delay.num, current.delay.den);
       }
 
+      // Set parameter from spec file.
+      _pApngasm->setLoops(pImpl->getLoops());
+      _pApngasm->setSkipFrameCount(pImpl->getSkipFrame());
+
       return true;
     }
 

@@ -156,6 +156,9 @@ namespace apngasm_cli {
 			assembler.loadAnimationSpec(srcFile);
 			return assemble();
 		}
+
+    assembler.setLoops(options.getLoops());
+    assembler.setSkipFrameCount( options.has("skip") ? 1 : 0 );
 		return assemble();
 	}
 
@@ -229,8 +232,6 @@ namespace apngasm_cli {
 			cout << "apngasm " << assembler.version() << "\nNo source frames were specified. Use --help for usage information." << std::endl;
 		else
 			cout << assembler.frameCount() << " Frames" << std::endl;
-
-//		cout << "loops=" << options.getLoops() << std::endl;
 
 		if (outfile == "") {
 			outfile = "out.png";

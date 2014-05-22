@@ -148,6 +148,8 @@ namespace apngasm {
   //Construct APNGAsm object
   APNGAsm::APNGAsm(void)
     : _listener(&defaultListener)
+    , _loops(0)
+    , _skipFrameCount(0)
   {
     // nop
   }
@@ -155,6 +157,8 @@ namespace apngasm {
   //Construct APNGAsm object
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
     : _listener(&defaultListener)
+    , _loops(0)
+    , _skipFrameCount(0)
   {
     _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
@@ -169,6 +173,18 @@ namespace apngasm {
   const std::vector<APNGFrame>& APNGAsm::getFrames() const
   {
     return _frames;
+  }
+
+  // Returns the loop count of animation.
+  unsigned int APNGAsm::getLoops() const
+  {
+    return _loops;
+  }
+
+  // Returns the skip frame count.
+  unsigned int APNGAsm::getSkipFrameCount() const
+  {
+    return _skipFrameCount;
   }
 
   size_t APNGAsm::frameCount()
@@ -306,6 +322,19 @@ namespace apngasm {
     _listener = (listener==NULL) ? &defaultListener : listener;
   }
 
+  // Set loop count of animation.
+  // If argument is 0, loop count is infinity.
+  void APNGAsm::setLoops(unsigned int loops)
+  {
+    _loops = loops;
+  }
+
+  // Set skip frame count.
+  void APNGAsm::setSkipFrameCount(unsigned int skipFrameCount)
+  {
+    _skipFrameCount = skipFrameCount;
+  }
+
 #ifdef APNG_WRITE_SUPPORTED
   //Assembles and outputs an APNG file
   //Returns the assembled file object
@@ -335,7 +364,7 @@ namespace apngasm {
 
     coltype = downconvertOptimizations(coltype, false, false);
 
-    if( !save(outputPath, coltype, 0, 0) )
+    if( !save(outputPath, coltype, _skipFrameCount, _loops) )
       return false;
 
     _listener->onPostSave(outputPath);
@@ -2000,6 +2029,7 @@ namespace apngasm {
             {
               flag_actl = 1;
               num_frames = swap32(pi[2]);
+              _loops = swap32(pi[3]);
               delete[] chunk.p;
             }
             else
