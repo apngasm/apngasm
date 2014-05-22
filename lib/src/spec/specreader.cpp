@@ -66,6 +66,7 @@ namespace apngasm {
 
       // Set parameter from spec file.
       _pApngasm->setLoops(pImpl->getLoops());
+      _pApngasm->setSkipFrameCount(pImpl->getSkipFrame());
 
       return true;
     }
