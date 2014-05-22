@@ -173,6 +173,12 @@ namespace apngasm {
     return _frames;
   }
 
+  // Returns the loop count of animation.
+  unsigned int APNGAsm::getLoops() const
+  {
+    return _loops;
+  }
+
   size_t APNGAsm::frameCount()
   {
     return _frames.size();
@@ -2009,6 +2015,7 @@ namespace apngasm {
             {
               flag_actl = 1;
               num_frames = swap32(pi[2]);
+              _loops = swap32(pi[3]);
               delete[] chunk.p;
             }
             else

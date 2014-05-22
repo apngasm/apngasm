@@ -173,7 +173,7 @@ namespace apngasm {
          * @brief Returns the loop count.
          * @return Returns the loop count.
          */
-        const unsigned int getLoops() const;
+        unsigned int getLoops() const;
 
         /**
          * @brief Returns the number of frames.

@@ -32,7 +32,7 @@ namespace apngasm {
 
           // Write apngasm fields.
           // root.put("name", _pApngasm->name());
-          // root.put("loops", _pApngasm->loops());
+          root.put("loops", _pApngasm->getLoops());
           // root.put("skip_first", _pApngasm->skipFirst());
 
           {
@@ -73,7 +73,7 @@ namespace apngasm {
 
           // Write apngasm fields.
           // root.put("animation.<xmlattr>.name", _pApngasm->name());
-          // root.put("animation.<xmlattr>.loops", _pApngasm->loops());
+          root.put("animation.<xmlattr>.loops", _pApngasm->getLoops());
           // root.put("animation.<xmlattr>.skip_first", _pApngasm->skipFirst());
 
           {
