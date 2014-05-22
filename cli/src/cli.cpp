@@ -158,6 +158,7 @@ namespace apngasm_cli {
 		}
 
     assembler.setLoops(options.getLoops());
+    assembler.setSkipFrameCount( options.has("skip") ? 1 : 0 );
 		return assemble();
 	}
 

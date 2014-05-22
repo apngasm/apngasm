@@ -164,6 +164,12 @@ namespace apngasm {
         void setLoops(unsigned int loops=0);
 
         /**
+         * @brief Set skip frame count.
+         * @param skipFrameCount Skip frame count.
+         */
+        void setSkipFrameCount(unsigned int skipFrameCount);
+
+        /**
          * @brief Returns the frame vector.
          * @return Returns the frame vector.
          */
@@ -174,6 +180,12 @@ namespace apngasm {
          * @return Returns the loop count.
          */
         unsigned int getLoops() const;
+
+        /**
+         * @brief Returns the skip frame count.
+         * @return Returns the skip frame count.
+         */
+        unsigned int getSkipFrameCount() const;
 
         /**
          * @brief Returns the number of frames.
@@ -199,6 +211,9 @@ namespace apngasm {
 
     // Animation loop count.
     unsigned int _loops;
+
+    // Skip frame count.
+    unsigned int _skipFrameCount;
 
     // APNGAsm event listener.
     listener::IAPNGAsmListener* _listener;
