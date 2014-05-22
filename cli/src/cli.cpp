@@ -230,7 +230,7 @@ namespace apngasm_cli {
 		else
 			cout << assembler.frameCount() << " Frames" << std::endl;
 
-//		cout << "loops=" << options.getLoops() << std::endl;
+    assembler.setLoops(options.getLoops());
 
 		if (outfile == "") {
 			outfile = "out.png";
