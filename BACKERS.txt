@@ -4,6 +4,23 @@ Mark Karpeles	http://www.tibanne.com/	PHP can do stuff!
 
 -------
 
+Chris Means			https://plus.google.com/u/0/+ChrisMeans
+David Whatley			
+Admiral Potato		http://NuclearPixel.com/
+Nina Paley			ninapaley.com
+Craig Dunn			djcrazycraig.com
+Jonathan DeNardis	http://hardlyenglish.com/
+MatthTheGeek			
+David Abplanalp		http://www.hard-light.net/
+Guy Jacks			
+Lisa Brewster		http://adora.io
+Jason Sperber			
+Andreas Gauger		na
+Mitsuya Shibata		no need
+Andrew McMillan		http://www.morphoss.com/
+
+-------
+
 David	www.pirateparty.be
 Sofox	www.sofoxcentral.com
 James Huebsch	None
@@ -107,7 +124,7 @@ Andy Gelme (Hacker At Large !)	http://geekscape.org	Open standards and open sour
 Brett James	http://brettjamesonline.com	Coding and commentating
 Eric Schultz	http://startuperic.com	Disrupting animated GIFs FTW!
 Joakim Rosendahl	mydeveloperstory.tumblr.com	Everything needs progress, even silly gifs.
-		
+none	none	none
 Barricane Technology Ltd.	http://www.barricane.com	Software, website and app development in C, NodeJS, AngularJS, Java, Android, Python and Haskell.
 Dominic Myers	http://drmsite.com	Jolly good show
 Sacha Greif	http://sachagreif.com	Wow, my first ever Kickstarter reward!

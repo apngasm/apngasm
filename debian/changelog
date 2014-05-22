@@ -1,4 +1,4 @@
-apngasm (3.1-1ppa1) trusty; urgency=low
+apngasm (3.1-2ppa0) trusty; urgency=low
 
   * fixed hooks and listener for loops and frame skip
   * fixed JSON and XML parser for loops and frame skip
