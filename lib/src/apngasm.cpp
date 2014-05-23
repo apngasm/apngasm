@@ -149,7 +149,7 @@ namespace apngasm {
   APNGAsm::APNGAsm(void)
     : _listener(&defaultListener)
     , _loops(0)
-    , _skipFrameCount(0)
+    , _skipFirst(false)
   {
     // nop
   }
@@ -158,7 +158,7 @@ namespace apngasm {
   APNGAsm::APNGAsm(const std::vector<APNGFrame> &frames)
     : _listener(&defaultListener)
     , _loops(0)
-    , _skipFrameCount(0)
+    , _skipFirst(false)
   {
     _frames.insert(_frames.end(), frames.begin(), frames.end());
   }
@@ -181,10 +181,10 @@ namespace apngasm {
     return _loops;
   }
 
-  // Returns the skip frame count.
-  unsigned int APNGAsm::getSkipFrameCount() const
+  // Returns the flag of skip first frame.
+  bool APNGAsm::isSkipFirst() const
   {
-    return _skipFrameCount;
+    return _skipFirst;
   }
 
   size_t APNGAsm::frameCount()
@@ -329,10 +329,10 @@ namespace apngasm {
     _loops = loops;
   }
 
-  // Set skip frame count.
-  void APNGAsm::setSkipFrameCount(unsigned int skipFrameCount)
+  // Set flag of skip first frame.
+  void APNGAsm::setSkipFirst(bool skipFirst)
   {
-    _skipFrameCount = skipFrameCount;
+    _skipFirst = skipFirst;
   }
 
 #ifdef APNG_WRITE_SUPPORTED
@@ -364,7 +364,7 @@ namespace apngasm {
 
     coltype = downconvertOptimizations(coltype, false, false);
 
-    if( !save(outputPath, coltype, _skipFrameCount, _loops) )
+    if( !save(outputPath, coltype, (_skipFirst ? 1 : 0), _loops) )
       return false;
 
     _listener->onPostSave(outputPath);

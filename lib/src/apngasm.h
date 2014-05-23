@@ -164,10 +164,10 @@ namespace apngasm {
         void setLoops(unsigned int loops=0);
 
         /**
-         * @brief Set skip frame count.
-         * @param skipFrameCount Skip frame count.
+         * @brief Set flag of skip first frame.
+         * @param skipFirst Flag of skip first frame.
          */
-        void setSkipFrameCount(unsigned int skipFrameCount);
+        void setSkipFirst(bool skipFirst);
 
         /**
          * @brief Returns the frame vector.
@@ -182,10 +182,10 @@ namespace apngasm {
         unsigned int getLoops() const;
 
         /**
-         * @brief Returns the skip frame count.
-         * @return Returns the skip frame count.
+         * @brief Returns the flag of skip first frame.
+         * @return Returns the flag of skip first frame.
          */
-        unsigned int getSkipFrameCount() const;
+        bool isSkipFirst() const;
 
         /**
          * @brief Returns the number of frames.
@@ -212,8 +212,8 @@ namespace apngasm {
     // Animation loop count.
     unsigned int _loops;
 
-    // Skip frame count.
-    unsigned int _skipFrameCount;
+    // Flag of skip first frame.
+    bool _skipFirst;
 
     // APNGAsm event listener.
     listener::IAPNGAsmListener* _listener;

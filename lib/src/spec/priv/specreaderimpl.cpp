@@ -65,7 +65,7 @@ namespace apngasm {
       AbstractSpecReaderImpl::AbstractSpecReaderImpl()
         : _name("")
         , _loops(0)
-        , _skipFrame(0)
+        , _skipFirst(false)
         , _frameInfos()
       {
         // nop
@@ -83,10 +83,10 @@ namespace apngasm {
         return _loops;
       }
 
-      // Return skip frame count.
-      unsigned int AbstractSpecReaderImpl::getSkipFrame() const
+      // Return flag of skip first frame.
+      bool AbstractSpecReaderImpl::isSkipFirst() const
       {
-        return _skipFrame;
+        return _skipFirst;
       }
 
       // Return frame information vector.
@@ -123,9 +123,9 @@ namespace apngasm {
         }
 
         // skip_first
-        if( boost::optional<bool> value = root.get_optional<bool>("skip_frame") )
+        if( boost::optional<bool> value = root.get_optional<bool>("skip_first") )
         {
-          _skipFrame = value.get();
+          _skipFirst = value.get();
         }
 
         // delay
@@ -222,9 +222,9 @@ namespace apngasm {
         }
 
         // skip_first
-        if( boost::optional<bool> value = root.get_optional<bool>("animation.<xmlattr>.skip_frame") )
+        if( boost::optional<bool> value = root.get_optional<bool>("animation.<xmlattr>.skip_first") )
         {
-          _skipFrame = value.get();
+          _skipFirst = value.get();
         }
 
         // delay
