@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<animation name="myanimation" loops="0" skip_frame="0" default_delay="800/1000">
+<animation name="myanimation" loops="0" skip_first="false" default_delay="800/1000">
   <frame src="apngasm/*" delay="1/5" />
   <frame src="apngasm/*" delay="10" />
   <frame src="apngasm/00" />

@@ -36,8 +36,8 @@ namespace apngasm {
         // Return loops.
         virtual unsigned int getLoops() const = 0;
 
-        // Return skip frame count.
-        virtual unsigned int getSkipFrame() const = 0;
+        // Return flag of skip first frame.
+        virtual bool isSkipFirst() const = 0;
 
         // Return frame vector.
         virtual const std::vector<FrameInfo>& getFrameInfos() const = 0;
@@ -58,8 +58,8 @@ namespace apngasm {
         // Return loops.
         unsigned int getLoops() const;
 
-        // Return skip frame count.
-        unsigned int getSkipFrame() const;
+        // Return flag of skip first frame.
+        bool isSkipFirst() const;
 
         // Return frame information vector.
         const std::vector<FrameInfo>& getFrameInfos() const;
@@ -68,7 +68,7 @@ namespace apngasm {
         // Fields.
         std::string _name;
         unsigned int _loops;
-        bool _skipFrame;
+        bool _skipFirst;
         std::vector<FrameInfo> _frameInfos;
 
       };  // class AbstractSpecReaderImpl
