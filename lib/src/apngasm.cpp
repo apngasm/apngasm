@@ -1971,7 +1971,6 @@ namespace apngasm {
       unsigned char sig[8];
       unsigned int  w0, h0, x0, y0;
       unsigned int  delay_num, delay_den, dop, bop, rowbytes, imagesize;
-      unsigned int  flag_actl = 0;
       unsigned int  flag_fctl = 0;
       unsigned int  flag_idat = 0;
       unsigned int  flag_info = 0;
@@ -2027,7 +2026,6 @@ namespace apngasm {
 
             if (id == id_acTL)
             {
-              flag_actl = 1;
               num_frames = swap32(pi[2]);
               _loops = swap32(pi[3]);
               delete[] chunk.p;
@@ -2035,7 +2033,7 @@ namespace apngasm {
             else
             if (id == id_fcTL)
             {
-              if (flag_fctl)
+              if (flag_idat)
               {
                 png_process_data(png_ptr, info_ptr, &footer[0], 12);
                 png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -2052,6 +2050,8 @@ namespace apngasm {
                 frameCur._delayNum = delay_num;
                 frameCur._delayDen = delay_den;
                 _frames.push_back(frameCur);
+                if (!flag_fctl)
+                  setSkipFirst(true);
 
                 if (dop != 2)
                 {
@@ -2096,16 +2096,13 @@ namespace apngasm {
             if (id == id_IDAT)
             {
               flag_idat = 1;
-              if (flag_fctl || !flag_actl)
+              if (!flag_info)
               {
-                if (!flag_info)
-                {
-                  flag_info = 1;
-                  for (i=0; i<_info_chunks.size(); ++i)
-                    png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
-                }
-                png_process_data(png_ptr, info_ptr, chunk.p, chunk.size);
+                flag_info = 1;
+                for (i=0; i<_info_chunks.size(); ++i)
+                  png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
               }
+              png_process_data(png_ptr, info_ptr, chunk.p, chunk.size);
               delete[] chunk.p;
             }
             else
@@ -2233,7 +2230,9 @@ namespace apngasm {
     const int count = _frames.size();
     for(int i = 0;  i < count;  ++i)
     {
-      const std::string outputPath = _listener->onCreatePngPath(outputDir, i);
+      // saving visible frames as #1, #2, #3, ...
+      // saving skipped frame  as #0 (if it's exists)
+      const std::string outputPath = _listener->onCreatePngPath(outputDir, _skipFirst ? i : i+1);
 
       if( !_listener->onPreSave(outputPath) )
         return false;
