@@ -2014,6 +2014,7 @@ namespace apngasm {
           png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
           png_infop   info_ptr = png_create_info_struct(png_ptr);
           setjmp(png_jmpbuf(png_ptr));
+          png_set_crc_action(png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
           png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
           png_process_data(png_ptr, info_ptr, &header[0], 8);
           png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
@@ -2064,11 +2065,11 @@ namespace apngasm {
                 frameCur._rows = frameNext._rows;
 
                 memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
-                recalc_crc(chunk_ihdr.p, chunk_ihdr.size);
 
                 png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
                 info_ptr = png_create_info_struct(png_ptr);
                 setjmp(png_jmpbuf(png_ptr));
+                png_set_crc_action(png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
                 png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
                 png_process_data(png_ptr, info_ptr, &header[0], 8);
                 png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
@@ -2117,7 +2118,6 @@ namespace apngasm {
               }
               pi[1] = swap32(chunk.size - 16);
               pi[2] = id_IDAT;
-              recalc_crc(chunk.p + 4, chunk.size - 4);
               png_process_data(png_ptr, info_ptr, chunk.p + 4, chunk.size - 4);
               delete[] chunk.p;
             }
@@ -2214,14 +2214,6 @@ namespace apngasm {
         return pi[1];
     }
     return 0;
-  }
-
-  void APNGAsm::recalc_crc(unsigned char * p, unsigned int size)
-  {
-    unsigned int crc = crc32(0, Z_NULL, 0);
-    crc = crc32(crc, p + 4, size - 8);
-    crc = swap32(crc);
-    memcpy(p + size - 4, &crc, 4);
   }
 
   // Save png files.
