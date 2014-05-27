@@ -2222,9 +2222,7 @@ namespace apngasm {
     const int count = _frames.size();
     for(int i = 0;  i < count;  ++i)
     {
-      // saving visible frames as #1, #2, #3, ...
-      // saving skipped frame  as #0 (if it's exists)
-      const std::string outputPath = _listener->onCreatePngPath(outputDir, _skipFirst ? i : i+1);
+      const std::string outputPath = _listener->onCreatePngPath(outputDir, i);
 
       if( !_listener->onPreSave(outputPath) )
         return false;
