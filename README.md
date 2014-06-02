@@ -2,6 +2,13 @@ apngasm
 =======
 The next generation of apngasm, the APNG Assembler.
 
+Installing
+==========
+If you just want pre-built libapngasm and apngasm:  
+*OSX*: Click "releases" at the top of the github page and get the latest release. Homebrew coming soon.  
+*Windows*: Click "releases" at the top of the github page and get the latest release.  
+*GNU Linux*: [Debian/Ubuntu/Mint/etc.] [PPA](https://code.launchpad.net/~zero-tsuki/+archive/ppa)
+
 Building
 ========
 apngasm uses CMake to provide cross platform build chains.
