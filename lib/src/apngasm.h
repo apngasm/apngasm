@@ -252,7 +252,6 @@ namespace apngasm {
     const std::vector<APNGFrame>& fileToFrames(const std::string &filePath, unsigned delayNum, unsigned delayDen);
     void compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
     unsigned int read_chunk(FILE * f, CHUNK * pChunk);
-    void recalc_crc(unsigned char * p, unsigned int size);
 
     std::vector<CHUNK>   _info_chunks;
 #endif

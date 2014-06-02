@@ -49,8 +49,9 @@ namespace {
   {
   public:
 	  // Initialize CustomAPNGAsmListener object.
-	  CustomAPNGAsmListener(int overwriteMode)
-		  : _overwriteMode(overwriteMode)
+	  CustomAPNGAsmListener(const apngasm::APNGAsm* apngasm, int overwriteMode)
+		  : _apngasm(apngasm)
+      , _overwriteMode(overwriteMode)
 	  {
 		  // nop
 	  }
@@ -104,7 +105,17 @@ namespace {
   	  std::cout << filePath << std::endl;
     }
 
+    // Called when create output path of png file.
+    // Return output path.
+    const std::string onCreatePngPath(const std::string& outputDir, int index) const
+    {
+      // saving visible frames as #1, #2, #3, ...
+      // saving skipped frame  as #0 (if it's exists)
+      return apngasm::listener::APNGAsmListener::onCreatePngPath(outputDir, _apngasm->isSkipFirst() ? index : index+1);
+    }
+
   private:
+    const apngasm::APNGAsm* const _apngasm;
 	  const int _overwriteMode;
 
 	  // Return true if create succeeded.
@@ -127,7 +138,7 @@ namespace apngasm_cli {
 	CLI::CLI(int argc, char **argv)
 		: options(argc, argv), assembler()
 	{
-		pListener = new CustomAPNGAsmListener(options.getOverwriteMode());
+		pListener = new CustomAPNGAsmListener(&assembler, options.getOverwriteMode());
 		assembler.setAPNGAsmListener(pListener);
 	}
 
