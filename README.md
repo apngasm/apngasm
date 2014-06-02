@@ -5,7 +5,7 @@ The next generation of apngasm, the APNG Assembler.
 Installing
 ==========
 If you just want pre-built libapngasm and apngasm:  
-*OSX*: Click "releases" at the top of the github page and get the latest release. Homebrew coming soon.  
+*OSX*: For the latest apngasm use homebrew: `brew install apngasm`. Otherwise Click "releases" at the top of the github page and get the latest build with an OSX package.  
 *Windows*: Click "releases" at the top of the github page and get the latest release.  
 *GNU Linux*: [Debian/Ubuntu/Mint/etc.] [PPA](https://code.launchpad.net/~zero-tsuki/+archive/ppa)
 
