@@ -1,3 +1,11 @@
+apngasm (3.1-3ppa0) trusty; urgency=low
+
+  * fixed skip-frame issues
+  * properly implemented disassemble with skipped frame
+  * fixed JSON/XML issues
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Mon, 02 Jun 2014 16:39:55 +0900
+
 apngasm (3.1-2ppa0) trusty; urgency=low
 
   * fixed hooks and listener for loops and frame skip
