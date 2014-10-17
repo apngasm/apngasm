@@ -129,5 +129,18 @@ int main(int argc, char* argv[])
   }
   std::cout << "Test 5 - finish" << std::endl;
 
+  std::cout << "Memory leak test - start" << std::endl;
+  {
+    for(int i = 0;  i < 1000;  ++i)
+    {
+      apngasm::APNGAsm memoryLeakTestAssembler;
+      memoryLeakTestAssembler.addFrame("samples/penguins.png");
+      memoryLeakTestAssembler.assemble("out/memory_leak_test.png");
+    }
+    std::cout << "Press enter to continue...";
+    std::cin.get();
+  }
+  std::cout << "Memory leak test - finish" << std::endl;
+
   return 0;
 }
