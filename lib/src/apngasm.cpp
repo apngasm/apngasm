@@ -1360,7 +1360,7 @@ namespace apngasm {
       _fin_zstream.zalloc = Z_NULL;
       _fin_zstream.zfree = Z_NULL;
       _fin_zstream.opaque = Z_NULL;
-      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
+//      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
 
       idat_size = (rowbytes + 1) * _height;
       zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
@@ -1682,7 +1682,7 @@ namespace apngasm {
     _fin_zstream.avail_in = _op[n].h*(rowbytes + 1);
     deflate(&_fin_zstream, Z_FINISH);
     *zsize = _fin_zstream.total_out;
-    deflateReset(&_fin_zstream);
+    deflateEnd(&_fin_zstream);
   }
 
   void APNGAsm::deflate_rect_op(unsigned char *pdata, int x, int y, int w, int h, int bpp, int stride, int zbuf_size, int n)
@@ -1718,8 +1718,8 @@ namespace apngasm {
     _op[n].w = w;
     _op[n].h = h;
     _op[n].valid = 1;
-    deflateReset(&_op_zstream1);
-    deflateReset(&_op_zstream2);
+    deflateEnd(&_op_zstream1);
+    deflateEnd(&_op_zstream2);
   }
 
   void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
