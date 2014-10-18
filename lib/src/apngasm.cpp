@@ -1356,12 +1356,6 @@ namespace apngasm {
       _op_zstream2.opaque = Z_NULL;
       deflateInit2(&_op_zstream2, Z_BEST_SPEED+1, 8, 15, 8, Z_FILTERED);
 
-      _fin_zstream.data_type = Z_BINARY;
-      _fin_zstream.zalloc = Z_NULL;
-      _fin_zstream.zfree = Z_NULL;
-      _fin_zstream.opaque = Z_NULL;
-//      deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
-
       idat_size = (rowbytes + 1) * _height;
       zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
 
@@ -1512,6 +1506,9 @@ namespace apngasm {
       delete[] _up_row;
       delete[] _avg_row;
       delete[] _paeth_row;
+
+      deflateEnd(&_op_zstream1);
+      deflateEnd(&_op_zstream2);
     }
     else
       return false;
@@ -1658,6 +1655,12 @@ namespace apngasm {
     unsigned char * row  = _op[n].p + _op[n].y*stride + _op[n].x*bpp;
     int rowbytes = _op[n].w*bpp;
 
+    z_stream _fin_zstream;
+    _fin_zstream.data_type = Z_BINARY;
+    _fin_zstream.zalloc = Z_NULL;
+    _fin_zstream.zfree = Z_NULL;
+    _fin_zstream.opaque = Z_NULL;
+
     if (_op[n].filters == 0)
     {
       deflateInit2(&_fin_zstream, Z_BEST_COMPRESSION, 8, 15, 8, Z_DEFAULT_STRATEGY);
@@ -1718,8 +1721,8 @@ namespace apngasm {
     _op[n].w = w;
     _op[n].h = h;
     _op[n].valid = 1;
-    deflateEnd(&_op_zstream1);
-    deflateEnd(&_op_zstream2);
+    deflateReset(&_op_zstream1);
+    deflateReset(&_op_zstream2);
   }
 
   void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
