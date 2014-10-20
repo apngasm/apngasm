@@ -487,8 +487,8 @@ namespace apngasm {
         _frames[n]._pixels = dst;
         _frames[n]._colorType = coltype;
 
-        for (j=0; j<_frames[n]._height; ++j)
-          _frames[n]._rows[j] = dst + j * _frames[n]._width * 4;
+        for (j=0; j<_frames[n]._height; ++j, dst += _frames[n]._width * 4)
+          _frames[n]._rows[j] = dst;
       }
       else
       if (coltype == 4 && _frames[n]._colorType == 0)
@@ -506,8 +506,8 @@ namespace apngasm {
         _frames[n]._pixels = dst;
         _frames[n]._colorType = coltype;
 
-        for (j=0; j<_frames[n]._height; ++j)
-          _frames[n]._rows[j] = dst + j * _frames[n]._width * 2;
+        for (j=0; j<_frames[n]._height; ++j, dst += _frames[n]._width * 2)
+          _frames[n]._rows[j] = dst;
       }
       else
       if (coltype == 2 && _frames[n]._colorType == 0)
@@ -526,8 +526,8 @@ namespace apngasm {
         _frames[n]._pixels = dst;
         _frames[n]._colorType = coltype;
 
-        for (j=0; j<_frames[n]._height; ++j)
-          _frames[n]._rows[j] = dst + j * _frames[n]._width * 3;
+        for (j=0; j<_frames[n]._height; ++j, dst += _frames[n]._width * 3)
+          _frames[n]._rows[j] = dst;
       }
     }
     return 0;
@@ -656,15 +656,12 @@ namespace apngasm {
         for (size_t n = 0; n < _frames.size(); ++n)
         {
           sp = dp = _frames[n]._pixels;
-          for (j=0; j<_size; j++)
+          for (j=0; j<_size; j++, sp+=4)
           {
-            r = *sp++;
-            g = *sp++;
-            b = *sp++;
-            if (*sp++ == 0)
+            if (sp[3] == 0)
               *dp++ = _trns[1];
             else
-              *dp++ = g;
+              *dp++ = sp[0];
           }
         }
       }
@@ -1066,7 +1063,6 @@ namespace apngasm {
       for (i=0; i<256; i++)
       if (col[i].num != 0)
       {
-        colors = i+1;
         if (col[i].a != 0)
         {
           if (col[i].a != 255)
@@ -1430,8 +1426,9 @@ namespace apngasm {
         op_min = _op[0].size;
         op_best = 0;
         for (j=1; j<6; j++)
+        if (_op[j].valid)
         {
-          if (_op[j].size < op_min && _op[j].valid)
+          if (_op[j].size < op_min)
           {
             op_min = _op[j].size;
             op_best = j;
@@ -2191,7 +2188,7 @@ namespace apngasm {
           {
             u = sp[3]*255;
             v = (255-sp[3])*dp[3];
-            al = 255*255-(255-sp[3])*(255-dp[3]);
+            al = u + v;
             dp[0] = (sp[0]*u + dp[0]*v)/al;
             dp[1] = (sp[1]*u + dp[1]*v)/al;
             dp[2] = (sp[2]*u + dp[2]*v)/al;
