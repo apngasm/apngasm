@@ -224,6 +224,7 @@ namespace apngasm {
     int upconvertToCommonType(unsigned char coltype);
     void dirtyTransparencyOptimization(unsigned char coltype);
     unsigned char downconvertOptimizations(unsigned char coltype, bool keep_palette, bool keep_coltype);
+    void duplicateFramesOptimization(unsigned char coltype, unsigned int first);
 
     bool save(const std::string &outputPath, unsigned char coltype, unsigned first, unsigned loops);
 

@@ -342,6 +342,8 @@ namespace apngasm {
 
     coltype = downconvertOptimizations(coltype, false, false);
 
+    duplicateFramesOptimization(coltype, (_skipFirst ? 1 : 0));
+
     if( !save(outputPath, coltype, (_skipFirst ? 1 : 0), _loops) )
       return false;
 
@@ -1201,6 +1203,52 @@ namespace apngasm {
     }
 
     return coltype;
+  }
+
+  void APNGAsm::duplicateFramesOptimization(unsigned char coltype, unsigned int first)
+  {
+    unsigned int bpp = 1;
+    if (coltype == 2)
+      bpp = 3;
+    else
+    if (coltype == 4)
+      bpp = 2;
+    else
+    if (coltype == 6)
+      bpp = 4;
+
+    size_t n = first;
+
+    while (++n < _frames.size())
+    {
+      if (memcmp(_frames[n-1]._pixels, _frames[n]._pixels, _size * bpp) != 0)
+        continue;
+
+      n--;
+      delete[] _frames[n]._pixels;
+      delete[] _frames[n]._rows;
+      unsigned int num = _frames[n]._delayNum;
+      unsigned int den = _frames[n]._delayDen;
+      _frames.erase(_frames.begin()+n);
+
+      if (_frames[n]._delayDen == den)
+        _frames[n]._delayNum += num;
+      else
+      {
+        _frames[n]._delayNum = num = num*_frames[n]._delayDen + den*_frames[n]._delayNum;
+        _frames[n]._delayDen = den = den*_frames[n]._delayDen;
+        while (num && den)
+        {
+          if (num > den)
+            num = num % den;
+          else
+            den = den % num;
+        }
+        num += den;
+        _frames[n]._delayNum /= num;
+        _frames[n]._delayDen /= num;
+      }
+    }
   }
 
   bool APNGAsm::save(const std::string &outputPath, unsigned char coltype, unsigned int first, unsigned int loops)
