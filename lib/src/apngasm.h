@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <string>
+#include <png.h>
 #include <zlib.h> // z_stream
 #include "apngframe.h"
 #include "apngasm-conf.h"
@@ -251,7 +252,14 @@ namespace apngasm {
     const std::vector<APNGFrame>& fileToFrames(const std::string &filePath, unsigned delayNum, unsigned delayDen);
     void compose_frame(unsigned char ** rows_dst, unsigned char ** rows_src, unsigned char bop, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
     unsigned int read_chunk(FILE * f, CHUNK * pChunk);
+    void processing_start(void * frame_ptr, bool hasInfo);
+    void processing_data(unsigned char * p, unsigned int size);
+    int processing_finish();
 
+    png_structp          _png;
+    png_infop            _info;
+
+    CHUNK                _chunkIHDR;
     std::vector<CHUNK>   _info_chunks;
 #endif
 

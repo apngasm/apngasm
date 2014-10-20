@@ -12,28 +12,6 @@
 #endif
 #include "listener/apngasmlistener.h"
 
-#if defined(_MSC_VER) && _MSC_VER >= 1300
-#define swap16(data) _byteswap_ushort(data)
-#define swap32(data) _byteswap_ulong(data)
-#elif defined(__linux__)
-#include <byteswap.h>
-#define swap16(data) bswap_16(data)
-#define swap32(data) bswap_32(data)
-#elif defined(__FreeBSD__)
-#include <sys/endian.h>
-#define swap16(data) bswap16(data)
-#define swap32(data) bswap32(data)
-#elif defined(__APPLE__)
-#include <libkern/OSByteOrder.h>
-#define swap16(data) OSSwapInt16(data)
-#define swap32(data) OSSwapInt32(data)
-#else
-namespace {
-  unsigned short swap16(unsigned short data) {return((data & 0xFF) << 8) | ((data >> 8) & 0xFF);}
-  unsigned int swap32(unsigned int data) {return((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data >> 8) & 0xFF00) | ((data >> 24) & 0xFF);}
-}
-#endif
-
 #define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 
 #define id_IHDR 0x52444849
@@ -1945,10 +1923,6 @@ namespace apngasm {
   {
     unsigned int   i, j, id;
     unsigned int   w, h;
-    unsigned int * pi;
-    unsigned char  header[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-    unsigned char  footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
-    CHUNK chunk_ihdr;
     CHUNK chunk;
 
     FILE * f;
@@ -1957,20 +1931,18 @@ namespace apngasm {
       unsigned char sig[8];
       unsigned int  w0, h0, x0, y0;
       unsigned int  delay_num, delay_den, dop, bop, rowbytes, imagesize;
-      unsigned int  flag_fctl = 0;
-      unsigned int  flag_idat = 0;
-      unsigned int  flag_info = 0;
-      unsigned int  num_frames = 1;
+      bool          isAnimated = false;
+      bool          skipFirst = false;
+      bool          hasInfo = false;
 
-      if (fread(sig, 1, 8, f) == 8 && memcmp(sig, header, 8) == 0)
+      if (fread(sig, 1, 8, f) == 8 && png_sig_cmp(sig, 0, 8) == 0)
       {
-        id = read_chunk(f, &chunk_ihdr);
+        id = read_chunk(f, &_chunkIHDR);
 
-        if (id == id_IHDR && chunk_ihdr.size == 25)
+        if (id == id_IHDR && _chunkIHDR.size == 25)
         {
-          pi = (unsigned int *)chunk_ihdr.p;
-          w0 = w = swap32(pi[2]);
-          h0 = h = swap32(pi[3]);
+          w0 = w = png_get_uint_32(_chunkIHDR.p + 8);
+          h0 = h = png_get_uint_32(_chunkIHDR.p + 12);
           x0 = 0;
           y0 = 0;
           delay_num = delayNum;
@@ -1997,125 +1969,110 @@ namespace apngasm {
           for (j=0; j<h; ++j)
             frameCur._rows[j] = frameCur._pixels + j * rowbytes;
 
-          png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-          png_infop   info_ptr = png_create_info_struct(png_ptr);
-          setjmp(png_jmpbuf(png_ptr));
-          png_set_crc_action(png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
-          png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
-          png_process_data(png_ptr, info_ptr, &header[0], 8);
-          png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
-          flag_info = 0;
+          processing_start((void *)&frameRaw, hasInfo);
 
           while ( !feof(f) )
           {
             id = read_chunk(f, &chunk);
-            pi = (unsigned int *)chunk.p;
 
-            if (id == id_acTL)
+            if (id == id_acTL && !hasInfo && !isAnimated)
             {
-              num_frames = swap32(pi[2]);
-              _loops = swap32(pi[3]);
-              delete[] chunk.p;
+              isAnimated = true;
+              skipFirst = true;
+              _loops = png_get_uint_32(chunk.p + 12);
             }
             else
-            if (id == id_fcTL)
+            if (id == id_fcTL && (!hasInfo || isAnimated))
             {
-              if (flag_idat)
+              if (hasInfo)
               {
-                png_process_data(png_ptr, info_ptr, &footer[0], 12);
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
-                frameNext._pixels = new unsigned char[imagesize];
-                frameNext._rows = new png_bytep[h * sizeof(png_bytep)];
-                for (j=0; j<h; ++j)
-                  frameNext._rows[j] = frameNext._pixels + j * rowbytes;
-
-                if (dop == 2)
-                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
-
-                compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
-                frameCur._delayNum = delay_num;
-                frameCur._delayDen = delay_den;
-                _frames.push_back(frameCur);
-                if (!flag_fctl)
-                  setSkipFirst(true);
-
-                if (dop != 2)
+                if (!processing_finish())
                 {
-                  memcpy(frameNext._pixels, frameCur._pixels, imagesize);
-                  if (dop == 1)
-                    for (j=0; j<h0; j++)
-                      memset(frameNext._rows[y0 + j] + x0*4, 0, w0*4);
+                  frameNext._pixels = new unsigned char[imagesize];
+                  frameNext._rows = new png_bytep[h * sizeof(png_bytep)];
+                  for (j=0; j<h; ++j)
+                    frameNext._rows[j] = frameNext._pixels + j * rowbytes;
+
+                  if (dop == 2)
+                    memcpy(frameNext._pixels, frameCur._pixels, imagesize);
+
+                  compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
+                  frameCur._delayNum = delay_num;
+                  frameCur._delayDen = delay_den;
+                  _frames.push_back(frameCur);
+
+                  if (dop != 2)
+                  {
+                    memcpy(frameNext._pixels, frameCur._pixels, imagesize);
+                    if (dop == 1)
+                      for (j=0; j<h0; j++)
+                        memset(frameNext._rows[y0 + j] + x0*4, 0, w0*4);
+                  }
+                  frameCur._pixels = frameNext._pixels;
+                  frameCur._rows = frameNext._rows;
                 }
-                frameCur._pixels = frameNext._pixels;
-                frameCur._rows = frameNext._rows;
-
-                memcpy(chunk_ihdr.p + 8, chunk.p + 12, 8);
-
-                png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-                info_ptr = png_create_info_struct(png_ptr);
-                setjmp(png_jmpbuf(png_ptr));
-                png_set_crc_action(png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
-                png_set_progressive_read_fn(png_ptr, (void *)&frameRaw, info_fn, row_fn, NULL);
-                png_process_data(png_ptr, info_ptr, &header[0], 8);
-                png_process_data(png_ptr, info_ptr, chunk_ihdr.p, chunk_ihdr.size);
-                flag_info = 0;
+                else
+                {
+                  delete[] frameCur._rows;
+                  delete[] frameCur._pixels;
+                  delete[] chunk.p;
+                  break;
+                }
               }
 
-              w0 = swap32(pi[3]);
-              h0 = swap32(pi[4]);
-              x0 = swap32(pi[5]);
-              y0 = swap32(pi[6]);
-              delay_num = chunk.p[28]*256 + chunk.p[29];
-              delay_den = chunk.p[30]*256 + chunk.p[31];
+              // At this point the old frame is done. Let's start a new one.
+              w0 = png_get_uint_32(chunk.p + 12);
+              h0 = png_get_uint_32(chunk.p + 16);
+              x0 = png_get_uint_32(chunk.p + 20);
+              y0 = png_get_uint_32(chunk.p + 24);
+              delay_num = png_get_uint_16(chunk.p + 28);
+              delay_den = png_get_uint_16(chunk.p + 30);
               dop = chunk.p[32];
               bop = chunk.p[33];
-              if (!flag_fctl)
+
+              if (hasInfo)
+              {
+                memcpy(_chunkIHDR.p + 8, chunk.p + 12, 8);
+                processing_start((void *)&frameRaw, hasInfo);
+              }
+              else
+                skipFirst = false;
+
+              if (_frames.size() == (skipFirst ? 1 : 0))
               {
                 bop = 0;
                 if (dop == 2)
                   dop = 1;
               }
-              flag_fctl = 1;
-              delete[] chunk.p;
             }
             else
             if (id == id_IDAT)
             {
-              flag_idat = 1;
-              if (!flag_info)
-              {
-                flag_info = 1;
-                for (i=0; i<_info_chunks.size(); ++i)
-                  png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
-              }
-              png_process_data(png_ptr, info_ptr, chunk.p, chunk.size);
-              delete[] chunk.p;
+              hasInfo = true;
+              processing_data(chunk.p, chunk.size);
             }
             else
-            if (id == id_fdAT)
+            if (id == id_fdAT && isAnimated)
             {
-              flag_idat = 1;
-              if (!flag_info)
-              {
-                flag_info = 1;
-                for (i=0; i<_info_chunks.size(); ++i)
-                  png_process_data(png_ptr, info_ptr, _info_chunks[i].p, _info_chunks[i].size);
-              }
-              pi[1] = swap32(chunk.size - 16);
-              pi[2] = id_IDAT;
-              png_process_data(png_ptr, info_ptr, chunk.p + 4, chunk.size - 4);
-              delete[] chunk.p;
+              png_save_uint_32(chunk.p + 4, chunk.size - 16);
+              memcpy(chunk.p + 8, "IDAT", 4);
+              processing_data(chunk.p + 4, chunk.size - 4);
             }
             else
             if (id == id_IEND)
             {
-              png_process_data(png_ptr, info_ptr, &footer[0], 12);
-
-              compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
-              frameCur._delayNum = delay_num;
-              frameCur._delayDen = delay_den;
-              _frames.push_back(frameCur);
+              if (hasInfo && !processing_finish())
+              {
+                compose_frame(frameCur._rows, frameRaw._rows, bop, x0, y0, w0, h0);
+                frameCur._delayNum = delay_num;
+                frameCur._delayDen = delay_den;
+                _frames.push_back(frameCur);
+              }
+              else
+              {
+                delete[] frameCur._rows;
+                delete[] frameCur._pixels;
+              }
               delete[] chunk.p;
               break;
             }
@@ -2126,26 +2083,28 @@ namespace apngasm {
               break;
             }
             else
+            if (!hasInfo)
             {
-              if (!flag_idat)
-                _info_chunks.push_back(chunk);
-              else
-                delete[] chunk.p;
+              processing_data(chunk.p, chunk.size);
+              _info_chunks.push_back(chunk);
+              continue;
             }
+            delete[] chunk.p;
           }
           delete[] frameRaw._rows;
           delete[] frameRaw._pixels;
-          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         }
       }
       fclose(f);
+
+      setSkipFirst(skipFirst);
 
       for (i=0; i<_info_chunks.size(); ++i)
         delete[] _info_chunks[i].p;
 
       _info_chunks.clear();
 
-      delete[] chunk_ihdr.p;
+      delete[] _chunkIHDR.p;
     }
     return _frames;
   }
@@ -2198,6 +2157,65 @@ namespace apngasm {
       if (fread(pChunk->p + 4, pChunk->size - 4, 1, f) == 1)
         return *(unsigned int *)(pChunk->p + 4);
     }
+    return 0;
+  }
+
+  void APNGAsm::processing_start(void * frame_ptr, bool hasInfo)
+  {
+    unsigned char header[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
+    _png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    _info = png_create_info_struct(_png);
+    if (!_png || !_info)
+      return;
+
+    if (setjmp(png_jmpbuf(_png)))
+    {
+      png_destroy_read_struct(&_png, &_info, 0);
+      return;
+    }
+
+    png_set_crc_action(_png, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+    png_set_progressive_read_fn(_png, frame_ptr, info_fn, row_fn, NULL);
+            
+    png_process_data(_png, _info, header, 8);
+    png_process_data(_png, _info, _chunkIHDR.p, _chunkIHDR.size);
+
+    if (hasInfo)
+      for (unsigned int i=0; i<_info_chunks.size(); ++i)
+        png_process_data(_png, _info, _info_chunks[i].p, _info_chunks[i].size);
+  }
+
+  void APNGAsm::processing_data(unsigned char * p, unsigned int size)
+  {
+    if (!_png || !_info)
+      return;
+
+    if (setjmp(png_jmpbuf(_png)))
+    {
+      png_destroy_read_struct(&_png, &_info, 0);
+      return;
+    }
+
+    png_process_data(_png, _info, p, size);
+  }
+
+  int APNGAsm::processing_finish()
+  {
+    unsigned char footer[12] = {0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130};
+
+    if (!_png || !_info)
+      return 1;
+
+    if (setjmp(png_jmpbuf(_png)))
+    {
+      png_destroy_read_struct(&_png, &_info, 0);
+      return 1;
+    }
+
+    png_process_data(_png, _info, footer, 12);
+    png_destroy_read_struct(&_png, &_info, 0);
+
     return 0;
   }
 
