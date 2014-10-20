@@ -1295,42 +1295,27 @@ namespace apngasm {
 
     if ((f = fopen(outputPath.c_str(), "wb")) != 0)
     {
-      struct IHDR
-      {
-        unsigned int    mWidth;
-        unsigned int    mHeight;
-        unsigned char   mDepth;
-        unsigned char   mColorType;
-        unsigned char   mCompression;
-        unsigned char   mFilterMethod;
-        unsigned char   mInterlaceMethod;
-      } ihdr = { swap32(_width), swap32(_height), 8, coltype, 0, 0, 0 };
+      unsigned char buf_IHDR[13];
+      unsigned char buf_acTL[8];
+      unsigned char buf_fcTL[26];
 
-      struct acTL
-      {
-        unsigned int    mFrameCount;
-        unsigned int    mLoopCount;
-      } actl = { swap32(_frames.size()-first), swap32(loops) };
+      png_save_uint_32(buf_IHDR, _width);
+      png_save_uint_32(buf_IHDR + 4, _height);
+      buf_IHDR[8] = 8;
+      buf_IHDR[9] = coltype;
+      buf_IHDR[10] = 0;
+      buf_IHDR[11] = 0;
+      buf_IHDR[12] = 0;
 
-      struct fcTL
-      {
-        unsigned int    mSeq;
-        unsigned int    mWidth;
-        unsigned int    mHeight;
-        unsigned int    mXOffset;
-        unsigned int    mYOffset;
-        unsigned short  mDelayNum;
-        unsigned short  mDelayDen;
-        unsigned char   mDisposeOp;
-        unsigned char   mBlendOp;
-      } fctl;
+      png_save_uint_32(buf_acTL, _frames.size() - first);
+      png_save_uint_32(buf_acTL + 4, loops);
 
       fwrite(png_sign, 1, 8, f);
 
-      write_chunk(f, "IHDR", (unsigned char *)(&ihdr), 13);
+      write_chunk(f, "IHDR", buf_IHDR, 13);
 
       if (_frames.size() > 1)
-        write_chunk(f, "acTL", (unsigned char *)(&actl), 8);
+        write_chunk(f, "acTL", buf_acTL, 8);
       else
         first = 0;
 
@@ -1437,16 +1422,16 @@ namespace apngasm {
 
         dop = op_best >> 1;
 
-        fctl.mSeq       = swap32(_next_seq_num++);
-        fctl.mWidth     = swap32(w0);
-        fctl.mHeight    = swap32(h0);
-        fctl.mXOffset   = swap32(x0);
-        fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(_frames[n]._delayNum);
-        fctl.mDelayDen  = swap16(_frames[n]._delayDen);
-        fctl.mDisposeOp = dop;
-        fctl.mBlendOp   = bop;
-        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
+        png_save_uint_32(buf_fcTL, _next_seq_num++);
+        png_save_uint_32(buf_fcTL + 4, w0);
+        png_save_uint_32(buf_fcTL + 8, h0);
+        png_save_uint_32(buf_fcTL + 12, x0);
+        png_save_uint_32(buf_fcTL + 16, y0);
+        png_save_uint_16(buf_fcTL + 20, _frames[n]._delayNum);
+        png_save_uint_16(buf_fcTL + 22, _frames[n]._delayDen);
+        buf_fcTL[24] = dop;
+        buf_fcTL[25] = bop;
+        write_chunk(f, "fcTL", buf_fcTL, 26);
 
         write_IDATs(f, n, zbuf, zsize, idat_size);
 
@@ -1477,16 +1462,16 @@ namespace apngasm {
 
       if (_frames.size() > 1)
       {
-        fctl.mSeq       = swap32(_next_seq_num++);
-        fctl.mWidth     = swap32(w0);
-        fctl.mHeight    = swap32(h0);
-        fctl.mXOffset   = swap32(x0);
-        fctl.mYOffset   = swap32(y0);
-        fctl.mDelayNum  = swap16(_frames[_frames.size()-1]._delayNum);
-        fctl.mDelayDen  = swap16(_frames[_frames.size()-1]._delayDen);
-        fctl.mDisposeOp = 0;
-        fctl.mBlendOp   = bop;
-        write_chunk(f, "fcTL", (unsigned char *)(&fctl), 26);
+        png_save_uint_32(buf_fcTL, _next_seq_num++);
+        png_save_uint_32(buf_fcTL + 4, w0);
+        png_save_uint_32(buf_fcTL + 8, h0);
+        png_save_uint_32(buf_fcTL + 12, x0);
+        png_save_uint_32(buf_fcTL + 16, y0);
+        png_save_uint_16(buf_fcTL + 20, _frames[_frames.size()-1]._delayNum);
+        png_save_uint_16(buf_fcTL + 22, _frames[_frames.size()-1]._delayDen);
+        buf_fcTL[24] = 0;
+        buf_fcTL[25] = bop;
+        write_chunk(f, "fcTL", buf_fcTL, 26);
       }
 
       write_IDATs(f, _frames.size()-1, zbuf, zsize, idat_size);
@@ -1866,18 +1851,19 @@ namespace apngasm {
 
   void APNGAsm::write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length)
   {
+    unsigned char buf[4];
     unsigned int crc = crc32(0, Z_NULL, 0);
-    unsigned int len = swap32(length);
 
-    fwrite(&len, 1, 4, f);
+    png_save_uint_32(buf, length);
+    fwrite(buf, 1, 4, f);
     fwrite(name, 1, 4, f);
     crc = crc32(crc, (const Bytef *)name, 4);
 
     if (memcmp(name, "fdAT", 4) == 0)
     {
-      unsigned int seq = swap32(_next_seq_num++);
-      fwrite(&seq, 1, 4, f);
-      crc = crc32(crc, (const Bytef *)(&seq), 4);
+      png_save_uint_32(buf, _next_seq_num++);
+      fwrite(buf, 1, 4, f);
+      crc = crc32(crc, buf, 4);
       length -= 4;
     }
 
@@ -1887,8 +1873,8 @@ namespace apngasm {
       crc = crc32(crc, data, length);
     }
 
-    crc = swap32(crc);
-    fwrite(&crc, 1, 4, f);
+    png_save_uint_32(buf, crc);
+    fwrite(buf, 1, 4, f);
   }
 
   void APNGAsm::write_IDATs(FILE * f, int n, unsigned char * data, unsigned int length, unsigned int idat_size)
@@ -2203,15 +2189,14 @@ namespace apngasm {
 
   unsigned int APNGAsm::read_chunk(FILE * f, CHUNK * pChunk)
   {
-    unsigned int len;
+    unsigned char len[4];
     if (fread(&len, 4, 1, f) == 1)
     {
-      pChunk->size = swap32(len) + 12;
+      pChunk->size = png_get_uint_32(len) + 12;
       pChunk->p = new unsigned char[pChunk->size];
-      unsigned int * pi = (unsigned int *)pChunk->p;
-      pi[0] = len;
+      memcpy(pChunk->p, len, 4);
       if (fread(pChunk->p + 4, pChunk->size - 4, 1, f) == 1)
-        return pi[1];
+        return *(unsigned int *)(pChunk->p + 4);
     }
     return 0;
   }
