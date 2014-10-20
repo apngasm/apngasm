@@ -239,7 +239,6 @@ namespace apngasm {
     z_stream        _op_zstream2;
     unsigned char * _op_zbuf1;
     unsigned char * _op_zbuf2;
-    z_stream        _fin_zstream;
     unsigned char * _row_buf;
     unsigned char * _sub_row;
     unsigned char * _up_row;
