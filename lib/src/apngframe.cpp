@@ -114,21 +114,26 @@ namespace apngasm {
     FILE * f;
     if ((f = fopen(filePath.c_str(), "rb")) != 0)
     {
-      png_structp     png_ptr;
-      png_infop       info_ptr;
       unsigned char   sig[8];
 
       if (fread(sig, 1, 8, f) == 8 && png_sig_cmp(sig, 0, 8) == 0)
       {
-        png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        info_ptr = png_create_info_struct(png_ptr);
-        if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
+        png_structp png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        png_infop   info_ptr = png_create_info_struct(png_ptr);
+        if (png_ptr && info_ptr)
         {
           png_byte       depth;
           png_uint_32    rowbytes, i;
           png_colorp     palette;
           png_color_16p  trans_color;
           png_bytep      trans_alpha;
+
+          if (setjmp(png_jmpbuf(png_ptr)))
+          {
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+            fclose(f);
+            return;
+          }
 
           png_init_io(png_ptr, f);
           png_set_sig_bytes(png_ptr, 8);
@@ -201,7 +206,6 @@ namespace apngasm {
           
           png_read_image(png_ptr, _rows);
           png_read_end(png_ptr, NULL);
-          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         }
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       }
@@ -294,8 +298,14 @@ namespace apngasm {
     {
       png_structp  png_ptr  = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
       png_infop    info_ptr = png_create_info_struct(png_ptr);
-      if (png_ptr != NULL && info_ptr != NULL && setjmp(png_jmpbuf(png_ptr)) == 0)
+      if (png_ptr && info_ptr)
       {
+        if (setjmp(png_jmpbuf(png_ptr)))
+        {
+          png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+          fclose(f);
+          return false;
+        }
         png_init_io(png_ptr, f);
         png_set_compression_level(png_ptr, 9);
         png_set_IHDR(png_ptr, info_ptr, _width, _height, 8, _colorType, 0, 0, 0);
