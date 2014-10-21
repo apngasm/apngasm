@@ -20,3 +20,5 @@ debian/stamp-makefile-build
 debian/stamp-makefile-install
 debian/tmp/
 obj-x86_64-linux-gnu/
+debian/files
+debian/libapngasm/
