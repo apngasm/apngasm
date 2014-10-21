@@ -2,14 +2,17 @@ Source: apngasm
 Section: devel
 Priority: optional
 Maintainer: Rei Kagetsuki <zero@genshin.org>
-Build-Depends: cmake, build-essential, cdbs, libpng-dev, libboost1.55-dev, libboost-program-options1.55-dev, libboost-regex1.55-dev, libboost-system1.55-dev, libboost-filesystem1.55-dev
+Build-Depends: cmake, build-essential, cdbs, libpng-dev, libboost1.55-dev, 
+  libboost-program-options1.55-dev, libboost-regex1.55-dev,
+  libboost-system1.55-dev, libboost-filesystem1.55-dev
 Homepage: https://github.com/apngasm/apngasm
-Vcs-Browser: https://github.com/apngasm/apngasm
-Vcs-Git: git@github.com:apngasm/apngasm.git
+Vcs-Browser: https://github.com/apngasm/apngasm.git
+Vcs-Git: git://github.com:apngasm/apngasm.git
 
 Package: apngasm
 Architecture: any
-Depends: libapngasm
+Depends: libapngasm, libboost-program-options1.55.0, ${shlibs:Depends},
+  ${misc:Depends}
 Description: Animated PNG Assembler CLI tool
   Assemble APNG animations from PNG image sequences.
   This is the command line tool to create APNG files from
@@ -23,13 +26,14 @@ Description: Animated PNG Assembler CLI tool
 
 Package: libapngasm
 Architecture: any
-Depends: libpng12-0, libboost-program-options1.55.0, libboost-regex1.55.0, libboost-system1.55.0, libboost-filesystem1.55.0, libc6
+Depends: libpng12-0, libboost-regex1.55.0, libboost-system1.55.0,
+  libboost-filesystem1.55.0, ${shlibs:Depends}, ${misc:Depends}
 Description: APNG Assembler library
   C++ Library to assemble APNG animations from PNG image sequences
   or RGB+A data. apngasm can also be used to read and disassemble 
   PNG/APNG images.
   .
-  The apngasmasm library can be used alone or in conjuction with many
+  The apngasm library can be used alone or in conjunction with many
   popular image processing libraries.
   .
   The Animated Portable Network Graphics (APNG) file format is an
