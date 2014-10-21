@@ -1,3 +1,11 @@
+apngasm (3.1-4ppa0) trusty; urgency=low
+
+  * fixed memory leaks
+  * added more robust handling of PNG sources
+  * added improvements for duplicate frames
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Tue, 21 Oct 2014 14:48:40 +0900
+
 apngasm (3.1-3ppa0) trusty; urgency=low
 
   * fixed skip-frame issues
