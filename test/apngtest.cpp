@@ -133,8 +133,7 @@ int main(int argc, char* argv[])
   {
     apngasm::APNGAsm skipFirstTestAssembler;
     skipFirstTestAssembler.setSkipFirst(true);
-    skipFirstTestAssembler.addFrame("samples/clock1.png");
-    skipFirstTestAssembler.addFrame("samples/clock1.png");
+    skipFirstTestAssembler.addFrame("samples/clk-first.png");
     skipFirstTestAssembler.addFrame("samples/clock*");
     skipFirstTestAssembler.assemble("out/skip_first_test.png");
 
