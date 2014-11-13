@@ -129,6 +129,16 @@ int main(int argc, char* argv[])
   }
   std::cout << "Test 5 - finish" << std::endl;
 
+  std::cout << "Skip first test - start" << std::endl;
+  {
+    apngasm::APNGAsm skipFirstTestAssembler;
+    skipFirstTestAssembler.addFrame("samples/clock1.png");
+    skipFirstTestAssembler.addFrame("samples/clock*");
+    skipFirstTestAssembler.setSkipFirst(true);
+    skipFirstTestAssembler.assemble("out/skip_first_test.png");
+  }
+  std::cout << "Skip first test - finish" << std::endl;
+
   // std::cout << "Memory leak test - start" << std::endl;
   // {
   //   for(int i = 0;  i < 1000;  ++i)
