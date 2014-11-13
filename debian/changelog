@@ -1,3 +1,9 @@
+apngasm (3.1.5) trusty; urgency=low
+
+  * fixed skip_first bug
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Thu, 13 Nov 2014 16:28:20 +0900
+
 apngasm (3.1.4) trusty; urgency=low
 
   * fixed memory leaks
