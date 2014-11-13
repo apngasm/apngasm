@@ -132,10 +132,16 @@ int main(int argc, char* argv[])
   std::cout << "Skip first test - start" << std::endl;
   {
     apngasm::APNGAsm skipFirstTestAssembler;
+    skipFirstTestAssembler.setSkipFirst(true);
+    skipFirstTestAssembler.addFrame("samples/clock1.png");
     skipFirstTestAssembler.addFrame("samples/clock1.png");
     skipFirstTestAssembler.addFrame("samples/clock*");
-    skipFirstTestAssembler.setSkipFirst(true);
     skipFirstTestAssembler.assemble("out/skip_first_test.png");
+
+    skipFirstTestAssembler.reset();
+    skipFirstTestAssembler.addFrame("out/skip_first_test.png");
+
+    std::cout << "frames=" << skipFirstTestAssembler.frameCount() << ", isSkipFirst=" << skipFirstTestAssembler.isSkipFirst() << std::endl;
   }
   std::cout << "Skip first test - finish" << std::endl;
 

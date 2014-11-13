@@ -1969,6 +1969,7 @@ namespace apngasm {
 
   const std::vector<APNGFrame>& APNGAsm::fileToFrames(const std::string &filePath, unsigned int delayNum, unsigned int delayDen)
   {
+    const int oldFrameCount = _frames.size();
     unsigned int   i, j, id;
     unsigned int   w, h;
     CHUNK chunk;
@@ -2145,7 +2146,8 @@ namespace apngasm {
       }
       fclose(f);
 
-      setSkipFirst(skipFirst);
+      if(_frames.size() - oldFrameCount > 1)
+        setSkipFirst(skipFirst);
 
       for (i=0; i<_info_chunks.size(); ++i)
         delete[] _info_chunks[i].p;
