@@ -15,6 +15,7 @@ public:
 	unsigned min_tokens() const { return 0; }
 	unsigned max_tokens() const { return 0; }
 	void notify(const boost::any&) const {}
+	bool adjacent_tokens_only() const { return false; }
 
 	std::string name(void) const {
 		static std::string arg("arg");
