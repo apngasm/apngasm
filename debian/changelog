@@ -1,3 +1,9 @@
+apngasm (3.1.6) trusty; urgency=low
+
+  * fix for boost 1.59(+)
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Fri, 21 Aug 2016 14:16:52 +0900
+
 apngasm (3.1.5) trusty; urgency=low
 
   * fixed skip_first bug
