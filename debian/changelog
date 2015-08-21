@@ -2,7 +2,7 @@ apngasm (3.1.6) trusty; urgency=low
 
   * fix for boost 1.59(+)
 
- -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Fri, 21 Aug 2016 14:16:52 +0900
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Fri, 21 Aug 2015 14:16:52 +0900
 
 apngasm (3.1.5) trusty; urgency=low
 
@@ -69,5 +69,4 @@ apngasm (3.0-0ppa0) saucy; urgency=low
 
   * Version 3.0.0 "stable" release.
 
- -- 影月 零 (Rei Kagetsuki) <zero@genshin.org> Tue, 07 Jan 2014 01:03:26 +0900
-
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Tue, 07 Jan 2014 01:03:26 +0900
