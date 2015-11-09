@@ -34,5 +34,5 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(RUBY)
-  INCLUDE(${PROJECT_SOURCE_DIR}lib/interfaces/ruby/CMakeLists.txt)
+  INCLUDE(${PROJECT_SOURCE_DIR}/lib/interfaces/ruby/CMakeLists.txt)
 ENDIF(RUBY)
