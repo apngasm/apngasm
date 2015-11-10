@@ -14,6 +14,7 @@
 namespace apngasm {
     class APNGAsm
     {
+    public:
 		APNGAsm(void);
 		~APNGAsm(void);
 		const char* version(void) const;
@@ -21,6 +22,7 @@ namespace apngasm {
 
     class APNGFrame
     {
+    public:
         APNGFrame();
     };
 }
