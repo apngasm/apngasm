@@ -1,5 +1,11 @@
 %module APNGAsm
 
+#ifdef SWIGRUBY
+%{
+#define Init_APNGAsm Init_RAPNGAsm
+%}
+#endif
+
 %{
 #include "apngasm.h"
 #include "apngframe.h"
