@@ -1,4 +1,4 @@
-%module RAPNGAsm
+%module APNGAsm
 
 %{
 #include "apngasm.h"
