@@ -12,8 +12,8 @@
 %rename(color_type) apngasm::APNGFrame::colorType;
 %rename(palette_size) apngasm::APNGFrame::paletteSize;
 %rename(transparency_size) apngasm::APNGFrame::transparencySize;
-%rename(delay_num) apngasm::APNGFrame::delayNum;
-%rename(delay_den) apngasm::APNGFrame::delayDen;
+%rename(delay_numerator) apngasm::APNGFrame::delayNum;
+%rename(delay_denominator) apngasm::APNGFrame::delayDen;
 
 %rename(add_frame) apngasm::APNGAsm::addFrame(const APNGFrame &frame);
 %rename(add_frame_file) apngasm::APNGAsm::addFrame(const std::string &filePath, unsigned delayNum = DEFAULT_FRAME_NUMERATOR, unsigned delayDen = DEFAULT_FRAME_DENOMINATOR);
