@@ -47,6 +47,8 @@
 %include "std_string.i"
 %include "std_vector.i"
 
+%include "apngasm-conf.h"
+
 namespace apngasm {
   typedef struct { unsigned char r, g, b; } rgb;
   typedef struct { unsigned char r, g, b, a; } rgba;
