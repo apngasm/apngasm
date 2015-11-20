@@ -30,6 +30,9 @@
 %rename(is_skip_first) apngasm::APNGAsm::isSkipFirst;
 %rename(frame_count) apngasm::APNGAsm::frameCount;
 
+%rename(Rgb) apngasm::rgb;
+%rename(Rgba) apngasm::rgba;
+
 #endif  // SWIGRUBY
 
 
