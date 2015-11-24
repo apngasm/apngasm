@@ -1,11 +1,11 @@
-%module APNGAsm
+%module APNG
 
 // For ruby.
 #ifdef SWIGRUBY
 
 // Replace init method name.
 %{
-#define Init_APNGAsm Init_RAPNGAsm
+#define Init_APNG Init_RAPNGAsm
 %}
 
 // Rename methods.
