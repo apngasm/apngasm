@@ -8,7 +8,6 @@ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/cli)
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/test)
 
 OPTION(RUBY "Build Ruby interfaces")
-OPTION(JAVA "Build Java interfaces")
 
 # Create package command
 IF(UNIX OR APPLE)
@@ -37,7 +36,3 @@ ENDIF(WIN32)
 IF(RUBY)
   INCLUDE(${PROJECT_SOURCE_DIR}/lib/interfaces/ruby/CMakeLists.txt)
 ENDIF(RUBY)
-
-IF(JAVA)
-  INCLUDE(${PROJECT_SOURCE_DIR}/lib/interfaces/java/CMakeLists.txt)
-ENDIF(JAVA)
