@@ -1,5 +1,13 @@
 %module APNG
 
+// For java.
+%pragma(java) jniclasscode=%{
+  static
+  {
+    NativeLibLoader.load();
+  }
+%}
+
 // For ruby.
 #ifdef SWIGRUBY
 
