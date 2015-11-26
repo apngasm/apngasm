@@ -82,7 +82,12 @@ ENDIF(UNIX OR APPLE)
 
 
 # SWIG
+OPTION(RUBY "Build Ruby interfaces")
 OPTION(JAVA "Build Java interfaces")
+
+IF(RUBY)
+  INCLUDE(${PROJECT_SOURCE_DIR}/interfaces/ruby/CMakeLists.txt)
+ENDIF(RUBY)
 
 IF(JAVA)
   INCLUDE(${PROJECT_SOURCE_DIR}/interfaces/java/CMakeLists.txt)
