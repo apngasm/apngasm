@@ -71,6 +71,31 @@ Building on Windows (with Visual Studio):
 ----------------------------------------------
 Please see detailed instructions [here](https://github.com/apngasm/apngasm/blob/master/docs/building/win/instructions.md)
 
+Interfaces
+----------
+apngasm now has interface wrappers with SWIG. Currently Java and Ruby are supported out of box - but if you are building for ruby you may as well use the rapngasm gem.
+
+Building for Java:
+```
+mkdir build
+cd build
+cmake -DJAVA=true ..
+make
+make java
+make jar
+```
+
+Building for Ruby (raw library, not using the rapngasm gem):
+```
+mkdir build
+cd build
+cmake -DRUBY=true ..
+make
+make ruby
+```
+
+If you'd like wrappers generated for another language we request you try and add it yourself and make a pull request. Each language has its own particular tweaks that may be neccesary so it's hard for us to implement on languages we aren't familiar with.
+
 License
 -------
 zlib/libpng
