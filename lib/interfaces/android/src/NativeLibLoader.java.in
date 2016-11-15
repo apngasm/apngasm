@@ -18,10 +18,10 @@ final class NativeLibLoader
   {
     // Load native libraries.
     final String arch = getArchitecture();
-    loadNativeLibraryFromJar("libcrystax.so", arch);
-    loadNativeLibraryFromJar("libgnustl_shared.so", arch);
-    loadNativeLibraryFromJar("libpng16.so.16", arch);
-    loadNativeLibraryFromJar("libapngasm-android.so", arch);
+    loadNativeLibrary("libcrystax.so", arch);
+    loadNativeLibrary("libgnustl_shared.so", arch);
+    loadNativeLibrary("libpng16.so.16", arch);
+    loadNativeLibrary("libapngasm-android.so", arch);
   }
 
   /**
