@@ -21,4 +21,4 @@ LOCAL_STATIC_LIBRARIES += boost_system_static boost_filesystem_static boost_prog
 
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module,boost/1.58.0)
+$(call import-module,boost/1.59.0)
