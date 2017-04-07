@@ -20,7 +20,7 @@ final class NativeLibLoader
     final String arch = getArchitecture();
     loadNativeLibrary("libcrystax.so", arch);
     loadNativeLibrary("libgnustl_shared.so", arch);
-    loadNativeLibrary("libpng16.so.16", arch);
+    loadNativeLibrary("libpng16.so", arch);
     loadNativeLibrary("libapngasm-android.so", arch);
   }
 
@@ -99,7 +99,13 @@ final class NativeLibLoader
     {
       final InputStream is = NativeLibLoader.class.getClassLoader().getResourceAsStream(source);
 
-      final File tmp = new File(System.getProperty("java.io.tmpdir"), destination);
+      final File tmp = new File(System.getProperty("java.io.tmpdir") + "/libapngasm", destination);
+      final File parentDir = tmp.getParentFile();
+      if( !parentDir.exists() )
+      {
+        parentDir.mkdirs();
+        parentDir.deleteOnExit();
+      }
       tmp.deleteOnExit();
 
       final FileOutputStream os = new FileOutputStream(tmp);
