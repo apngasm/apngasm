@@ -31,7 +31,13 @@ Building on (Ubuntu/Debian) Linux:
     ```
     make
     ```
-4. [optional] Build packages  
+4. Installing or [optional] Build packages  
+You can either install directly or roll your own .deb package to keep it under system package management.  
+    To install, just do:
+    ```
+    sudo make install
+    ```
+    To make packages:
     ```
     make package
     ```
