@@ -1,0 +1,138 @@
+package japngasm;
+
+import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+/**
+ *  Native library loader.
+ */
+final class NativeLibLoader
+{
+  /**
+   *  Load library.
+   */
+  static void load()
+  {
+    // Load native libraries.
+    final String arch = getArchitecture();
+    loadNativeLibrary("libcrystax.so", arch);
+    loadNativeLibrary("libgnustl_shared.so", arch);
+    loadNativeLibrary("libpng16.so", arch);
+    loadNativeLibrary("libapngasm-android.so", arch);
+  }
+
+  /**
+   *  Get architecture name.
+   */
+  private static String getArchitecture()
+  {
+    final LinkedHashMap<String, String[]> table = new LinkedHashMap<String, String[]>()
+    {
+      {
+//        put("armv7l", new String[] {"armeabi"});
+//        put("", new String[] {"arm64-v8a", "armeabi"});
+        put("arm", new String[] {"armeabi"});
+//        put("", new String[] {"mips64", "mips"});
+        put("mips", new String[] {"mips"});
+        put("i686", new String[] {"x86"});
+        put("x86_64", new String[] {"x86_64", "x86"});
+      }
+    };
+
+    // Check library file exists.
+    final String arch = System.getProperty("os.arch");
+    for(Map.Entry<String, String[]> entry : table.entrySet())
+    {
+      if( arch.contains(entry.getKey()) )
+      {
+        for(String result : entry.getValue())
+        {
+          if(isExists("libapngasm-android.so", result))
+            return result;
+        }
+      }
+    }
+
+    return "armeabi";
+  }
+
+  /**
+   * Get native library file path.
+   */
+  private static String getNativeLibraryPath(String name, String arch)
+  {
+    return "libs/" + arch + "/" + name + "_";
+  }
+
+  /**
+   *  Load native library.
+   */
+  private static void loadNativeLibrary(String name, String arch)
+  {
+    try
+    {
+      System.load(name);
+    }
+    catch(UnsatisfiedLinkError e)
+    {
+      loadNativeLibraryFromJar(name, arch);
+    }
+  }
+
+  /**
+   *  Load native library from jar file.
+   */
+  private static void loadNativeLibraryFromJar(String name, String arch)
+  {
+    System.load(copyFileFromJar(getNativeLibraryPath(name, arch), name));
+  }
+
+  /**
+   *  Copy file from jar to temporary directory.
+   */
+  private static String copyFileFromJar(String source, String destination)
+  {
+    try
+    {
+      final InputStream is = NativeLibLoader.class.getClassLoader().getResourceAsStream(source);
+
+      final File tmp = new File(System.getProperty("java.io.tmpdir") + "/libapngasm", destination);
+      final File parentDir = tmp.getParentFile();
+      if( !parentDir.exists() )
+      {
+        parentDir.mkdirs();
+        parentDir.deleteOnExit();
+      }
+      tmp.deleteOnExit();
+
+      final FileOutputStream os = new FileOutputStream(tmp);
+      final byte[] buf = new byte[4096];
+      int readBytes;
+
+      while( (readBytes = is.read(buf)) != -1 )
+        os.write(buf, 0, readBytes);
+
+      os.close();
+      is.close();
+
+      return tmp.getAbsolutePath();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+
+    return "";
+  }
+
+  /**
+   *  Check file exists.
+   */
+  private static boolean isExists(String name, String arch)
+  {
+    return NativeLibLoader.class.getClassLoader().getResource(getNativeLibraryPath(name, arch)) != null;
+  }
+}

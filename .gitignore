@@ -22,3 +22,4 @@ debian/tmp/
 obj-x86_64-linux-gnu/
 debian/files
 debian/libapngasm/
+lib/tmp
