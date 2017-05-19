@@ -12,7 +12,7 @@ Vcs-Git: git://github.com:apngasm/apngasm.git
 Package: apngasm
 Architecture: any
 Depends: libapngasm,
-  libboost-program-options (>= 1.58) | libboost-program-options,
+  libboost-program-options1.63.0 | libboost-program-options1.62.0 | libboost-program-options1.61.0 | libboost-program-options1.60.0 | libboost-program-options1.58.0 | libboost-program-options-dev,
   ${shlibs:Depends}, ${misc:Depends}
 Description: Animated PNG Assembler CLI tool
   Assemble APNG animations from PNG image sequences.
@@ -27,9 +27,10 @@ Description: Animated PNG Assembler CLI tool
 
 Package: libapngasm
 Architecture: any
-Depends: libpng16-16, libboost-regex (>= 1.58) | libboost-regex,
-  libboost-system (>= 1.58) | libboost-system,
-  libboost-filesystem (>= 1.58) | libboost-filesystem,
+Depends: libpng16-16,
+  libboost-regex1.63.0 | libboost-regex1.62.0 | libboost-regex1.61.0 | libboost-regex1.60.0 | libboost-regex1.58.0 | libboost-regex-dev,
+  libboost-system1.63.0 | libboost-system1.62.0 | libboost-system1.61.0 | libboost-system1.60.0 | libboost-system1.58.0 | libboost-system-dev,
+  libboost-filesystem1.63.0 | libboost-filesystem1.62.0 | libboost-filesystem1.61.0 | libboost-filesystem1.60.0 | libboost-filesystem1.58.0 | libboost-filesystem-dev,
   ${shlibs:Depends}, ${misc:Depends}
 Description: APNG Assembler library
   C++ Library to assemble APNG animations from PNG image sequences
