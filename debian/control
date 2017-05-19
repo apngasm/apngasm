@@ -11,8 +11,9 @@ Vcs-Git: git://github.com:apngasm/apngasm.git
 
 Package: apngasm
 Architecture: any
-Depends: libapngasm, libboost-program-options (>= 1.58.0), ${shlibs:Depends},
-  ${misc:Depends}
+Depends: libapngasm,
+  libboost-program-options (>= 1.58) | libboost-program-options,
+  ${shlibs:Depends}, ${misc:Depends}
 Description: Animated PNG Assembler CLI tool
   Assemble APNG animations from PNG image sequences.
   This is the command line tool to create APNG files from
@@ -26,8 +27,10 @@ Description: Animated PNG Assembler CLI tool
 
 Package: libapngasm
 Architecture: any
-Depends: libpng16-16, libboost-regex (>= 1.58.0), libboost-system (>= 1.58.0),
-  libboost-filesystem (>= 1.58.0), ${shlibs:Depends}, ${misc:Depends}
+Depends: libpng16-16, libboost-regex (>= 1.58) | libboost-regex,
+  libboost-system (>= 1.58) | libboost-system,
+  libboost-filesystem (>= 1.58) | libboost-filesystem,
+  ${shlibs:Depends}, ${misc:Depends}
 Description: APNG Assembler library
   C++ Library to assemble APNG animations from PNG image sequences
   or RGB+A data. apngasm can also be used to read and disassemble 
