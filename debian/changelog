@@ -1,3 +1,9 @@
+apngasm (3.1.7) xenial; urgency=low
+
+  * fixes for package builds and adjustments for ports
+
+ -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Fri, 19 May 2017 11:48:57 +0900
+
 apngasm (3.1.6) trusty; urgency=low
 
   * fix for boost 1.59(+)
