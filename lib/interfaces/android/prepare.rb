@@ -5,7 +5,7 @@ require 'fileutils'
 
 @build_dir = ARGV[0] || Dir.pwd
 
-@build_api_level = 14
+@build_api_level = 21
 @build_targets = ["arm", "arm64", "x86", "x86_64"] #, "mips"]
 
 puts "=== Preparing Android build dependencies"
@@ -102,15 +102,19 @@ def build_libpng()
 
   puts '== Building libpng'
 
-  puts '= Building for arm'
-  `git clean -fdx`
-  `autoreconf --force --install`
-  `#{chain_env('arm')} ./configure --prefix=#{@build_dir}/natives/arm/ --disable-static --host=arm-linux-androideabi && make && make install`
+  if @build_targets.include? 'arm'
+    puts '= Building for arm'
+    `git clean -fdx`
+    `autoreconf --force --install`
+    `#{chain_env('arm')} ./configure --prefix=#{@build_dir}/natives/arm/ --disable-static --host=arm-linux-androideabi && make && make install`
+  end
 
-  puts '= Building for x86'
-  `git clean -fdx`
-  `autoreconf --force --install`
-  `#{chain_env('x86')} ./configure --prefix=#{@build_dir}/natives/x86/ --disable-static --host=i686-linux-android && make && make install`
+  if @build_targets.include? 'x86'
+    puts '= Building for x86'
+    `git clean -fdx`
+    `autoreconf --force --install`
+    `#{chain_env('x86')} ./configure --prefix=#{@build_dir}/natives/x86/ --disable-static --host=i686-linux-android && make && make install`
+  end
 
   if @build_targets.include? 'mips'
     puts '= Building for mips'
