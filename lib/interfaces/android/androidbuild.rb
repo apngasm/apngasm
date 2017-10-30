@@ -33,12 +33,27 @@ puts "== Running NDK Build"
 puts "== copying natives"
 FileUtils.mkdir_p(@interface_dir)
 FileUtils.mkdir_p("#{@build_dir}/libs")
-FileUtils.mkdir_p("#{@build_dir}/libs/armeabi")
-FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/arm/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/armeabi/", {remove_destination: true})
-FileUtils.mkdir_p("#{@build_dir}/libs/x86")
-FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/x86/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/x86/", {remove_destination: true})
-FileUtils.mkdir_p("#{@build_dir}/libs/mips")
-FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/mips/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/mips/", {remove_destination: true})
+
+if File.exists? "#{@natives_dir}/natives/lib/arm"
+  FileUtils.mkdir_p("#{@build_dir}/libs/armeabi")
+  FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/arm/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/armeabi/", {remove_destination: true})
+end
+if File.exists? "#{@natives_dir}/natives/lib/arm64"
+  FileUtils.mkdir_p("#{@build_dir}/libs/arm64-v8a")
+  FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/arm64/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/arm64-v8a/", {remove_destination: true})
+end
+if File.exists? "#{@natives_dir}/natives/lib/x86"
+  FileUtils.mkdir_p("#{@build_dir}/libs/x86")
+  FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/x86/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/x86/", {remove_destination: true})
+end
+if File.exists? "#{@natives_dir}/natives/lib/x86_64"
+  FileUtils.mkdir_p("#{@build_dir}/libs/x86_64")
+  FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/x86_64/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/x86_64/", {remove_destination: true})
+end
+if File.exists? "#{@natives_dir}/natives/lib/mips"
+  FileUtils.mkdir_p("#{@build_dir}/libs/mips")
+  FileUtils.cp_r(Dir["#{@natives_dir}/natives/lib/mips/*.so*"].collect{|f| File.expand_path(f)}, "#{@build_dir}/libs/mips/", {remove_destination: true})
+end
 
 puts "== for mac (copy the missing file)"
 

@@ -32,13 +32,12 @@ final class NativeLibLoader
     final LinkedHashMap<String, String[]> table = new LinkedHashMap<String, String[]>()
     {
       {
-//        put("armv7l", new String[] {"armeabi"});
-//        put("", new String[] {"arm64-v8a", "armeabi"});
-        put("arm", new String[] {"armeabi"});
-//        put("", new String[] {"mips64", "mips"});
-        put("mips", new String[] {"mips"});
+        put("armv7l", new String[] {"armeabi"});
+        put("aarch64", new String[] {"arm64-v8a", "armeabi"});
         put("i686", new String[] {"x86"});
         put("x86_64", new String[] {"x86_64", "x86"});
+        put("mips", new String[] {"mips"});
+//        put("", new String[] {"mips64", "mips"});
       }
     };
 
