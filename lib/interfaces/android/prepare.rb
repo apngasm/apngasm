@@ -12,7 +12,8 @@ puts "=== Preparing Android build dependencies"
 
 def init()
   if @build_api_level < 21
-    @build_targets = ["arm", "x86"] #, "mips"]
+    @build_targets.delete "arm64"
+    @build_targets.delete "x86_64"
   end
 
   FileUtils.mkdir_p("#{@build_dir}") unless File.exists? "#{@build_dir}"
