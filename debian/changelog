@@ -1,3 +1,9 @@
+apngasm (3.1.8) disco; urgency=low
+
+  * compatibility update
+
+ -- 影月 零 (Rei Kagetsuki) <zero@phantom.industries>  Wed, 26 Jun 2018 13:42:57 +0900
+
 apngasm (3.1.7) xenial; urgency=low
 
   * fixes for package builds and adjustments for ports
