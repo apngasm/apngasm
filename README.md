@@ -114,5 +114,5 @@ zlib/libpng
 
 Copyright
 ---------
-This version of apngasm is a joint production by Max Stepin and Genshin Souzou Kabushiki Kaisha.
+This version of apngasm is a joint production by Max Stepin and K.K. GenSouSha.
 The original apngasm is wholly copyright Max Stepin. The apngasm name and project is copyright Max Stepin all rights reserved.
