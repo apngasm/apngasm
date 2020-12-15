@@ -8,31 +8,31 @@ namespace apngasm {
 
   unsigned char* APNGFrame::pixels(unsigned char* setPixels)
   {
-  	if (setPixels != NULL)
-  		_pixels  = setPixels;
-  	return _pixels;
+    if (setPixels != NULL)
+      _pixels  = setPixels;
+    return _pixels;
   }
 
   unsigned int APNGFrame::width(unsigned int setWidth)
   {
-  	if (setWidth != 0)
-  		_width = setWidth;
-  	return _width;
+    if (setWidth != 0)
+      _width = setWidth;
+    return _width;
   }
 
   unsigned int APNGFrame::height(unsigned int setHeight)
   {
-  	if (setHeight != 0)
-  		_height = setHeight;
-  	return _height;
+    if (setHeight != 0)
+      _height = setHeight;
+    return _height;
   }
 
   unsigned char APNGFrame::colorType(unsigned char setColorType)
   {
-  	if (setColorType != 255)
+    if (setColorType != 255)
 
-  		_colorType = setColorType;
-  	return _colorType;
+      _colorType = setColorType;
+    return _colorType;
   }
     
   rgb* APNGFrame::palette(rgb* setPalette)
@@ -110,7 +110,7 @@ namespace apngasm {
     , _delayDen(delayDen)
     , _rows(NULL)
   {
-  	//TODO save extracted info to self
+    //TODO save extracted info to self
     FILE * f;
     if ((f = fopen(filePath.c_str(), "rb")) != 0)
     {
