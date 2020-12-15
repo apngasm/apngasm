@@ -1,72 +1,71 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 
-PROJECT(APNGASM_CLI)
-
-# cmake policy
-IF(POLICY CMP0026)
-  CMAKE_POLICY(SET CMP0026 OLD)
-ENDIF(POLICY CMP0026)
+project(APNGASM_CLI)
 
 # Generate version header
-SET(APNGASM_CLI_VERSION_MAJOR 3)
-SET(APNGASM_CLI_VERSION_MINOR 1)
-SET(APNGASM_CLI_VERSION_PATCH 6)
-SET(APNGASM_CLI_VERSION "${APNGASM_CLI_VERSION_MAJOR}.${APNGASM_CLI_VERSION_MINOR}.${APNGASM_CLI_VERSION_PATCH}")
+set(APNGASM_CLI_VERSION_MAJOR 3)
+set(APNGASM_CLI_VERSION_MINOR 1)
+set(APNGASM_CLI_VERSION_PATCH 6)
+set(APNGASM_CLI_VERSION "${APNGASM_CLI_VERSION_MAJOR}.${APNGASM_CLI_VERSION_MINOR}.${APNGASM_CLI_VERSION_PATCH}")
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/apngasm-cli-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-cli-version.h @ONLY)
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
+configure_file(${PROJECT_SOURCE_DIR}/src/apngasm-cli-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-cli-version.h @ONLY)
+include_directories(${PROJECT_BINARY_DIR}/src)
 
 # Generate executable file
-ADD_EXECUTABLE(apngasm-cli
-    ${PROJECT_SOURCE_DIR}/src/apngasm-cli.cpp
-    ${PROJECT_SOURCE_DIR}/src/options.cpp
-    ${PROJECT_SOURCE_DIR}/src/cli.cpp
+add_executable(apngasm-cli
+	${PROJECT_SOURCE_DIR}/src/apngasm-cli.cpp
+	${PROJECT_SOURCE_DIR}/src/options.cpp
+	${PROJECT_SOURCE_DIR}/src/cli.cpp
 )
-SET_TARGET_PROPERTIES(apngasm-cli
+set_target_properties(apngasm-cli
 	PROPERTIES OUTPUT_NAME apngasm)
 
 # Link libraries
-LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/../lib)
-INCLUDE_DIRECTORIES(
-  ${PROJECT_SOURCE_DIR}/../lib/src
-  ${PROJECT_BINARY_DIR}/../lib/src
+link_directories(${PROJECT_BINARY_DIR}/../lib)
+include_directories(
+	${PROJECT_SOURCE_DIR}/../lib/src
+	${PROJECT_BINARY_DIR}/../lib/src
 )
-TARGET_LINK_LIBRARIES(apngasm-cli apngasm)
+target_link_libraries(apngasm-cli apngasm)
 
-FIND_PACKAGE(ZLIB REQUIRED)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(apngasm-cli ${ZLIB_LIBRARIES})
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+target_link_libraries(apngasm-cli ${ZLIB_LIBRARIES})
 
-IF(APPLE OR WIN32)
-  SET(Boost_USE_STATIC_LIBS ON)
-ENDIF(APPLE OR WIN32)
-FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options regex filesystem system) 
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}) 
-TARGET_LINK_LIBRARIES(apngasm-cli ${Boost_LIBRARIES})
+if (APPLE OR WIN32)
+	set(Boost_USE_STATIC_LIBS ON)
+endif ()
+find_package(Boost REQUIRED COMPONENTS program_options regex filesystem system) 
+include_directories(${Boost_INCLUDE_DIRS}) 
+target_link_libraries(apngasm-cli ${Boost_LIBRARIES})
 
 # Installation
-INSTALL(TARGETS apngasm-cli DESTINATION "bin")
+install(TARGETS apngasm-cli DESTINATION "bin")
 
 # Create package command
-SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
-GET_PROPERTY(INSTALL_APPS TARGET apngasm-cli PROPERTY LOCATION)
+set(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
+#get_property(INSTALL_APPS TARGET apngasm-cli PROPERTY LOCATION)
 
-IF(WIN32)
-  SET(INSTALL_HEADERS "${PROJECT_SOURCE_DIR}/../lib/src/apngasm.h ${PROJECT_SOURCE_DIR}/../lib/src/apngframe.h ${PROJECT_SOURCE_DIR}/../lib/src/apngasm-conf.h ${PROJECT_BINARY_DIR}/../lib/src/apngasm-version.h")
-  GET_PROPERTY(INSTALL_LIBS TARGET apngasm PROPERTY LOCATION)
-  STRING(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_APPS "${INSTALL_APPS}")
-  STRING(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_LIBS "${INSTALL_LIBS}")
-ENDIF(WIN32)
+if (WIN32)
+	set(INSTALL_HEADERS
+		${PROJECT_SOURCE_DIR}/../lib/src/apngasm.h
+		${PROJECT_SOURCE_DIR}/../lib/src/apngframe.h
+		${PROJECT_SOURCE_DIR}/../lib/src/apngasm-conf.h
+		${PROJECT_BINARY_DIR}/../lib/src/apngasm-version.h)
+	get_property(INSTALL_LIBS TARGET apngasm PROPERTY LOCATION)
+	string(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_APPS "${INSTALL_APPS}")
+	string(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_LIBS "${INSTALL_LIBS}")
+endif ()
 
-INCLUDE(${PROJECT_BINARY_DIR}/../lib/manifest.txt)
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
+include(${PROJECT_BINARY_DIR}/../lib/manifest.txt)
+configure_file(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
 
-IF(UNIX OR APPLE)
-  ADD_CUSTOM_TARGET(
-    package-cli
-    COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} package
-    WORKING_DIRECTORY ${PACKAGE_DIR}
-  )
-  INSTALL(FILES ${PROJECT_SOURCE_DIR}/../docs/man/apngasm.1 DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
-ENDIF(UNIX OR APPLE)
+if (UNIX OR APPLE)
+	add_custom_target(
+		package-cli
+		COMMAND ${CMAKE_COMMAND} .
+		COMMAND ${CMAKE_MAKE_PROGRAM} package
+		WORKING_DIRECTORY ${PACKAGE_DIR}
+	)
+	install(FILES ${PROJECT_SOURCE_DIR}/../docs/man/apngasm.1 DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
+endif ()

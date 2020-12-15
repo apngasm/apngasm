@@ -1,116 +1,144 @@
-PROJECT(APNGASM_LIB)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 
-SET(APNGASM_LIB_VERSION_MAJOR 3)
-SET(APNGASM_LIB_VERSION_MINOR 1)
-SET(APNGASM_LIB_VERSION_PATCH 9)
+project(APNGASM_LIB)
 
-SET(APNGASM_LIB_VERSION "${APNGASM_LIB_VERSION_MAJOR}.${APNGASM_LIB_VERSION_MINOR}.${APNGASM_LIB_VERSION_PATCH}")
+set(APNGASM_LIB_VERSION_MAJOR 3)
+set(APNGASM_LIB_VERSION_MINOR 1)
+set(APNGASM_LIB_VERSION_PATCH 9)
 
+# Set the version
+set(APNGASM_LIB_VERSION "${APNGASM_LIB_VERSION_MAJOR}.${APNGASM_LIB_VERSION_MINOR}.${APNGASM_LIB_VERSION_PATCH}")
+# Generate a header file with the version
+configure_file(${PROJECT_SOURCE_DIR}/src/apngasm-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-version.h @ONLY)
+# Generate a package manifest file with the version
+configure_file(${PROJECT_SOURCE_DIR}/manifest.txt.in ${PROJECT_BINARY_DIR}/manifest.txt @ONLY)
 
-# cmake policy
-IF(POLICY CMP0026)
-  CMAKE_POLICY(SET CMP0026 OLD)
-ENDIF(POLICY CMP0026)
+include_directories(${PROJECT_BINARY_DIR}/src)
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/apngasm-version.h.in ${PROJECT_BINARY_DIR}/src/apngasm-version.h @ONLY)
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
-
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/manifest.txt.in ${PROJECT_BINARY_DIR}/manifest.txt @ONLY)
-
-
-# shared library and sources
-SET(APNGASM_DYNAMIC_LIB_TARGET apngasm)
-
-ADD_LIBRARY(${APNGASM_DYNAMIC_LIB_TARGET} SHARED
-  ${PROJECT_SOURCE_DIR}/src/apngasm.cpp
-  ${PROJECT_SOURCE_DIR}/src/apngframe.cpp
-  ${PROJECT_SOURCE_DIR}/src/spec/specreader.cpp
-  ${PROJECT_SOURCE_DIR}/src/spec/specwriter.cpp
-  ${PROJECT_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
-  ${PROJECT_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
-  ${PROJECT_SOURCE_DIR}/src/listener/apngasmlistener.cpp
+# Sources and Headers
+set(APNGASM_HEADERS
+	${PROJECT_SOURCE_DIR}/src/apngasm.h
+	${PROJECT_SOURCE_DIR}/src/apngframe.h
+	${PROJECT_SOURCE_DIR}/src/apngasm-conf.h
+	${PROJECT_BINARY_DIR}/src/apngasm-version.h
+)
+set(APNGASM_SOURCES
+	${PROJECT_SOURCE_DIR}/src/apngasm.cpp
+	${PROJECT_SOURCE_DIR}/src/apngframe.cpp
+	${PROJECT_SOURCE_DIR}/src/spec/specreader.cpp
+	${PROJECT_SOURCE_DIR}/src/spec/specwriter.cpp
+	${PROJECT_SOURCE_DIR}/src/spec/priv/specreaderimpl.cpp
+	${PROJECT_SOURCE_DIR}/src/spec/priv/specwriterimpl.cpp
+	${PROJECT_SOURCE_DIR}/src/listener/apngasmlistener.cpp
 )
 
+# Add the dynamic/shared library
+set(APNGASM_DYNAMIC_LIB_TARGET apngasm)
+add_library(${APNGASM_DYNAMIC_LIB_TARGET} SHARED
+	${APNGASM_SOURCES}
+)
+set_target_properties(${APNGASM_DYNAMIC_LIB_TARGET}
+	PROPERTIES
+	POSITION_INDEPENDENT_CODE TRUE
+	OUTPUT_NAME apngasm
+)
 
-# Link libraries
-FIND_PACKAGE(PNG REQUIRED)
-INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR})
-TARGET_LINK_LIBRARIES(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
-MESSAGE(${PNG_VERSION_STRING})
+# Add the static library/archive
+set(APNGASM_STATIC_LIB_TARGET apngasm-static)
+add_library(${APNGASM_STATIC_LIB_TARGET}
+	${APNGASM_SOURCES}
+)
+set_target_properties(${APNGASM_STATIC_LIB_TARGET}
+	PROPERTIES
+	POSITION_INDEPENDENT_CODE TRUE
+	OUTPUT_NAME apngasm
+)
 
-FIND_PACKAGE(ZLIB REQUIRED)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(${APNGASM_DYNAMIC_LIB_TARGET} ${ZLIB_LIBRARIES})
+# Add libraries/includes
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARY})
+message(${PNG_VERSION_STRING})
 
-IF(APPLE OR WIN32)
-  SET(Boost_USE_STATIC_LIBS ON)
-ENDIF(APPLE OR WIN32)
-FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options regex filesystem system)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(${APNGASM_DYNAMIC_LIB_TARGET} ${Boost_LIBRARIES})
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${ZLIB_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${ZLIB_LIBRARIES})
+
+if (APPLE OR WIN32)
+	set(Boost_USE_STATIC_LIBS ON)
+endif ()
+find_package(Boost REQUIRED COMPONENTS program_options regex filesystem system)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${Boost_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${Boost_LIBRARIES})
+
+set(APNGASM_LIBRARIES
+	$<TARGET_FILE:${APNGASM_DYNAMIC_LIB_TARGET}>
+	$<TARGET_FILE:${APNGASM_STATIC_LIB_TARGET}>
+)
 
 # Installation
-INSTALL(FILES
-  ${PROJECT_SOURCE_DIR}/src/apngasm.h
-  ${PROJECT_SOURCE_DIR}/src/apngframe.h
-  ${PROJECT_SOURCE_DIR}/src/apngasm-conf.h
-  ${PROJECT_BINARY_DIR}/src/apngasm-version.h
-  DESTINATION "include")
-
-IF(NOT DEFINED LIB_INSTALL_DIR)
-  SET (LIB_INSTALL_DIR "lib")
-ENDIF(NOT DEFINED LIB_INSTALL_DIR)
-
-INSTALL(TARGETS ${APNGASM_DYNAMIC_LIB_TARGET} DESTINATION ${LIB_INSTALL_DIR})
+install(
+	FILES
+		${APNGASM_HEADERS}
+	DESTINATION "include"
+)
+if (NOT DEFINED LIB_INSTALL_DIR)
+	set(LIB_INSTALL_DIR "lib")
+endif ()
+install(
+	TARGETS
+		${APNGASM_DYNAMIC_LIB_TARGET}
+		${APNGASM_STATIC_LIB_TARGET}
+	DESTINATION ${LIB_INSTALL_DIR}
+)
 
 # Create package command
-SET(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
-SET(INSTALL_HEADERS "${PROJECT_SOURCE_DIR}/src/apngasm.h ${PROJECT_SOURCE_DIR}/src/apngframe.h ${PROJECT_SOURCE_DIR}/src/apngasm-conf.h ${PROJECT_BINARY_DIR}/src/apngasm-version.h")
-GET_PROPERTY(INSTALL_LIBS TARGET ${APNGASM_DYNAMIC_LIB_TARGET} PROPERTY LOCATION)
+set(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
 
-IF(WIN32)
-  STRING(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_LIBS "${INSTALL_LIBS}")
-ENDIF(WIN32)
+if (WIN32)
+	string(REPLACE "$(Configuration)" "\\\${CMAKE_INSTALL_CONFIG_NAME}" INSTALL_LIBS "${INSTALL_LIBS}")
+endif ()
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
 
-IF(UNIX OR APPLE)
-  ADD_CUSTOM_TARGET(
-    package-lib
-    COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} package
-    WORKING_DIRECTORY ${PACKAGE_DIR}
-  )
-ENDIF(UNIX OR APPLE)
+if (UNIX OR APPLE)
+	ADD_CUSTOM_TARGET(
+		package-lib
+		COMMAND ${CMAKE_COMMAND} .
+		COMMAND ${CMAKE_MAKE_PROGRAM} package
+		WORKING_DIRECTORY ${PACKAGE_DIR}
+)
+endif ()
 
 # Package .in
-IF(NOT WIN32 OR CYGWIN OR MINGW)
-  # Set some pkg-config variables
-  SET(prefix      ${CMAKE_INSTALL_PREFIX})
-  SET(exec_prefix ${CMAKE_INSTALL_PREFIX})
-  set(libdir      ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR})
-  set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
-  SET(LIBS "-lz -lpng")
+if (NOT WIN32 OR CYGWIN OR MINGW)
+	# Set some pkg-config variables
+	set(prefix      ${CMAKE_INSTALL_PREFIX})
+	set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+	set(libdir      ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR})
+	set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
+	set(LIBS "-lz -lpng")
 
-  # CMake lists are separated by a semi colon, replace with colon
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libapngasm.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libapngasm.pc @ONLY)
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libapngasm.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-endif(NOT WIN32 OR CYGWIN OR MINGW)
-
+	# CMake lists are separated by a semi colon, replace with colon
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libapngasm.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libapngasm.pc @ONLY)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libapngasm.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+endif ()
 
 # SWIG
-OPTION(RUBY "Build Ruby interfaces")
-OPTION(JAVA "Build Java interfaces")
+option(RUBY "Build Ruby interfaces")
+option(JAVA "Build Java interfaces")
 
-IF(RUBY)
-  INCLUDE(${PROJECT_SOURCE_DIR}/interfaces/ruby/CMakeLists.txt)
-ENDIF(RUBY)
+if (RUBY)
+	include(${PROJECT_SOURCE_DIR}/interfaces/ruby/CMakeLists.txt)
+endif ()
 
-IF(JAVA)
-  INCLUDE(${PROJECT_SOURCE_DIR}/interfaces/java/CMakeLists.txt)
-ENDIF(JAVA)
+if (JAVA)
+	include(${PROJECT_SOURCE_DIR}/interfaces/java/CMakeLists.txt)
+endif ()
 
-IF(ANDROID)
-  INCLUDE(${PROJECT_SOURCE_DIR}/interfaces/android/CMakeLists.txt)
-ENDIF(ANDROID)
+if (ANDROID)
+	include(${PROJECT_SOURCE_DIR}/interfaces/android/CMakeLists.txt)
+endif ()

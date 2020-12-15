@@ -1,34 +1,35 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 
-PROJECT(APNGASM_TEST)
+project(APNGASM_TEST)
 
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
+include_directories(${PROJECT_BINARY_DIR}/src)
 
-ENABLE_TESTING()
+enable_testing()
 # Generate executable file
-ADD_EXECUTABLE(apngasm-test
+add_executable(apngasm-test
 	EXCLUDE_FROM_ALL
-    ${PROJECT_SOURCE_DIR}/apngtest.cpp
+	${PROJECT_SOURCE_DIR}/apngtest.cpp
 )
 
-SET_TARGET_PROPERTIES(apngasm-test
-	PROPERTIES OUTPUT_NAME apngtest)
-
-LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/../lib)
-INCLUDE_DIRECTORIES(
-  ${PROJECT_SOURCE_DIR}/../lib/src
-  ${PROJECT_BINARY_DIR}/../lib/src
+set_target_properties(apngasm-test
+	PROPERTIES OUTPUT_NAME apngtest
 )
-TARGET_LINK_LIBRARIES(apngasm-test apngasm)
 
-ADD_TEST(
+link_directories(${PROJECT_BINARY_DIR}/../lib)
+include_directories(
+	${PROJECT_SOURCE_DIR}/../lib/src
+	${PROJECT_BINARY_DIR}/../lib/src
+)
+target_link_libraries(apngasm-test apngasm)
+
+add_test(
 	NAME apngasm-test
 	COMMAND apngasm-test
 )
 
-FIND_PACKAGE(ZLIB REQUIRED)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(apngasm-test ${ZLIB_LIBRARIES})
+#FIND_PACKAGE(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+target_link_libraries(apngasm-test ${ZLIB_LIBRARIES})
 
-FILE(COPY ${PROJECT_SOURCE_DIR}/samples DESTINATION ./)
-FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/out)
+file(COPY ${PROJECT_SOURCE_DIR}/samples DESTINATION ./)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/out)
