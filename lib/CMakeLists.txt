@@ -74,9 +74,16 @@ include_directories(${Boost_INCLUDE_DIRS})
 target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${Boost_LIBRARIES})
 target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${Boost_LIBRARIES})
 
+if (APPLE)
+	set(APNGASM_DYNAMIC_LIB_NAME libapngasm.dylib)
+elseif (UNIX)
+	set(APNGASM_DYNAMIC_LIB_NAME libapngasm.so)
+else (APPLE)
+	set(APNGASM_DYNAMIC_LIB_NAME libapngasm.dll)
+endif (APPLE)
 set(APNGASM_LIBRARIES
-	$<TARGET_FILE:${APNGASM_DYNAMIC_LIB_TARGET}>
-	$<TARGET_FILE:${APNGASM_STATIC_LIB_TARGET}>
+	${PROJECT_BINARY_DIR}/${APNGASM_DYNAMIC_LIB_NAME}
+	${PROJECT_BINARY_DIR}/libapngasm.a
 )
 
 # Installation

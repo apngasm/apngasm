@@ -32,6 +32,10 @@ find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 target_link_libraries(apngasm-cli ${ZLIB_LIBRARIES})
 
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+target_link_libraries(apngasm-cli ${PNG_LIBRARY})
+
 if (APPLE OR WIN32)
 	set(Boost_USE_STATIC_LIBS ON)
 endif ()
