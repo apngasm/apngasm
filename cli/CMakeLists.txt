@@ -48,7 +48,7 @@ install(TARGETS apngasm-cli DESTINATION "bin")
 
 # Create package command
 set(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
-#get_property(INSTALL_APPS TARGET apngasm-cli PROPERTY LOCATION)
+set(APNGASM_BINARIES ${PROJECT_BINARY_DIR}/apngasm)
 
 if (WIN32)
 	set(INSTALL_HEADERS
