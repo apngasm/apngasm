@@ -48,9 +48,9 @@ install(TARGETS apngasm-cli DESTINATION "bin")
 
 # Create package command
 set(PACKAGE_DIR ${PROJECT_BINARY_DIR}/package)
-set(APNGASM_BINARIES ${PROJECT_BINARY_DIR}/apngasm)
+set(APNGASM_BINARIES ${PROJECT_BINARY_DIR}/apngasm${CMAKE_EXECUTABLE_SUFFIX})
 
-if (WIN32)
+if (WIN32 AND NOT MINGW)
 	set(INSTALL_HEADERS
 		${PROJECT_SOURCE_DIR}/../lib/src/apngasm.h
 		${PROJECT_SOURCE_DIR}/../lib/src/apngframe.h
@@ -64,7 +64,7 @@ endif ()
 include(${PROJECT_BINARY_DIR}/../lib/manifest.txt)
 configure_file(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
 
-if (UNIX OR APPLE)
+if (UNIX OR APPLE OR MINGW)
 	add_custom_target(
 		package-cli
 		COMMAND ${CMAKE_COMMAND} .

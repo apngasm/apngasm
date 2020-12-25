@@ -106,8 +106,8 @@ endif ()
 
 configure_file(${PROJECT_SOURCE_DIR}/package/CMakeLists.txt.in ${PACKAGE_DIR}/CMakeLists.txt @ONLY)
 
-if (UNIX OR APPLE)
-	ADD_CUSTOM_TARGET(
+if (UNIX OR APPLE OR MINGW)
+	add_custom_target(
 		package-lib
 		COMMAND ${CMAKE_COMMAND} .
 		COMMAND ${CMAKE_MAKE_PROGRAM} package

@@ -4,7 +4,7 @@ project(apngasm)
 
 install(PROGRAMS @APNGASM_BINARIES@ DESTINATION bin COMPONENT applications)
 
-if (WIN32)
+if (WIN32 AND NOT MINGW)
 	install(FILES @APNGASM_LIBRARIES@ DESTINATION bin COMPONENT libraries)
 endif ()
 
@@ -23,10 +23,10 @@ set(CPACK_PACKAGE_VENDOR "apngasm")
 set(CPACK_PACKAGE_CONTACT "zero@phantom.industries")
 set(CPACK_PACKAGE_FILE_NAME "apngasm_${VERSION}_${CMAKE_SYSTEM_PROCESSOR}")
 
-if (WIN32)
+if (WIN32 AND NOT MINGW)
 	set(CPACK_COMPONENTS applications libraries)
 else ()
-	SET(CPACK_COMPONENTS_ALL applications)
+	set(CPACK_COMPONENTS_ALL applications)
 endif ()
 
 if (UNIX)

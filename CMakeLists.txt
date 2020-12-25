@@ -7,7 +7,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/cli)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
 # Create package command
-if (UNIX OR APPLE)
+if (UNIX OR APPLE OR MINGW)
 	add_custom_target(
 		package
 		COMMAND ${CMAKE_MAKE_PROGRAM}
@@ -15,9 +15,7 @@ if (UNIX OR APPLE)
 		COMMAND ${CMAKE_MAKE_PROGRAM} package-cli
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
-endif ()
-
-if (WIN32)
+elseif (WIN32)
 	add_custom_target(
 		package
 		COMMAND cd lib/package
