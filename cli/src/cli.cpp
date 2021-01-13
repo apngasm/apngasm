@@ -1,14 +1,14 @@
 #include "cli.h"
 #include "apngasm-cli-version.h"
+#include <filesystem>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
-#include <boost/filesystem.hpp>
 #include "listener/apngasmlistener.h"
 
 
 namespace {
-  const char separator = boost::filesystem::path::preferred_separator;
+  const char separator = std::filesystem::path::preferred_separator;
 
   bool isNumber(const std::string s)
   {
@@ -121,12 +121,12 @@ namespace {
 	  // Return true if create succeeded.
 	  bool createParentDirs(const std::string& filePath) const
 	  {
-		  boost::filesystem::path path = filePath;
-		  boost::filesystem::path parent = path.parent_path();
+		  std::filesystem::path path = filePath;
+		  std::filesystem::path parent = path.parent_path();
 		  if(parent == "") {
 			  return true;
 		  }
-		  return boost::filesystem::create_directories(parent);
+		  return std::filesystem::create_directories(parent);
 	  }
   };	// class CustomAPNGAsmListener
 
@@ -264,7 +264,7 @@ namespace apngasm_cli {
 		// Output png image files.
 		std::string outdir;
 		if(!options.outputFile(outdir)) {
-			boost::filesystem::path path = src;
+			std::filesystem::path path = src;
 			outdir = path.replace_extension("").string();
 		}
 		if( !assembler.savePNGs(outdir) )
@@ -274,7 +274,7 @@ namespace apngasm_cli {
 		std::string outSpecFile;
 		if( options.outputJSONFile(outSpecFile) )
 		{
-			boost::filesystem::path path = outSpecFile;
+			std::filesystem::path path = outSpecFile;
 			if(path.is_relative())
 				outSpecFile = outdir + separator + outSpecFile;
 
@@ -284,7 +284,7 @@ namespace apngasm_cli {
 		// Output XML spec files.
 		if( options.outputXMLFile(outSpecFile) )
 		{
-			boost::filesystem::path path = outSpecFile;
+			std::filesystem::path path = outSpecFile;
 			if(path.is_relative())
 				outSpecFile = outdir + separator + outSpecFile;
 

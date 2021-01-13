@@ -12,14 +12,17 @@ ADD_EXECUTABLE(apngasm-test
 )
 
 SET_TARGET_PROPERTIES(apngasm-test
-	PROPERTIES OUTPUT_NAME apngtest)
+	PROPERTIES
+	OUTPUT_NAME apngtest
+	CXX_STANDARD 17
+)
 
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/../lib)
 INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/../lib/src
   ${PROJECT_BINARY_DIR}/../lib/src
 )
-TARGET_LINK_LIBRARIES(apngasm-test apngasm)
+TARGET_LINK_LIBRARIES(apngasm-test apngasm stdc++fs)
 
 ADD_TEST(
 	NAME apngasm-test

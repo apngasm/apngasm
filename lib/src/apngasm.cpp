@@ -1,9 +1,9 @@
 #include "apngasm.h"
 #include <cstdlib>
+#include <filesystem>
 #include <png.h>
 #include <zlib.h>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/regex.hpp>
 #include <boost/range/algorithm.hpp>
 #ifdef APNG_SPECS_SUPPORTED
@@ -56,13 +56,13 @@ namespace apngasm {
     {
       static std::vector<std::string> files;
 
-      boost::filesystem::path nativePath(filepath);
+      std::filesystem::path nativePath(filepath);
       nativePath.make_preferred();
 
       // filepath is current directory.
       if( !nativePath.has_parent_path() )
       {
-        const std::string currentDirPath = "." + std::string(1, boost::filesystem::path::preferred_separator);
+        const std::string currentDirPath = "." + std::string(1, std::filesystem::path::preferred_separator);
         nativePath = currentDirPath + nativePath.string();
       }
 
@@ -76,14 +76,14 @@ namespace apngasm {
         if (!boost::algorithm::iends_with(nativePath.string(), ".png"))
           nativePath = nativePath.string() + ".png";
 
-        if (boost::filesystem::exists(nativePath))
+        if (std::filesystem::exists(nativePath))
           files.push_back(nativePath.string());
       }
 
       // File path has wildcard.
       else
       {
-        const boost::filesystem::path &parentPath = nativePath.parent_path();
+        const std::filesystem::path &parentPath = nativePath.parent_path();
 
         // Convert filepath.
         static const boost::regex escape("[\\^\\.\\$\\|\\(\\)\\[\\]\\+\\?\\\\]");
@@ -93,16 +93,16 @@ namespace apngasm {
         nativePath = boost::regex_replace(nativePath.string(), wildcard, ".*");
 
         // Skip if directory is not found.
-        if (!boost::filesystem::exists(parentPath))
+        if (!std::filesystem::exists(parentPath))
           return files;
 
         // Search files.
         const boost::regex filter(nativePath.string());
-        const boost::filesystem::directory_iterator itEnd;
-        for (boost::filesystem::directory_iterator itCur(parentPath); itCur != itEnd; ++itCur)
+        const std::filesystem::directory_iterator itEnd;
+        for (std::filesystem::directory_iterator itCur(parentPath); itCur != itEnd; ++itCur)
         {
           // Skip if not a file.
-          if (!boost::filesystem::is_regular_file(itCur->status()))
+          if (!std::filesystem::is_regular_file(itCur->status()))
             continue;
 
           // Skip if no match.
