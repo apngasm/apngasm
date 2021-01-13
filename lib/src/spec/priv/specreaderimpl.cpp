@@ -1,10 +1,10 @@
 #include "specreaderimpl.h"
 #include "../../apngframe.h"  // DEFAULT_FRAME_NUMERATOR, DEFAULT_FRAME_DENOMINATOR
+#include <filesystem>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
-#include <boost/filesystem/operations.hpp>
 
 namespace apngasm {
   namespace spec {
@@ -104,10 +104,10 @@ namespace apngasm {
         boost::property_tree::read_json(filePath, root);
 
         // Set current directory.
-        const boost::filesystem::path oldPath = boost::filesystem::current_path();
-        const boost::filesystem::path currentPath = boost::filesystem::path(filePath);
+        const std::filesystem::path oldPath = std::filesystem::current_path();
+        const std::filesystem::path currentPath = std::filesystem::path(filePath);
         if(currentPath.has_parent_path())
-          boost::filesystem::current_path(currentPath.parent_path());
+          std::filesystem::current_path(currentPath.parent_path());
 
         // Read fields.
         // name
@@ -181,7 +181,7 @@ namespace apngasm {
             }
 
             // Add frame informations.
-            const FrameInfo frameInfo = { boost::filesystem::absolute(file).string(), delay };
+            const FrameInfo frameInfo = { std::filesystem::absolute(file).string(), delay };
             _frameInfos.push_back(frameInfo);
 
             ++delayIndex;
@@ -189,7 +189,7 @@ namespace apngasm {
         }
 
         // Reset current directory.
-        boost::filesystem::current_path(oldPath);
+        std::filesystem::current_path(oldPath);
 
         return true;
       }
@@ -203,10 +203,10 @@ namespace apngasm {
         boost::property_tree::read_xml(filePath, root);
 
         // Set current directory.
-        const boost::filesystem::path oldPath = boost::filesystem::current_path();
-        const boost::filesystem::path currentPath = boost::filesystem::path(filePath);
+        const std::filesystem::path oldPath = std::filesystem::current_path();
+        const std::filesystem::path currentPath = std::filesystem::path(filePath);
         if(currentPath.has_parent_path())
-          boost::filesystem::current_path(currentPath.parent_path());
+          std::filesystem::current_path(currentPath.parent_path());
 
         // Read fields.
         // name
@@ -267,13 +267,13 @@ namespace apngasm {
             }
 
             // Add frame informations.
-            const FrameInfo frameInfo = { boost::filesystem::absolute(file).string(), delay };
+            const FrameInfo frameInfo = { std::filesystem::absolute(file).string(), delay };
             _frameInfos.push_back(frameInfo);
           }
         }
 
         // Reset current directory.
-        boost::filesystem::current_path(oldPath);
+        std::filesystem::current_path(oldPath);
 
         return true;
       }
