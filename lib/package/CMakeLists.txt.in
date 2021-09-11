@@ -22,7 +22,7 @@ SET(CPACK_COMPONENTS libraries headers)
 
 IF(UNIX)
   SET(CPACK_GENERATOR "DEB")
-  SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.14), libpng12-0 (>= 1.2.13-4), zlib1g (>= 1:1.1.4)")
+  SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.14), libpng16-16 (>= 1.6.0), zlib1g (>= 1:1.1.4)")
 ENDIF(UNIX)
 IF(APPLE)
   SET(CPACK_GENERATOR "PackageMaker")
