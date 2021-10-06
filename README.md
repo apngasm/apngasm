@@ -13,12 +13,17 @@ Building
 ========
 apngasm uses CMake to provide cross platform build chains.
 
-Building on (Ubuntu/Debian) Linux:  
+Building on Linux:  
 ----------------------------------
 1. Install dependencies/build chain  
-    ```
+    * Debian/Ubuntu:
+	```
     sudo apt-get install cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential
     ```
+	* Fedora:
+	```
+	sudo dnf install cmake libpng-devel boost-devel build-essential
+	```
 2. Generate Makefiles with CMake  
     ```
     mkdir build;
