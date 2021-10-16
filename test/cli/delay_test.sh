@@ -4,7 +4,7 @@
 cd `dirname $0`
 
 # Set variable.
-EXEC="../build/cli/apngasm"
+EXEC="../cli/apngasm"
 SRC="\
   ../resources/images/apngasm/12.png 650\
   ../resources/images/apngasm/13.png\

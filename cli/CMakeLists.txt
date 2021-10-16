@@ -16,7 +16,7 @@ configure_file(${PROJECT_SOURCE_DIR}/src/apngasm-cli-version.h.in ${PROJECT_BINA
 include_directories(
   ${PROJECT_BINARY_DIR}/src
   ${PROJECT_SOURCE_DIR}/../lib/src
-  ${PROJECT_BINARY_DIR}/../lib/src
+  ${PROJECT_BINARY_DIR}/../lib/src # Version header is generated here
 )
 
 # Add library build path to link directory paths
@@ -46,7 +46,7 @@ add_executable(apngasm-cli
 set_target_properties(apngasm-cli
   PROPERTIES 
   OUTPUT_NAME apngasm
-  CXX_STANDARD 17
+  CXX_STANDARD 20
 )
 
 # Link to built apngasm library

@@ -52,7 +52,7 @@ set_target_properties(${APNGASM_DYNAMIC_LIB_TARGET}
   PROPERTIES
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME apngasm
-  CXX_STANDARD 17
+  CXX_STANDARD 20
 )
 
 # Add the static library/archive
@@ -64,10 +64,13 @@ set_target_properties(${APNGASM_STATIC_LIB_TARGET}
   PROPERTIES
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME apngasm
-  CXX_STANDARD 17
+  CXX_STANDARD 20
 )
 
 # Add libraries/includes
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} stdc++fs)
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} stdc++fs)
+
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
 target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
