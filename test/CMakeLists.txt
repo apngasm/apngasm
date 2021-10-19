@@ -38,7 +38,10 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cli-out)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cpp-out)
 
 add_custom_command(
-  DEPENDS ${CMAKE_BINARY_DIR}/test/apngasm-cpp-test
+  DEPENDS
+    ${CMAKE_BINARY_DIR}/lib/libapngasm.a
+    ${CMAKE_BINARY_DIR}/lib/libapngasm.so
+    ${CMAKE_BINARY_DIR}/test/apngasm-cpp-test
   OUTPUT
     ${CMAKE_BINARY_DIR}/test/cpp-out/circle_anim.png
     ${CMAKE_BINARY_DIR}/test/cpp-out/circle_anim2.png
@@ -46,17 +49,63 @@ add_custom_command(
     ${CMAKE_BINARY_DIR}/test/cpp-out/penguins.xml
     ${CMAKE_BINARY_DIR}/test/cpp-out/test5_anim.png
 
-	#  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test
   COMMAND apngasm-cpp-test ${PROJECT_SOURCE_DIR}/samples
+)
+
+add_custom_command(
+  OUTPUT
+    ${CMAKE_BINARY_DIR}/test/cli-out/logo-test.png
+
+  COMMAND ${PROJECT_SOURCE_DIR}/cli/logo-test.sh
+)
+
+add_custom_command(
+  OUTPUT
+    ${CMAKE_BINARY_DIR}/test/cli-out/delay-test.png
+
+  COMMAND ${PROJECT_SOURCE_DIR}/cli/delay-test.sh
+)
+
+add_custom_command(
+  OUTPUT
+    ${CMAKE_BINARY_DIR}/test/cli-out/json-test.png
+
+  COMMAND ${PROJECT_SOURCE_DIR}/cli/json-test.sh
+)
+
+add_custom_command(
+  OUTPUT
+    ${CMAKE_BINARY_DIR}/test/cli-out/xml-test.png
+
+  COMMAND ${PROJECT_SOURCE_DIR}/cli/xml-test.sh
+)
+
+add_custom_command(
+  OUTPUT
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/33.png
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/animation.json
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/xanimation.xml
+
+  COMMAND ${PROJECT_SOURCE_DIR}/cli/disassemble-test.sh
 )
 
 add_custom_target(test
   DEPENDS
+	# CPP
     ${CMAKE_BINARY_DIR}/test/cpp-out/circle_anim.png
     ${CMAKE_BINARY_DIR}/test/cpp-out/circle_anim2.png
     ${CMAKE_BINARY_DIR}/test/cpp-out/penguins.json
     ${CMAKE_BINARY_DIR}/test/cpp-out/penguins.xml
     ${CMAKE_BINARY_DIR}/test/cpp-out/test5_anim.png
+
+	# CLI
+    ${CMAKE_BINARY_DIR}/test/cli-out/logo-test.png
+	${CMAKE_BINARY_DIR}/test/cli-out/delay-test.png
+   	${CMAKE_BINARY_DIR}/test/cli-out/json-test.png
+   	${CMAKE_BINARY_DIR}/test/cli-out/xml-test.png
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/33.png
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/animation.json
+   	${CMAKE_BINARY_DIR}/test/cli-out/disassemble-test/xanimation.xml
 )
 
 
