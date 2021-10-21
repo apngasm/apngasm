@@ -2,7 +2,7 @@
 #define _APNGASM_VERSION_H_
 
 namespace apngasm {
-  static const char* APNGASM_VERSION = "@APNGASM_LIB_VERSION@";
+static const char *APNGASM_VERSION = "@APNGASM_LIB_VERSION@";
 } // namespace apngasm
 
-#endif  // _APNGASM_VERSION_H_
+#endif // _APNGASM_VERSION_H_
