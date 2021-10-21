@@ -34,3 +34,4 @@ debian/files
 debian/libapngasm/
 lib/tmp
 debian/.debhelper
+.clang-format
