@@ -18,6 +18,7 @@ namespace apngasm {
         std::filesystem::current_path(oldPath);
         return result;
       }
+
       const std::string createRelativeDir(const std::string& from, const std::string& to)
       {
         std::filesystem::path fromPath = createAbsolutePath(from);
@@ -27,9 +28,9 @@ namespace apngasm {
         // Convert path to native.
         fromPath.make_preferred();
         toPath.make_preferred();
-        if( *fromPath.string().rbegin() != separator )
+        if (*fromPath.string().rbegin() != separator)
           fromPath /= separatorStr;
-        if( *toPath.string().rbegin() != separator )
+        if (*toPath.string().rbegin() != separator)
           toPath /= separatorStr;
 
         // Other drive.
@@ -43,45 +44,35 @@ namespace apngasm {
         {
           const int count = std::min(fromDir.length(), toDir.length());
           int find = -1;
-          for(int i = 0;  i < count;  ++i)
-          {
+          for (int i = 0;  i < count;  ++i) {
             const char fromChar = fromDir.at(i);
             const char toChar = toDir.at(i);
 
-            if(fromChar == toChar)
-            {
-              if( fromChar == separator )
+            if (fromChar == toChar) {
+              if (fromChar == separator)
                 find = i;
             }
             else
               break;
-          }
-          if(find != -1)
-          {
+          } if (find != -1) {
             fromDir = fromDir.substr(find + 1);
             toDir = toDir.substr(find + 1);
           }
         }
 
         std::string result = "";
-        if(!fromDir.empty())
-        {
+        if (!fromDir.empty()) {
           const int count = fromDir.length();
           const std::string parentDir = ".." + separatorStr;
           bool beforeIsSeparator = true;
-          for(int i = 0;  i < count;  ++i)
-          {
+          for (int i = 0;  i < count;  ++i) {
             const char currentChar = fromDir.at(i);
-            if( currentChar == separator )
-            {
-              if( !beforeIsSeparator )
-              {
+            if (currentChar == separator) {
+              if (!beforeIsSeparator) {
                 result += parentDir;
                 beforeIsSeparator = true;
               }
-            }
-            else
-            {
+            } else {
               beforeIsSeparator = false;
             }
           }
@@ -104,7 +95,7 @@ namespace apngasm {
     // Return true if write succeeded.
     bool SpecWriter::writeJSON(const std::string& filePath, const std::string& imageDir) const
     {
-      if( !_pApngasm )
+      if (!_pApngasm)
         return false;
 
       priv::JSONSpecWriterImpl impl(_pApngasm, _pListener);
@@ -115,7 +106,7 @@ namespace apngasm {
     // Return true if write succeeded.
     bool SpecWriter::writeXML(const std::string& filePath, const std::string& imageDir) const
     {
-      if( !_pApngasm )
+      if (!_pApngasm)
         return false;
 
       priv::XMLSpecWriterImpl impl(_pApngasm, _pListener);
