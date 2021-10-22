@@ -65,9 +65,9 @@ Building on OS-X (with homebrew):
 
 2. Generate Makefiles with CMake  
     ```
-    mkdir build;
-    cd build;
-    cmake ../
+    mkdir build
+    cd build
+    cmake ..
     ```
 3. Make  
     ```
