@@ -1413,7 +1413,7 @@ namespace apngasm {
           _op[j].valid = 0;
 
         /* dispose = none */
-        get_rect(_width, _height, _frames[n]._pixels, _frames[n+1]._pixels, over1, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
+        get_rect(_width, _height, _frames[n]._pixels, _frames[n+1]._pixels, over1, coltype, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 0);
 
         /* dispose = background */
         if (has_tcolor)
@@ -1427,12 +1427,12 @@ namespace apngasm {
             for (j=0; j<h0; j++)
               memset(temp + ((j+y0)*_width + x0)*bpp, tcolor, w0*bpp);
 
-          get_rect(_width, _height, temp, _frames[n+1]._pixels, over2, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
+          get_rect(_width, _height, temp, _frames[n+1]._pixels, over2, coltype, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 1);
         }
 
         /* dispose = previous */
         if (n > first)
-          get_rect(_width, _height, prev, _frames[n+1]._pixels, over3, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
+          get_rect(_width, _height, prev, _frames[n+1]._pixels, over3, coltype, bpp, rowbytes, zbuf_size, has_tcolor, tcolor, 2);
 
         op_min = _op[0].size;
         op_best = 0;
@@ -1733,7 +1733,7 @@ namespace apngasm {
     deflateReset(&_op_zstream2);
   }
 
-  void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
+  void APNGAsm::get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned char coltype, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n)
   {
     unsigned int   i, j, x0, y0, w0, h0;
     unsigned int   x_min = w-1;
@@ -1759,7 +1759,8 @@ namespace apngasm {
         if (*pa++ != c)
         {
           diffnum++;
-          if (has_tcolor && c == tcolor) over_is_possible = 0;
+          if (coltype == 0 && has_tcolor && c == tcolor) over_is_possible = 0;
+          if (coltype == 3 && _trns[c] != 0xFF) over_is_possible = 0;
           if (i<x_min) x_min = i;
           if (i>x_max) x_max = i;
           if (j<y_min) y_min = j;

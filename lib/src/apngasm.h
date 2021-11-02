@@ -231,7 +231,7 @@ namespace apngasm {
     void process_rect(unsigned char * row, int rowbytes, int bpp, int stride, int h, unsigned char * rows);
     void deflate_rect_fin(unsigned char * zbuf, unsigned int * zsize, int bpp, int stride, unsigned char * rows, int zbuf_size, int n);
     void deflate_rect_op(unsigned char *pdata, int x, int y, int w, int h, int bpp, int stride, int zbuf_size, int n);
-    void get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n);
+    void get_rect(unsigned int w, unsigned int h, unsigned char *pimage1, unsigned char *pimage2, unsigned char *ptemp, unsigned char coltype, unsigned int bpp, unsigned int stride, int zbuf_size, unsigned int has_tcolor, unsigned int tcolor, int n);
 
     void write_chunk(FILE * f, const char * name, unsigned char * data, unsigned int length);
     void write_IDATs(FILE * f, int frame, unsigned char * data, unsigned int length, unsigned int idat_size);
