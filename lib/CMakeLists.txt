@@ -153,7 +153,3 @@ endif ()
 if (JAVA)
   include(${PROJECT_SOURCE_DIR}/interfaces/java/CMakeLists.txt)
 endif ()
-
-if (ANDROID)
-  include(${PROJECT_SOURCE_DIR}/interfaces/android/CMakeLists.txt)
-endif ()
