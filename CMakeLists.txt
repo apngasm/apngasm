@@ -1,35 +1,18 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 
-PROJECT(APNGASM)
+project(APNGASM)
 
-IF(POLICY CMP0037)
-  CMAKE_POLICY(SET CMP0037 OLD)
-ENDIF(POLICY CMP0037)
-
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/lib)
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/cli)
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/test)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+add_subdirectory(${PROJECT_SOURCE_DIR}/cli)
+add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
 # Create package command
-IF(UNIX OR APPLE)
-  ADD_CUSTOM_TARGET(
+if (UNIX OR APPLE OR MINGW)
+  add_custom_target(
     package
     COMMAND ${CMAKE_MAKE_PROGRAM}
     COMMAND ${CMAKE_MAKE_PROGRAM} package-lib
     COMMAND ${CMAKE_MAKE_PROGRAM} package-cli
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
   )
-ENDIF(UNIX OR APPLE)
-
-IF(WIN32)
-  ADD_CUSTOM_TARGET(
-    package
-    COMMAND cd lib/package
-    COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj /p:Configuration=$(Configuration)
-    COMMAND cd ../../cli/package
-    COMMAND ${CMAKE_COMMAND} .
-    COMMAND ${CMAKE_MAKE_PROGRAM} PACKAGE.vcxproj /p:Configuration=$(Configuration)
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-  )
-ENDIF(WIN32)
+endif ()
