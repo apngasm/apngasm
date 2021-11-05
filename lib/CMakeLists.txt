@@ -68,8 +68,8 @@ set_target_properties(${APNGASM_STATIC_LIB_TARGET}
 )
 
 # Add libraries/includes
-target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} stdc++fs)
-target_link_libraries(${APNGASM_STATIC_LIB_TARGET} stdc++fs)
+#target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} stdc++fs)
+#target_link_libraries(${APNGASM_STATIC_LIB_TARGET} stdc++fs)
 
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
