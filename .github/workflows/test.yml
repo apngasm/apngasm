@@ -1,0 +1,33 @@
+name: test
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: "install dependencies Ubuntu"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: | 
+          sudo apt-get install libpng-dev \
+            libboost-program-options-dev \
+            libboost-regex-dev \
+            libboost-system-dev \
+            libboost-filesystem-dev
+      - name: "install dependencies macOS"
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: | 
+          brew install cmake \
+            boost \
+            libpng \
+            lzlib
+      - name: "create and enter build dir"
+        run: |
+          mkdir build
+          cd build
+      - name: "run cmake "
+        run: cmake ../apngasm
+      - name: "run make "
+        run: make
