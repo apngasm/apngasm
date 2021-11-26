@@ -28,12 +28,14 @@ jobs:
         run: |
           mkdir build
           cd build
-      - name: "Set environment variables for OS-X:"
+      - name: "Run cmake on Ubuntu:"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: cmake ../apngasm
+      - name: "Run cmake on OS-X:"
         if: ${{ matrix.os == 'macos-latest' }}
         env:
           LDFLAGS: -L/usr/local/opt/icu4c/lib
           CPPFLAGS: -I/usr/local/opt/icu4c/include
-      - name: "run cmake "
         run: cmake ../apngasm
       - name: "run make "
         run: make
