@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: "install dependencies Ubuntu"
+      - name: "Install Ubuntu dependencies:"
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: | 
           sudo apt-get install libpng-dev \
@@ -16,7 +16,7 @@ jobs:
             libboost-regex-dev \
             libboost-system-dev \
             libboost-filesystem-dev
-      - name: "install dependencies macOS"
+      - name: "Install OS-X dependencies:"
         if: ${{ matrix.os == 'macos-latest' }}
         run: | 
           brew install cmake \
@@ -24,12 +24,15 @@ jobs:
             libpng \
             lzlib \
             icu4c
-      - name: "create and enter build dir"
+      - name: "Create and enter the build directory:"
         run: |
-          export LDFLAGS="-L/usr/local/opt/icu4c/lib"
-          export CPPFLAGS="-I/usr/local/opt/icu4c/include"
           mkdir build
           cd build
+      -name: "Set environment variables for OS-X:"
+        if: ${{ matrix.os == 'macos-latest' }}
+        env:
+          LDFLAGS: -L/usr/local/opt/icu4c/lib
+          CPPFLAGS: -I/usr/local/opt/icu4c/include
       - name: "run cmake "
         run: cmake ../apngasm
       - name: "run make "
