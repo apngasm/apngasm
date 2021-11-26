@@ -22,9 +22,12 @@ jobs:
           brew install cmake \
             boost \
             libpng \
-            lzlib
+            lzlib \
+            icu4c
       - name: "create and enter build dir"
         run: |
+          export LDFLAGS="-L/usr/local/opt/icu4c/lib"
+          export CPPFLAGS="-I/usr/local/opt/icu4c/include"
           mkdir build
           cd build
       - name: "run cmake "
