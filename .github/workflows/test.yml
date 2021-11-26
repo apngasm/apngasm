@@ -37,5 +37,5 @@ jobs:
           LDFLAGS: -L/usr/local/opt/icu4c/lib
           CPPFLAGS: -I/usr/local/opt/icu4c/include
         run: cmake ../apngasm
-      - name: "run make "
+      - name: "Run make:"
         run: make
