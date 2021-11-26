@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir build
           cd build
-      -name: "Set environment variables for OS-X:"
+      - name: "Set environment variables for OS-X:"
         if: ${{ matrix.os == 'macos-latest' }}
         env:
           LDFLAGS: -L/usr/local/opt/icu4c/lib
