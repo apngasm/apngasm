@@ -1,8 +1,17 @@
-apngasm (3.1.9) disco; urgency=low
+apngasm (3.1.10) impish; urgency=low
 
-  * update details
+  * Switch to std fs.
+  * Fix assembly bug where alpha was "stacking".
+  * Update dependencies.
+  * Other small fixes and improvements.
 
- -- 影月 零 (Rei Kagetsuki) <zero@phantom.industries>  Wed, 26 Jun 2018 14:03:57 +0900
+ -- 影月 零 (Rei Kagetsuki) <zero@phantom.industries>  Thu, 11 Nov 2021 11:11:11 +0900
+
+apngasm (3.1.9) hirsute; urgency=low
+
+  * various updates
+
+ -- 影月 零 (Rei Kagetsuki) <zero@phantom.industries>  Wed, 11 Aug 2021 14:03:57 +0900
 
 apngasm (3.1.8) disco; urgency=low
 
