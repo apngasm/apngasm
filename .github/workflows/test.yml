@@ -1,0 +1,41 @@
+name: test
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install Ubuntu dependencies:"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: | 
+          sudo apt-get install libpng-dev \
+            libboost-program-options-dev \
+            libboost-regex-dev \
+            libboost-system-dev \
+            libboost-filesystem-dev
+      - name: "Install OS-X dependencies:"
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: | 
+          brew install cmake \
+            boost \
+            libpng \
+            lzlib \
+            icu4c
+      - name: "Create and enter the build directory:"
+        run: |
+          mkdir build
+          cd build
+      - name: "Run cmake on Ubuntu:"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: cmake ../apngasm
+      - name: "Run cmake on OS-X:"
+        if: ${{ matrix.os == 'macos-latest' }}
+        env:
+          LDFLAGS: -L/usr/local/opt/icu4c/lib
+          CPPFLAGS: -I/usr/local/opt/icu4c/include
+        run: cmake ../apngasm
+      - name: "Run make:"
+        run: make

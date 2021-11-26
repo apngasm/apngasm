@@ -54,22 +54,28 @@ management.
 
 Building on OS-X (with homebrew):  
 ---------------------------------
-1. Install build requirements. We recommend using a package manager such as 
-    [Homebrew](http://brew.sh/). Just keep in mind that if you want to distribute packages you 
-    will need the same set of libraries on each system. Since OSX comes with its own (older) 
-    versions of libpng and zlib, you will NOT want to install libpng and zlib from your package 
-    manger IF you want to distribute packages.
+Assuming you have homebrew the build process is fairly simple. Without homebrew you'll need to 
+provide cmake, boost, libpng and zlib yourself. To build with homebrew:
+1. Install build requirements:
     ```
-    brew install cmake boost libpng lzlib
+    brew install cmake boost libpng lzlib icu4c
     ```
-
-2. Generate Makefiles with CMake  
+2. You'll need to override which icu libraries (icudata icui18n icuuc) are used for 
+	building as the system defaults don't seem to be compatible with the other libraries
+	distributed by boost which are needed to build:
+	```
+	export LDFLAGS="-L/usr/local/opt/icu4c/lib"
+	export CPPFLAGS="-I/usr/local/opt/icu4c/include"
+	```
+	※ Note: this is not set in CMake as it is homebrew specific and could break non-homebrew 
+	builds.
+3. Generate Makefiles with CMake:
     ```
     mkdir build
     cd build
     cmake ..
     ```
-3. Make  
+4. Make:
     ```
     make
     ```

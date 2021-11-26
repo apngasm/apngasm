@@ -29,6 +29,9 @@ add_test(NAME apngasm-cpp-test
   COMMAND apngasm-cpp-test ${PROJECT_SOURCE_DIR}/samples
 )
 
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIRS})
+target_link_libraries(apngasm-cpp-test ${PNG_LIBRARIES})
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 target_link_libraries(apngasm-cpp-test ${ZLIB_LIBRARIES})
@@ -39,8 +42,6 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cpp-out)
 
 add_custom_command(
   DEPENDS
-    ${CMAKE_BINARY_DIR}/lib/libapngasm.a
-    ${CMAKE_BINARY_DIR}/lib/libapngasm.so
     ${CMAKE_BINARY_DIR}/test/apngasm-cpp-test
   OUTPUT
     ${CMAKE_BINARY_DIR}/test/cpp-out/circle_anim.png
