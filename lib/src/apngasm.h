@@ -103,7 +103,7 @@ namespace apngasm {
         /**
          * @brief Assembles and outputs an APNG file.
          * @param outputPath The output file path.
-         * @return Returns true if assemble completed succesfully.
+         * @return Returns true if assemble completed successfully.
          */
 		bool assemble(const std::string &outputPath);
 #endif
