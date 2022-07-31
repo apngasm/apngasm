@@ -49,7 +49,7 @@ processOptions(std::list<boost::program_options::options_description> &pack,
 
   options_description main_opts("Main Options");
   main_opts.add_options()("delay,d", value<string>()->default_value("100"),
-                          "Default frame delay [in miliseconds or fractions of "
+                          "Default frame delay [in milliseconds or fractions of "
                           "a second], default is 100.")(
       "loops,l", value<int>()->default_value(0),
       "Number of loops. Use 0 [the default] for infinite loops.")(
@@ -149,7 +149,7 @@ void Options::putHelpTo(std::basic_ostream<char> &out) const {
           "    apngasm -o outfile.png frame1.png frame2.png frame3.png "
           "[options]\n"
           "    apngasm -o outfile.png frame*.png [options]\n"
-          "\nAssemble an APNG with specific frame delays in miliseconds:\n\n"
+          "\nAssemble an APNG with specific frame delays in milliseconds:\n\n"
           "    apngasm -o outfile.png frame1.png 200 frame2.png 100 [options]\n"
           "\nAssemble an APNG with specific frame delays in fractions of a "
           "second:\n\n"
