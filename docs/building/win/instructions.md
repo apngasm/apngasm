@@ -1,7 +1,7 @@
 apngasm Build Instructions for Windows
 --------------------------------------
 This guide was written for Windows 8 using Visual Studio 2013.  
-Building on Windows is significantly more complex than Linux or OSX. Due to this an other factors this guide will likely not be actively maintained. If you find part of this guide needs revision please do not report it as an issue. Instead; fork the repository on github, make your revisions, and submit a pull request.
+Building on Windows is significantly more complex than Linux or OSX. Due to this and other factors this guide will likely not be actively maintained. If you find part of this guide needs revision please do not report it as an issue. Instead; fork the repository on github, make your revisions, and submit a pull request.
 
 Preperation
 ===========
