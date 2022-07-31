@@ -24,7 +24,7 @@ namespace apngasm {
 
     };  // class SpecReader
 
-  } // namespacce spec
-} // namespacce apngasm
+  } // namespace spec
+} // namespace apngasm
 
 #endif  // _SPECREADER_H_
