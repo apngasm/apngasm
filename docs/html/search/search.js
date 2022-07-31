@@ -543,7 +543,7 @@ function SearchResults(name)
       return true;
     }
 
-    // return the first item with index index or higher that is visible
+    // return the first visible item with index greater than or equal to index
     this.NavNext = function(index)
     {
       var focusItem;
