@@ -3,7 +3,7 @@ apngasm Build Instructions for Windows
 This guide was written for Windows 8 using Visual Studio 2013.  
 Building on Windows is significantly more complex than Linux or OSX. Due to this and other factors this guide will likely not be actively maintained. If you find part of this guide needs revision please do not report it as an issue. Instead; fork the repository on github, make your revisions, and submit a pull request.
 
-Preperation
+Preparation
 ===========
 0. Install [git](http://www.git-scm.com) unless you have already installed it with something else. git should be in your system path and the git command should be accessable from the command line or from git bash.
 1. Install Visual Studio. Express versions are fine. 
