@@ -233,7 +233,7 @@ int CLI::assemble(void) {
 }
 
 int CLI::disassemble(const std::string &src) {
-  // Dissassemble apng file.
+  // Disassemble apng file.
   std::vector<apngasm::APNGFrame> frames = assembler.disassemble(src);
   std::cout << frames.size() << " Frames" << std::endl;
 
