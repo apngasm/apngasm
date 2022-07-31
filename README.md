@@ -147,7 +147,7 @@ make ruby
 ```
 
 If you'd like wrappers generated for another language we request you try and add it yourself and 
-make a pull request. Each language has its own particular tweaks that may be neccesary so it's 
+make a pull request. Each language has its own particular tweaks that may be necessary so it's 
 hard for us to implement on languages we aren't familiar with.
 
 Special Thanks

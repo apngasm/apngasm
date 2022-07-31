@@ -81,7 +81,7 @@ namespace apngasm {
 
         return result;
       }
-    } // unnnamed namespace
+    } // unnamed namespace
 
     // Initialize SpecWriter object.
     SpecWriter::SpecWriter(const APNGAsm *pApngasm, const listener::IAPNGAsmListener* pListener)

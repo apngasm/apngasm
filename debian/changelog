@@ -69,7 +69,7 @@ apngasm (3.1-1ppa1) trusty; urgency=low
 
 apngasm (3.1-1ppa0) trusty; urgency=low
 
-  * add RGB/ARGB frame addtion in APNGAsm class
+  * add RGB/ARGB frame addition in APNGAsm class
   * adjust dependencies for debian
 
  -- 影月 零 (Rei Kagetsuki) <zero@genshin.org>  Wed, 14 May 2014 22:03:13 +0900

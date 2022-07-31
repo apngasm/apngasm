@@ -71,7 +71,7 @@ public:
    * @param delayNum The delay numerator for this frame (defaults to
    * DEFAULT_FRAME_NUMERATOR).
    * @param delayDen The delay denominator for this frame (defaults to
-   * DEFAULT_FRAME_DENMINATOR).
+   * DEFAULT_FRAME_DENOMINATOR).
    */
   APNGFrame(const std::string &filePath,
             unsigned delayNum = DEFAULT_FRAME_NUMERATOR,
@@ -85,7 +85,7 @@ public:
    * @param delayNum The delay numerator for this frame (defaults to
    * DEFAULT_FRAME_NUMERATOR).
    * @param delayDen The delay denominator for this frame (defaults to
-   * DEFAULT_FRAME_DENMINATOR).
+   * DEFAULT_FRAME_DENOMINATOR).
    */
   APNGFrame(rgb *pixels, unsigned int width, unsigned int height,
             unsigned delayNum = DEFAULT_FRAME_NUMERATOR,
@@ -100,7 +100,7 @@ public:
    * @param delayNum The delay numerator for this frame (defaults to
    * DEFAULT_FRAME_NUMERATOR).
    * @param delayDen The delay denominator for this frame (defaults to
-   * DEFAULT_FRAME_DENMINATOR).
+   * DEFAULT_FRAME_DENOMINATOR).
    */
   APNGFrame(rgb *pixels, unsigned int width, unsigned int height,
             rgb *trns_color = NULL, unsigned delayNum = DEFAULT_FRAME_NUMERATOR,
@@ -114,7 +114,7 @@ public:
    * @param delayNum The delay numerator for this frame (defaults to
    * DEFAULT_FRAME_NUMERATOR).
    * @param delayDen The delay denominator for this frame (defaults to
-   * DEFAULT_FRAME_DENMINATOR).
+   * DEFAULT_FRAME_DENOMINATOR).
    */
   APNGFrame(rgba *pixels, unsigned int width, unsigned int height,
             unsigned delayNum = DEFAULT_FRAME_NUMERATOR,
