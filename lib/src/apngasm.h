@@ -196,7 +196,7 @@ namespace apngasm {
 
         /**
          * @brief Destroy all frames in memory/dispose of the frame vector. Leaves the apngasm object in a clean state.
-         * @return Retruns number of frames disposed of.
+         * @return Returns number of frames disposed of.
          */
 		size_t reset();
 
