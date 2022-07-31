@@ -29,7 +29,7 @@ Build zlib and libpng
 Build boost
 ===========
 1. Decompress the boost sources.
-2. Open a command prompt and navigate to the directory where you decompressed bost.
+2. Open a command prompt and navigate to the directory where you decompressed boost.
 3. Run bootstrap.bat .
 4. Run b2.exe .
 5. Header files will be located in the /boost directory, built libraries will be in the /stage/lib directory
