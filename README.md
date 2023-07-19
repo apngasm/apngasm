@@ -122,6 +122,18 @@ Step by step:
     CMAKE_GENERATOR="Unix Makefiles" make package
     ```
 
+Docker:
+------
+Build:
+```sh
+docker build -t apngasm .
+```
+
+Run:
+```sh
+docker run -it --rm apngasm --help
+```
+
 Interfaces
 ----------
 apngasm now uses SWIG to generate interface wrappers. Currently Java and Ruby are supported - 
