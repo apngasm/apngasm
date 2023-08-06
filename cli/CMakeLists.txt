@@ -55,6 +55,12 @@ target_link_libraries(apngasm-cli
   ${Boost_LIBRARIES}
 )
 
+if (WIN32)
+  FIND_PACKAGE(ZLIB REQUIRED)
+  INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
+  TARGET_LINK_LIBRARIES(apngasm-cli ${ZLIB_LIBRARIES})
+endif ()
+
 # Installation
 install(TARGETS apngasm-cli DESTINATION "bin")
 
