@@ -37,6 +37,12 @@ endif ()
 find_package(Boost REQUIRED COMPONENTS program_options regex system)
 include_directories(${Boost_INCLUDE_DIRS})
 
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIRS})
+
 # Generate executable
 add_executable(apngasm-cli
   ${PROJECT_SOURCE_DIR}/src/apngasm-cli.cpp
@@ -52,14 +58,8 @@ set_target_properties(apngasm-cli
 # Link to built apngasm library
 target_link_libraries(apngasm-cli
   apngasm
-  ${Boost_LIBRARIES}
+  ${Boost_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES}
 )
-
-if (WIN32)
-  FIND_PACKAGE(ZLIB REQUIRED)
-  INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-  TARGET_LINK_LIBRARIES(apngasm-cli ${ZLIB_LIBRARIES})
-endif ()
 
 # Installation
 install(TARGETS apngasm-cli DESTINATION "bin")

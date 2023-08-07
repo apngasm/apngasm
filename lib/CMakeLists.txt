@@ -75,14 +75,16 @@ set_target_properties(${APNGASM_STATIC_LIB_TARGET}
 #target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} stdc++fs)
 #target_link_libraries(${APNGASM_STATIC_LIB_TARGET} stdc++fs)
 
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${ZLIB_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${ZLIB_LIBRARIES})
+
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
 target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
 target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARY})
 message(${PNG_VERSION_STRING})
-
-target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${ZLIB_LIBRARIES})
-target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${ZLIB_LIBRARIES})
 
 #if (APPLE OR WIN32)
 #    set(Boost_USE_STATIC_LIBS ON)
