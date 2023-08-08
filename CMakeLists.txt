@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 
 project(APNGASM)
 
-cmake_policy(SET CMP0074 NEW)
-cmake_policy(SET CMP0144 NEW)
-
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
 add_subdirectory(${PROJECT_SOURCE_DIR}/cli)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
