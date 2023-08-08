@@ -30,18 +30,6 @@ if (MSYS)
   set(Boost_ROOT "/mingw64")
 endif ()
 
-# If BUILD_SHARED_LIBS was set to OFF, prepare for static linking
-if (NOT BUILD_SHARED_LIBS)
-  set(Boost_USE_STATIC_LIBS ON)
-  set(Boost_USE_MULTITHREADED ON)
-  set(Boost_USE_STATIC_RUNTIME ON)
-  set(ZLIB_USE_STATIC_LIBS ON)
-  if (MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-  endif()
-endif()
-
 # Search and prepare Boost
 find_package(Boost REQUIRED COMPONENTS program_options regex system)
 include_directories(${Boost_INCLUDE_DIRS})
