@@ -16,6 +16,8 @@ jobs:
           name: Release ${{ github.ref_name }}
 
   build:
+    name: Build packages
+    needs: createrelease
     strategy:
       matrix:
         include:
@@ -31,7 +33,8 @@ jobs:
               mkdir ../release
               cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ../apngasm
               make -j install
-              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_${{matrix.TARGET}}_AMD64.zip
+              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
+            OUT_FILE_NAME: apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
 
           - os: macos-latest
             TARGET: macos
@@ -48,7 +51,8 @@ jobs:
               mkdir ../release
               cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ../apngasm
               make -j install
-              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_${{matrix.TARGET}}_AMD64.zip
+              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_macos_AMD64.zip
+            OUT_FILE_NAME: apngasm_${{github.ref_name}}_macos_AMD64.zip
 
           - os: windows-latest
             TARGET: windows
@@ -57,7 +61,8 @@ jobs:
             CMD_COMPILE: |
               cmake -DBUILD_SHARED_LIBS=OFF -DZLIB_ROOT=%cd%/../windows/zlib -DPNG_ROOT=%cd%/../windows/libpng -DBOOST_ROOT=%cd%/../windows/boost -DCMAKE_INSTALL_PREFIX:PATH=%cd%/../release ..
               cmake --build . --config Release --target INSTALL
-              Compress-Archive -Path ../release/* -Destination ../apngasm_${{github.ref_name}}_${{matrix.TARGET}}_AMD64.zip
+              Compress-Archive -Path ../release/* -Destination ../apngasm_${{github.ref_name}}_windows_AMD64.zip
+            OUT_FILE_NAME: apngasm_${{github.ref_name}}_windows_AMD64.zip
 
     steps:
       - uses: actions/checkout@v3
@@ -88,4 +93,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: apngasm_${{github.ref_name}}_${{matrix.TARGET}}_AMD64.zip
+          files: ${{ matrix.OUT_FILE_NAME }}
