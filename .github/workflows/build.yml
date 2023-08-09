@@ -79,14 +79,14 @@ jobs:
       - name: Get Release
         id: get_release
         uses: bruceadams/get-release@v1.3.2
-        needs: createrelease
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Upload Release Asset
         id: upload-release-asset
         uses: softprops/action-gh-release@v1
-        needs: createrelease
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
