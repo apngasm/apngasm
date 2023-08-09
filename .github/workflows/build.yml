@@ -43,7 +43,8 @@ jobs:
           - os: windows-latest
             TARGET: windows
             CMD_DEPS: |
-              cmd /c "windows\compile_deps_windows.bat"
+              cd windows
+              compile_deps_windows.bat
             CMD_COMPILE: |
               cmake -DBUILD_SHARED_LIBS=OFF -DZLIB_ROOT=%cd%/../windows/zlib -DPNG_ROOT=%cd%/../windows/libpng -DBOOST_ROOT=%cd%/../windows/boost -DCMAKE_INSTALL_PREFIX:PATH=%cd%/../release ..
               cmake --build . --config Release --target INSTALL
