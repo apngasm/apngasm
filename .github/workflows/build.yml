@@ -32,7 +32,7 @@ jobs:
               cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
               cd ..
-              zip -r9 ./release/* apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
+              zip -r9 apngasm_${{github.ref_name}}_ubuntu_AMD64.zip ./release/*
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
 
           - os: macos-11
@@ -51,7 +51,7 @@ jobs:
               cmake -DBoost_USE_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
               cd ..
-              zip -r9 ./release/* apngasm_${{github.ref_name}}_macos_AMD64.zip
+              zip -r9 apngasm_${{github.ref_name}}_macos_AMD64.zip ./release/*
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_macos_AMD64.zip
 
           - os: windows-2019
@@ -64,6 +64,7 @@ jobs:
             CMD_COMPILE: |
               cd windows
               .\compile.bat
+              cd ..
               Compress-Archive -Path ./release/* -Destination apngasm_${{github.ref_name}}_windows_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_windows_AMD64.zip
 
