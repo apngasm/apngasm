@@ -19,6 +19,7 @@ jobs:
         include:
           - os: ubuntu-latest
             TARGET: ubuntu
+            ENV_COMPILE:
             CMD_DEPS: |
               sudo apt-get install libpng-dev \
               libboost-program-options-dev \
@@ -52,6 +53,7 @@ jobs:
 
           - os: windows-latest
             TARGET: windows
+            ENV_COMPILE:
             CMD_DEPS: |
               cd windows
               .\compile_deps.bat
