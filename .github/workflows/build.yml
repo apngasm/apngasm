@@ -16,8 +16,8 @@ jobs:
               libboost-system-dev \
               libboost-filesystem-dev
             CMD_COMPILE: |
-              mkdir ../release
-              cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ../apngasm
+              cd build
+              cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
               zip -r9 ../release/* ../apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
@@ -34,8 +34,8 @@ jobs:
               lzlib \
               icu4c
             CMD_COMPILE: |
-              mkdir ../release
-              cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ../apngasm
+              cd build
+              cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
               zip -r9 ../release/* ../apngasm_${{github.ref_name}}_macos_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_macos_AMD64.zip
@@ -46,6 +46,7 @@ jobs:
               cd windows
               .\compile_deps.bat
             CMD_COMPILE: |
+              cd build
               cmake -DBUILD_SHARED_LIBS=OFF -DZLIB_ROOT=%cd%/../windows/zlib -DPNG_ROOT=%cd%/../windows/libpng -DBOOST_ROOT=%cd%/../windows/boost -DCMAKE_INSTALL_PREFIX:PATH=%cd%/../release ..
               cmake --build . --config Release --target INSTALL
               Compress-Archive -Path ../release/* -Destination ../apngasm_${{github.ref_name}}_windows_AMD64.zip
@@ -61,7 +62,6 @@ jobs:
         run: |
           mkdir release
           mkdir build
-          cd build
 
       - name: "Compile on ${{matrix.TARGET}}:"
         run: ${{ matrix.CMD_COMPILE }}
