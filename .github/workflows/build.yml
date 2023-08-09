@@ -34,7 +34,7 @@ jobs:
 
           - os: macos-latest
             TARGET: macos
-            env:
+            ENV_COMPILE:
               LDFLAGS: -L/usr/local/opt/icu4c/lib
               CPPFLAGS: -I/usr/local/opt/icu4c/include
             CMD_DEPS: |
@@ -74,6 +74,7 @@ jobs:
           mkdir build
 
       - name: "Compile on ${{matrix.TARGET}}:"
+        env: ${{ matrix.ENV_COMPILE }}
         run: ${{ matrix.CMD_COMPILE }}
 
       - name: Get Release
