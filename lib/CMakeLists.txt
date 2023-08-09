@@ -44,11 +44,7 @@ if (MSYS)
 endif ()
 
 # Add the dynamic/shared library
-if (WIN32)
-  set(APNGASM_DYNAMIC_LIB_TARGET apngasm)
-else ()
-  set(APNGASM_DYNAMIC_LIB_TARGET apngasm-dynamic)
-endif ()
+set(APNGASM_DYNAMIC_LIB_TARGET apngasm)
 add_library(${APNGASM_DYNAMIC_LIB_TARGET} SHARED
   ${APNGASM_SOURCES}
 )
