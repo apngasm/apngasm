@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             TARGET: ubuntu
             ENV_COMPILE:
               PLACEHOLDER_ENV:
@@ -31,10 +31,11 @@ jobs:
               cd build
               cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
-              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
+              cd ..
+              zip -r9 ./release/* apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_ubuntu_AMD64.zip
 
-          - os: macos-latest
+          - os: macos-11
             TARGET: macos
             ENV_COMPILE:
               LDFLAGS: -L/usr/local/opt/icu4c/lib
@@ -49,10 +50,11 @@ jobs:
               cd build
               cmake -DBoost_USE_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
-              zip -r9 ../release/* ../apngasm_${{github.ref_name}}_macos_AMD64.zip
+              cd ..
+              zip -r9 ./release/* apngasm_${{github.ref_name}}_macos_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_macos_AMD64.zip
 
-          - os: windows-latest
+          - os: windows-2019
             TARGET: windows
             ENV_COMPILE:
               PLACEHOLDER_ENV:
@@ -63,7 +65,8 @@ jobs:
               cd build
               cmake -DBUILD_SHARED_LIBS=OFF -DZLIB_ROOT=%cd%/../windows/zlib -DPNG_ROOT=%cd%/../windows/libpng -DBOOST_ROOT=%cd%/../windows/boost -DCMAKE_INSTALL_PREFIX:PATH=%cd%/../release ..
               cmake --build . --config Release --target INSTALL
-              Compress-Archive -Path ../release/* -Destination ../apngasm_${{github.ref_name}}_windows_AMD64.zip
+              cd ..
+              Compress-Archive -Path ./release/* -Destination apngasm_${{github.ref_name}}_windows_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_windows_AMD64.zip
 
     steps:
