@@ -26,3 +26,5 @@ cd boost
 call bootstrap.bat --prefix=.
 b2.exe install --build-dir=tmp --prefix=. --build-type=complete --with-program_options --with-regex --with-system -j4 msvc stage
 robocopy include\boost-1_82\boost include\boost /E
+
+exit 0
