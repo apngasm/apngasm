@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(APNGASM)
 
 # If BUILD_SHARED_LIBS was set to OFF, prepare for static linking
-if (NOT BUILD_SHARED_LIBS)
+if (DEFINED BUILD_SHARED_LIBS AND NOT BUILD_SHARED_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(Boost_USE_MULTITHREADED ON)
   set(Boost_USE_STATIC_RUNTIME ON)
