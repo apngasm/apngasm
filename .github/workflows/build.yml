@@ -45,7 +45,7 @@ jobs:
               icu4c
             CMD_COMPILE: |
               cd build
-              cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
+              cmake -DBoost_USE_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
               make -j install
               zip -r9 ../release/* ../apngasm_${{github.ref_name}}_macos_AMD64.zip
             OUT_FILE_NAME: apngasm_${{github.ref_name}}_macos_AMD64.zip
