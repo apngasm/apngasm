@@ -55,7 +55,7 @@ set_target_properties(apngasm-cli
 # Link to built apngasm library
 target_link_libraries(apngasm-cli
   apngasm
-  ${Boost_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES}
+  ${Boost_LIBRARIES}
 )
 
 # Installation
