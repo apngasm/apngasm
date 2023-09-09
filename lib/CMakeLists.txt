@@ -78,8 +78,8 @@ target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${ZLIB_LIBRARIES})
 
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
-target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
-target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARY})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARIES})
 message(${PNG_VERSION_STRING})
 
 #SET(CMAKE_FIND_LIBRARY_SUFFIXES .dll.a .a .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
