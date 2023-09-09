@@ -34,9 +34,6 @@ endif ()
 find_package(Boost REQUIRED COMPONENTS program_options regex system)
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIRS})
-
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIRS})
 
