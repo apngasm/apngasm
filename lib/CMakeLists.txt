@@ -44,7 +44,7 @@ if (MSYS)
 endif ()
 
 # Add the dynamic/shared library
-set(APNGASM_DYNAMIC_LIB_TARGET apngasm-dynamic)
+set(APNGASM_DYNAMIC_LIB_TARGET apngasm)
 add_library(${APNGASM_DYNAMIC_LIB_TARGET} SHARED
   ${APNGASM_SOURCES}
 )
@@ -71,24 +71,22 @@ set_target_properties(${APNGASM_STATIC_LIB_TARGET}
 #target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} stdc++fs)
 #target_link_libraries(${APNGASM_STATIC_LIB_TARGET} stdc++fs)
 
-find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR})
-target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARY})
-target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARY})
-message(${PNG_VERSION_STRING})
-
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
 target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${ZLIB_LIBRARIES})
 target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${ZLIB_LIBRARIES})
 
-#if (APPLE OR WIN32)
-#    set(Boost_USE_STATIC_LIBS ON)
-#endif ()
-#set(Boost_USE_STATIC_LIBS OFF)
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${PNG_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${PNG_LIBRARIES})
+message(${PNG_VERSION_STRING})
+
 #SET(CMAKE_FIND_LIBRARY_SUFFIXES .dll.a .a .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
 find_package(Boost REQUIRED COMPONENTS program_options regex system)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} Boost::program_options Boost::regex Boost::system)
-target_link_libraries(${APNGASM_STATIC_LIB_TARGET} Boost::program_options Boost::regex Boost::system)
+target_link_libraries(${APNGASM_DYNAMIC_LIB_TARGET} ${Boost_LIBRARIES})
+target_link_libraries(${APNGASM_STATIC_LIB_TARGET} ${Boost_LIBRARIES})
 
 get_target_property(APNGASM_DYNAMIC_LIB_TARGET_NAME ${APNGASM_DYNAMIC_LIB_TARGET} OUTPUT_NAME)
 get_target_property(APNGASM_STATIC_LIB_TARGET_NAME ${APNGASM_STATIC_LIB_TARGET} OUTPUT_NAME)

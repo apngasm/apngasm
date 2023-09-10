@@ -35,3 +35,7 @@ debian/libapngasm/
 lib/tmp
 debian/.debhelper
 .clang-format
+
+windows/boost/**
+windows/libpng/**
+windows/zlib/**

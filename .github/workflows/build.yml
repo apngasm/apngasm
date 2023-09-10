@@ -1,0 +1,100 @@
+name: Build
+on: [push]
+jobs:
+  createrelease:
+      name: Create Release
+      runs-on: [ubuntu-latest]
+      if: startsWith(github.ref, 'refs/tags/v')
+      steps:
+        - uses: ncipollo/release-action@v1
+          with:
+            token: "${{ secrets.GITHUB_TOKEN }}"
+            name: Release ${{ github.ref_name }}
+
+  build:
+    name: Build packages
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            TARGET: linux
+            ENV_COMPILE:
+              PLACEHOLDER_ENV:
+            CMD_DEPS: |
+              sudo apt-get install libpng-dev \
+              libboost-program-options-dev \
+              libboost-regex-dev \
+              libboost-system-dev \
+              libboost-filesystem-dev
+            CMD_COMPILE: |
+              cd build
+              cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
+              make -j install
+              cd ../release
+              zip -r9 apngasm_${{github.ref_name}}_linux_AMD64.zip ./*
+            OUT_FILE_NAME: release/apngasm_${{github.ref_name}}_linux_AMD64.zip
+
+          - os: macos-11
+            TARGET: macos
+            ENV_COMPILE:
+              LDFLAGS: -L/usr/local/opt/icu4c/lib
+              CPPFLAGS: -I/usr/local/opt/icu4c/include
+            CMD_DEPS: |
+              brew install cmake \
+              boost \
+              libpng \
+              lzlib \
+              icu4c
+            CMD_COMPILE: |
+              cd build
+              cmake -DBoost_USE_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../release ..
+              make -j install
+              cd ../release
+              zip -r9 apngasm_${{github.ref_name}}_macos_AMD64.zip ./*
+            OUT_FILE_NAME: release/apngasm_${{github.ref_name}}_macos_AMD64.zip
+
+          - os: windows-2019
+            TARGET: windows
+            ENV_COMPILE:
+              PLACEHOLDER_ENV:
+            CMD_DEPS: |
+              cd windows
+              .\compile_deps.bat
+            CMD_COMPILE: |
+              cd windows
+              .\compile.bat
+              cd ..\release
+              Compress-Archive -Path ./* -Destination apngasm_${{github.ref_name}}_windows_AMD64.zip
+            OUT_FILE_NAME: release/apngasm_${{github.ref_name}}_windows_AMD64.zip
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Install ${{matrix.TARGET}} dependencies:"
+        run: ${{ matrix.CMD_DEPS }}
+
+      - name: "Create directory on ${{matrix.TARGET}}:"
+        run: |
+          mkdir release
+          mkdir build
+
+      - name: "Compile on ${{matrix.TARGET}}:"
+        env: ${{ matrix.ENV_COMPILE }}
+        run: ${{ matrix.CMD_COMPILE }}
+
+      - name: Get Release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ${{ matrix.OUT_FILE_NAME }}
