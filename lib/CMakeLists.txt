@@ -54,6 +54,7 @@ set_target_properties(${APNGASM_DYNAMIC_LIB_TARGET}
   OUTPUT_NAME apngasm
   CXX_STANDARD 20
 )
+target_compile_definitions(${APNGASM_DYNAMIC_LIB_TARGET} PRIVATE apngasm_EXPORTS)
 
 # Add the static library/archive
 set(APNGASM_STATIC_LIB_TARGET apngasm-static)
@@ -63,7 +64,7 @@ add_library(${APNGASM_STATIC_LIB_TARGET}
 set_target_properties(${APNGASM_STATIC_LIB_TARGET}
   PROPERTIES
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME apngasm
+  OUTPUT_NAME apngasm-static
   CXX_STANDARD 20
 )
 
